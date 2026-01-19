@@ -8,8 +8,21 @@ import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent } from '@/components/ui/card';
 import { Loader2, UploadCloud } from 'lucide-react';
+import { cn } from '@/lib/utils';
+import Image from 'next/image';
 
-export default function ApplicationForm({ jobId, jobTitle }: { jobId: number, jobTitle: string }) {
+interface FormField {
+    id: number;
+    label: string;
+    name: string;
+    type: string;
+    required: boolean;
+    placeholder: string | null;
+    options: string | null;
+    isSystem: boolean;
+}
+
+export default function ApplicationForm({ jobId, jobTitle, fields }: { jobId: number, jobTitle: string, fields: FormField[] }) {
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [success, setSuccess] = useState(false);
     const [errorMsg, setErrorMsg] = useState('');
@@ -35,14 +48,17 @@ export default function ApplicationForm({ jobId, jobTitle }: { jobId: number, jo
         formData.append('jobId', jobId.toString());
 
         try {
+            // Collect dynamic fields that are NOT system fields
+            const dynamicData: Record<string, string> = {};
+            fields.filter(f => !f.isSystem).forEach(f => {
+                const value = formData.get(f.name);
+                if (value) dynamicData[f.name] = value.toString();
+            });
+            formData.append('dynamicData', JSON.stringify(dynamicData));
+
             const result = await submitApplication(null, formData);
             if (result?.error) {
                 setErrorMsg(result.error);
-                if (result.fieldErrors) {
-                    console.error(result.fieldErrors);
-                    // Could map errors to UI here if needed, showing generic for now
-                    setErrorMsg("Please check the required fields.");
-                }
             } else if (result?.success) {
                 setSuccess(true);
             }
@@ -59,7 +75,7 @@ export default function ApplicationForm({ jobId, jobTitle }: { jobId: number, jo
                 <CardContent className="pt-6 text-center">
                     <h3 className="text-2xl font-bold text-green-700 mb-2">Application Submitted!</h3>
                     <p className="text-green-600">
-                        Thank you for applying to <strong>{jobTitle}</strong>. 
+                        Thank you for applying to <strong>{jobTitle}</strong>.
                         We have received your application and will review it shortly.
                     </p>
                 </CardContent>
@@ -67,198 +83,127 @@ export default function ApplicationForm({ jobId, jobTitle }: { jobId: number, jo
         );
     }
 
+    // Helper to render field inputs
+    const renderField = (field: FormField) => {
+        const commonProps = {
+            id: field.name,
+            name: field.name,
+            required: field.required,
+            placeholder: field.placeholder || undefined,
+            className: "h-11 clay-input bg-white/50"
+        };
+
+        switch (field.type) {
+            case 'textarea':
+                return <Textarea {...commonProps} className="min-h-[120px] clay-input bg-white/50" />;
+            case 'select':
+                return (
+                    <select {...commonProps} className={cn("flex w-full rounded-md border border-input px-3 py-2 text-sm ring-offset-background clay-input bg-white/50", commonProps.className)}>
+                        <option value="">Select {field.label}</option>
+                        {field.options?.split(',').map(opt => (
+                            <option key={opt.trim()} value={opt.trim()}>{opt.trim()}</option>
+                        ))}
+                    </select>
+                );
+            case 'radio':
+                return (
+                    <div className="flex flex-wrap gap-4 pt-1">
+                        {field.options?.split(',').map(opt => (
+                            <label key={opt.trim()} className="flex items-center space-x-2 cursor-pointer bg-white/40 px-3 py-1.5 rounded-lg border border-transparent hover:border-primary/20 transition-all">
+                                <input type="radio" name={field.name} value={opt.trim()} className="accent-primary h-4 w-4" required={field.required} />
+                                <span className="text-sm font-medium text-slate-700">{opt.trim()}</span>
+                            </label>
+                        ))}
+                    </div>
+                );
+            case 'file':
+                if (field.name === 'photo') {
+                    return (
+                        <div className="border-2 border-dashed border-primary/20 bg-primary/5 rounded-xl p-6 text-center hover:bg-primary/10 transition-colors relative group">
+                            <input
+                                {...commonProps}
+                                type="file"
+                                accept="image/*"
+                                className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
+                                onChange={handlePhotoChange}
+                            />
+                            {photoPreview ? (
+                                <div className="relative inline-block">
+                                    <img src={photoPreview} alt="Preview" className="mx-auto h-32 w-32 object-cover rounded-full border-4 border-white shadow-md relative z-0" />
+                                    <div className="absolute inset-0 bg-black/40 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                                        <UploadCloud className="text-white h-8 w-8" />
+                                    </div>
+                                </div>
+                            ) : (
+                                <div className="flex flex-col items-center justify-center text-muted-foreground">
+                                    <div className="bg-white p-3 rounded-full shadow-sm mb-3">
+                                        <UploadCloud className="h-6 w-6 text-primary" />
+                                    </div>
+                                    <span className="text-sm font-medium text-primary">Upload Photo</span>
+                                    <span className="text-xs mt-1 opacity-70">Click or drag image</span>
+                                </div>
+                            )}
+                        </div>
+                    );
+                } else {
+                    return (
+                        <Input {...commonProps} type="file" className="file:bg-primary/10 file:text-primary file:border-0 file:rounded-lg file:mr-4 file:px-4 file:py-1 hover:file:bg-primary/20 transition-all cursor-pointer pt-2" />
+                    )
+                }
+            default: // text, email, number, date
+                return <Input {...commonProps} type={field.type === 'phone' ? 'tel' : field.type} />;
+        }
+    };
+
     return (
-        <Card className="bg-white">
-            <CardContent className="pt-8 px-8">
-                <div className="mb-6">
-                    <h2 className="text-2xl font-bold text-slate-800">Apply for this position</h2>
-                    <p className="text-sm text-slate-500 mt-1">
-                        Please complete this form with accurate and verified data. Ensure that all information provided is truthful and correct.
+        <Card className="clay-card border-none overflow-hidden">
+            <div className="h-2 bg-gradient-to-r from-cyan-400 to-blue-500" />
+            <CardContent className="pt-8 px-6 sm:px-10">
+                <div className="mb-8 text-center">
+                    <h2 className="text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-slate-700 to-slate-900 mb-2">Apply Now</h2>
+                    <p className="text-muted-foreground max-w-lg mx-auto">
+                        Please complete the form below. Fields marked with <span className="text-destructive">*</span> are required.
                     </p>
                 </div>
 
                 {errorMsg && (
-                    <div className="bg-red-50 text-red-600 p-3 rounded-md mb-6 text-sm">
-                        {errorMsg}
+                    <div className="bg-destructive/10 text-destructive p-4 rounded-xl mb-8 text-sm flex items-center border border-destructive/20">
+                        <span className="text-lg mr-2">⚠️</span> {errorMsg}
                     </div>
                 )}
 
                 <form onSubmit={handleSubmit} className="space-y-6">
-                    {/* Photo Upload */}
-                    <div className="space-y-2">
-                        <Label>Your Photo</Label>
-                        <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center hover:bg-gray-50 transition-colors relative">
-                            <input 
-                                type="file" 
-                                name="photo" 
-                                accept="image/jpeg,image/png,image/gif"
-                                className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
-                                onChange={handlePhotoChange}
-                            />
-                            {photoPreview ? (
-                                <img src={photoPreview} alt="Preview" className="mx-auto h-32 w-32 object-cover rounded-md" />
-                            ) : (
-                                <div className="flex flex-col items-center justify-center text-gray-400">
-                                    <UploadCloud className="h-8 w-8 mb-2" />
-                                    <span className="text-sm font-medium text-blue-600">Drop files here or click to upload</span>
-                                    <span className="text-xs mt-1">Maximum allowed file size is 10 MB.</span>
-                                </div>
+                    {fields.map(field => (
+                        <div key={field.id} className={cn("space-y-2 animate-in fade-in slide-in-from-bottom-2 duration-500", `fill-mode-backwards delay-[${field.id * 50}ms]`)}>
+                            {field.type !== 'file' && (
+                                <Label htmlFor={field.name} className="text-base font-medium text-slate-700">
+                                    {field.label} {field.required && <span className="text-destructive">*</span>}
+                                </Label>
                             )}
+                            {field.type === 'file' && field.name !== 'photo' && (
+                                <Label htmlFor={field.name} className="text-base font-medium text-slate-700">
+                                    {field.label} {field.required && <span className="text-destructive">*</span>}
+                                </Label>
+                            )}
+                            {renderField(field)}
                         </div>
-                        <p className="text-xs text-gray-400">Allowed Type(s): .jpg, .jpeg, .png, .gif</p>
-                    </div>
+                    ))}
 
-                    {/* Personal Info */}
-                    <div className="space-y-2">
-                        <Label htmlFor="fullName">Full Name <span className="text-red-500">*</span></Label>
-                        <Input id="fullName" name="fullName" required className="h-10" />
-                    </div>
-
-                    <div className="space-y-2">
-                        <Label htmlFor="nid">NID <span className="text-red-500">*</span></Label>
-                        <Input id="nid" name="nid" required placeholder="NID must be 10, 13 or 17 digit long" className="h-10" />
-                    </div>
-
-                    <div className="space-y-2">
-                        <Label htmlFor="dob">Date of Birth <span className="text-red-500">*</span></Label>
-                        <Input id="dob" name="dob" type="date" required className="h-10" />
-                    </div>
-
-                    <div className="space-y-2">
-                        <Label>Gender <span className="text-red-500">*</span></Label>
-                        <div className="flex gap-6 pt-1">
-                            {['Male', 'Female', 'Other', 'Rather not Mention'].map((g) => (
-                                <label key={g} className="flex items-center space-x-2 cursor-pointer">
-                                    <input type="radio" name="gender" value={g} className="accent-rose-500 h-4 w-4" required />
-                                    <span className="text-sm text-gray-700">{g}</span>
-                                </label>
-                            ))}
-                        </div>
-                    </div>
-
-                    <div className="space-y-2">
-                        <Label htmlFor="mobile">Mobile No <span className="text-red-500">*</span></Label>
-                        <Input id="mobile" name="mobile" required placeholder="Phone Number" className="h-10" />
-                    </div>
-
-                    <div className="space-y-2">
-                        <Label htmlFor="email">Email <span className="text-red-500">*</span></Label>
-                        <Input id="email" name="email" type="email" required placeholder="Email Address" className="h-10" />
-                    </div>
-
-                    <div className="space-y-2">
-                        <Label htmlFor="experience">Experience <span className="text-red-500">*</span></Label>
-                        <select id="experience" name="experience" className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background" required>
-                            <option value="">Select Experience</option>
-                            <option value="Less than 1 Year">Less than 1 Year</option>
-                            <option value="1-3 Years">1-3 Years</option>
-                            <option value="3-5 Years">3-5 Years</option>
-                            <option value="5+ Years">5+ Years</option>
-                        </select>
-                    </div>
-
-                    <div className="space-y-2">
-                        <Label htmlFor="currentSalary">Current Salary</Label>
-                        <Input id="currentSalary" name="currentSalary" className="h-10" />
-                    </div>
-
-                    <div className="space-y-2">
-                        <Label htmlFor="expectedSalary">Expected Salary</Label>
-                        <Input id="expectedSalary" name="expectedSalary" className="h-10" />
-                    </div>
-
-                    <div className="space-y-2">
-                        <Label htmlFor="education">Latest Education Qualification <span className="text-red-500">*</span></Label>
-                        <select id="education" name="education" className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background" required>
-                            <option value="">Select Education</option>
-                            <option value="PhD">PhD</option>
-                            <option value="Masters">Masters</option>
-                            <option value="Bachelor">Bachelor</option>
-                            <option value="Diploma">Diploma</option>
-                            <option value="HSC">HSC</option>
-                            <option value="SSC">SSC</option>
-                        </select>
-                    </div>
-
-                    <div className="space-y-2">
-                        <Label htmlFor="source">Recruitment Source <span className="text-red-500">*</span></Label>
-                        <select id="source" name="source" className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background" required>
-                            <option value="">Select Source</option>
-                            <option value="Linkedin">Linkedin</option>
-                            <option value="Bdjobs">Bdjobs</option>
-                            <option value="Facebook">Facebook</option>
-                            <option value="Website">Website</option>
-                            <option value="Referral">Referral</option>
-                        </select>
-                    </div>
-
-                     <div className="space-y-2">
-                        <Label htmlFor="objective">Career Objective <span className="text-red-500">*</span></Label>
-                        <Textarea id="objective" name="objective" required placeholder="Write your objective here" className="min-h-[100px]" />
-                    </div>
-
-                    {/* Resume Upload */}
-                    <div className="space-y-2">
-                        <Label htmlFor="resume">Upload CV/Resume <span className="text-red-500">*</span></Label>
-                        <div className="flex items-center gap-2">
-                             <Input id="resume" name="resume" type="file" accept=".pdf,.doc,.docx" required className="cursor-pointer text-sm file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-xs file:font-semibold file:bg-violet-50 file:text-violet-700 hover:file:bg-violet-100" />
-                        </div>
-                        <p className="text-xs text-gray-400">Allowed Type(s): .pdf, .doc, .docx</p>
-                    </div>
-
-                     <div className="space-y-2">
-                        <Label htmlFor="achievements">Achievement (Related to Career and Study)</Label>
-                        <Textarea id="achievements" name="achievements" className="min-h-[100px]" />
-                    </div>
-
-                    <div className="space-y-2">
-                        <Label htmlFor="message">Your Message (If Any)</Label>
-                        <Textarea id="message" name="message" className="min-h-[100px]" />
-                    </div>
-
-                    {/* Social Links */}
-                    <div className="space-y-4 pt-2">
-                        <div className="space-y-2">
-                            <Label htmlFor="linkedin">Linkedin Profile</Label>
-                            <Input id="linkedin" name="linkedin" />
-                        </div>
-                        <div className="space-y-2">
-                            <Label htmlFor="facebook">Facebook Profile</Label>
-                            <Input id="facebook" name="facebook" placeholder="www.facebook.com/username" />
-                        </div>
-                         <div className="space-y-2">
-                            <Label htmlFor="portfolio">Personal Website/Portfolio/Github</Label>
-                            <Input id="portfolio" name="portfolio" placeholder="www.example.com" />
-                        </div>
-                    </div>
-
-                    <div className="flex items-start space-x-2 pt-4">
-                        <input type="checkbox" id="agreement" name="agreement" required className="mt-1 h-4 w-4 rounded border-gray-300 text-rose-600 focus:ring-rose-500" />
-                        <label htmlFor="agreement" className="text-sm text-gray-600 leading-tight">
-                            By using this form you agree with the storage and handling of your data by this website. <span className="text-red-500">*</span>
+                    <div className="flex items-start space-x-3 pt-4 pb-4">
+                        <input type="checkbox" id="agreement" name="agreement" required className="mt-1 h-5 w-5 rounded border-gray-300 text-primary focus:ring-primary cursor-pointer accent-primary" />
+                        <label htmlFor="agreement" className="text-sm text-slate-600 leading-tight cursor-pointer select-none">
+                            By using this form you agree with the storage and handling of your data by this website. <span className="text-destructive">*</span>
                         </label>
                     </div>
 
-                     {/* Captcha Placeholder */}
-                     <div className="bg-gray-100 border p-3 rounded-md flex items-center justify-between w-64">
-                        <div className="flex items-center gap-2">
-                            <input type="checkbox" className="h-6 w-6" disabled checked/>
-                            <span className="text-sm text-gray-600">I'm not a robot</span>
-                        </div>
-                        <div className="flex flex-col items-center">
-                            <img src="https://www.gstatic.com/recaptcha/api2/logo_48.png" className="w-8 opacity-50" alt=""/>
-                            <span className="text-[10px] text-gray-400">reCAPTCHA</span>
-                        </div>
-                     </div>
-
-                    <Button type="submit" className="w-32 bg-rose-500 hover:bg-rose-600 text-white" disabled={isSubmitting}>
+                    <Button type="submit" size="lg" className="w-full text-lg h-14 font-semibold shadow-lg hover:shadow-xl transition-all clay-button bg-primary hover:bg-primary/90" disabled={isSubmitting}>
                         {isSubmitting ? (
                             <>
-                                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                                Sending...
+                                <Loader2 className="mr-2 h-5 w-5 animate-spin" />
+                                Submitting Application...
                             </>
                         ) : (
-                            'Submit'
+                            'Submit Application'
                         )}
                     </Button>
                 </form>
@@ -266,3 +211,4 @@ export default function ApplicationForm({ jobId, jobTitle }: { jobId: number, jo
         </Card>
     );
 }
+

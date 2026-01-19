@@ -4,6 +4,7 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 import { Button } from '@/components/ui/button';
+import { Switch } from '@/components/ui/switch';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { useState } from 'react';
@@ -11,18 +12,18 @@ import dynamic from 'next/dynamic';
 import { createJobAction, updateJobAction } from '@/lib/job-actions';
 import { Department, JobType, Location } from '@prisma/client'; // Import types
 
-const Tiptap = dynamic(() => import('@/components/ui/tiptap'), { ssr: false });
+const RichTextEditor = dynamic(() => import('@/components/ui/rich-text-editor'), { ssr: false });
 
 const jobSchema = z.object({
-  title: z.string().min(2, 'Title must be at least 2 characters'),
-  description: z.string().min(10, 'Description must be at least 10 characters'),
-  departmentId: z.string().min(1, 'Please select a department'),
-  typeId: z.string().min(1, 'Please select a job type'),
-  locationId: z.string().min(1, 'Please select a location'),
-  expiryDate: z.string().refine((date) => new Date(date) > new Date(), {
-     message: "Expiry date must be in the future"
-  }),
-  isDraft: z.boolean().optional(),
+    title: z.string().min(2, 'Title must be at least 2 characters'),
+    description: z.string().min(10, 'Description must be at least 10 characters'),
+    departmentId: z.string().min(1, 'Please select a department'),
+    typeId: z.string().min(1, 'Please select a job type'),
+    locationId: z.string().min(1, 'Please select a location'),
+    expiryDate: z.string().refine((date) => new Date(date) > new Date(), {
+        message: "Expiry date must be in the future"
+    }),
+    status: z.string().min(1, 'Please select a status'),
 });
 
 type JobFormValues = z.infer<typeof jobSchema>;
@@ -35,8 +36,13 @@ interface AddJobFormProps {
     jobId?: number;
 }
 
+import { useRouter } from 'next/navigation';
+
+// ...
+
 export default function AddJobForm({ departments, jobTypes, locations, initialData, jobId }: AddJobFormProps) {
     const [loading, setLoading] = useState(false);
+    const router = useRouter(); // Initialize router
     const form = useForm<JobFormValues>({
         resolver: zodResolver(jobSchema),
         defaultValues: initialData || {
@@ -45,16 +51,17 @@ export default function AddJobForm({ departments, jobTypes, locations, initialDa
             departmentId: '',
             typeId: '',
             locationId: '',
-            isDraft: false
+            status: 'Active'
         }
     });
 
-    const { register, handleSubmit, setValue, formState: { errors } } = form;
+    const { register, handleSubmit, setValue, watch, formState: { errors } } = form;
+    const status = watch('status');
 
     const onSubmit = async (data: JobFormValues) => {
         setLoading(true);
         console.log("Submitting Job:", data);
-        
+
         try {
             let result;
             if (jobId) {
@@ -63,15 +70,21 @@ export default function AddJobForm({ departments, jobTypes, locations, initialDa
                 result = await createJobAction(data);
             }
 
+            if (result?.success) { // Handle success
+                router.push('/admin/dashboard/job-recruitment/job-list');
+                router.refresh();
+                return;
+            }
+
             if (result?.error) {
                 alert(result.error);
-                 if (result.fieldErrors) {
+                if (result.fieldErrors) {
                     console.error(result.fieldErrors);
-                 }
+                }
             }
         } catch (e) {
-            alert("An unexpected error occurred.");
             console.error(e);
+            alert("An unexpected error occurred.");
         } finally {
             setLoading(false);
         }
@@ -83,7 +96,25 @@ export default function AddJobForm({ departments, jobTypes, locations, initialDa
                 <CardTitle>{jobId ? 'Edit Job' : 'Job Details'}</CardTitle>
             </CardHeader>
             <CardContent>
-                <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+                <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+                    {/* Status Toggle moved to top */}
+                    <div className="flex items-center justify-between bg-slate-50 p-4 rounded-lg border border-slate-100 mb-6">
+                        <div className="space-y-0.5">
+                            <label className="text-base font-medium text-slate-900">Job Status</label>
+                            <p className="text-sm text-slate-500">
+                                {status === 'Active' ? 'This job is visible to candidates.' : 'This job is hidden from the public.'}
+                            </p>
+                        </div>
+                        <div className="flex items-center gap-3">
+                            <span className={`text-sm font-medium ${status === 'Active' ? 'text-slate-400' : 'text-slate-900'}`}>Inactive</span>
+                            <Switch
+                                checked={status === 'Active'}
+                                onCheckedChange={(checked) => setValue('status', checked ? 'Active' : 'Inactive')}
+                            />
+                            <span className={`text-sm font-medium ${status === 'Active' ? 'text-green-600' : 'text-slate-400'}`}>Active</span>
+                        </div>
+                    </div>
+
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div className="space-y-2">
                             <label className="text-sm font-medium">Job Title</label>
@@ -98,7 +129,7 @@ export default function AddJobForm({ departments, jobTypes, locations, initialDa
                     </div>
 
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                         <div className="space-y-2">
+                        <div className="space-y-2">
                             <label className="text-sm font-medium">Department</label>
                             <select {...register('departmentId')} className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50">
                                 <option value="">Select Department</option>
@@ -108,7 +139,7 @@ export default function AddJobForm({ departments, jobTypes, locations, initialDa
                             </select>
                             {errors.departmentId && <p className="text-red-500 text-sm">{errors.departmentId.message}</p>}
                         </div>
-                         <div className="space-y-2">
+                        <div className="space-y-2">
                             <label className="text-sm font-medium">Job Type</label>
                             <select {...register('typeId')} className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50">
                                 <option value="">Select Type</option>
@@ -118,7 +149,7 @@ export default function AddJobForm({ departments, jobTypes, locations, initialDa
                             </select>
                             {errors.typeId && <p className="text-red-500 text-sm">{errors.typeId.message}</p>}
                         </div>
-                         <div className="space-y-2">
+                        <div className="space-y-2">
                             <label className="text-sm font-medium">Location</label>
                             <select {...register('locationId')} className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50">
                                 <option value="">Select Location</option>
@@ -132,17 +163,18 @@ export default function AddJobForm({ departments, jobTypes, locations, initialDa
 
                     <div className="space-y-2">
                         <label className="text-sm font-medium">Job Description</label>
-                        <Tiptap content={initialData?.description || ""} onChange={(content) => setValue('description', content)} />
-                         {errors.description && <p className="text-red-500 text-sm">{errors.description.message}</p>}
+                        <RichTextEditor
+                            value={form.watch('description') || ""}
+                            onChange={(content) => setValue('description', content)}
+                            placeholder="Write the job description here..."
+                        />
+                        {errors.description && <p className="text-red-500 text-sm">{errors.description.message}</p>}
                     </div>
 
-                     <div className="flex items-center space-x-2">
-                         <input type="checkbox" {...register('isDraft')} id="isDraft" className="h-4 w-4" />
-                         <label htmlFor="isDraft" className="text-sm font-medium">Save as Draft</label>
-                     </div>
+
 
                     <div className="flex justify-end space-x-4">
-                        <Button type="button" variant="outline">Cancel</Button>
+                        <Button type="button" variant="outline" onClick={() => router.push('/admin/dashboard/job-recruitment/job-list')}>Cancel</Button>
                         <Button type="submit" disabled={loading}>
                             {loading ? (jobId ? 'Updating...' : 'Saving...') : (jobId ? 'Update Job' : 'Publish Job')}
                         </Button>

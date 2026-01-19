@@ -17,41 +17,45 @@ model Admin {
 }
 
 model Department {
-  id   Int    @id @default(autoincrement())
-  name String @unique
-  jobs Job[]
+  id       Int     @id @default(autoincrement())
+  name     String  @unique
+  isSystem Boolean @default(false)
+  jobs     Job[]
 }
 
 model JobType {
-  id   Int    @id @default(autoincrement())
-  name String @unique
-  jobs Job[]
+  id       Int     @id @default(autoincrement())
+  name     String  @unique
+  isSystem Boolean @default(false)
+  jobs     Job[]
 }
 
 model Location {
-  id   Int    @id @default(autoincrement())
-  name String @unique
-  jobs Job[]
+  id       Int     @id @default(autoincrement())
+  name     String  @unique
+  isSystem Boolean @default(false)
+  jobs     Job[]
 }
 
 model Job {
-  id           Int           @id @default(autoincrement())
+  id           Int         @id @default(autoincrement())
   title        String
-  description  String        @db.Text
-  departmentId Int
-  department   Department    @relation(fields: [departmentId], references: [id])
-  typeId       Int
-  jobType      JobType       @relation(fields: [typeId], references: [id])
-  locationId   Int
-  location     Location      @relation(fields: [locationId], references: [id])
-  expiryDate   DateTime
+  description  String      @db.Text
+  departmentId Int?
+  department   Department? @relation(fields: [departmentId], references: [id])
+  typeId       Int?
+  jobType      JobType?    @relation(fields: [typeId], references: [id])
+  locationId   Int?
+  location     Location?   @relation(fields: [locationId], references: [id])
+  expiryDate   DateTime?
+  slug         String      @unique @default(cuid()) // Temporary default using cuid to pass migration, can be updated later.
   salaryRange  String?
-  status       String        @default("Active") // Active, On Hold, Expired, Closed
-  isDraft      Boolean       @default(false)
+  status       String      @default("Active") // Active, On Hold, Expired, Closed
+  isDraft      Boolean     @default(false)
   positionFilled Int         @default(0)
-  views        Int           @default(0)
-  createdAt    DateTime      @default(now())
-  updatedAt    DateTime      @updatedAt
+  views        Int         @default(0)
+  createdAt    DateTime    @default(now())
+  updatedAt    DateTime    @updatedAt
   applications Application[]
 }
 
@@ -82,4 +86,28 @@ model Application {
   notes          String?  @db.Text
   createdAt      DateTime @default(now())
   updatedAt      DateTime @updatedAt
+  dynamicData    Json?    // Stores values for custom dynamic fields
+}
+
+model FormField {
+  id          Int      @id @default(autoincrement())
+  label       String
+  name        String   @unique
+  type        String   // text, number, date, file, textarea, select
+  required    Boolean  @default(false)
+  placeholder String?
+  order       Int      @default(0)
+  options     String?  // For select/radio types (comma separated or JSON)
+  isSystem    Boolean  @default(false) // True for core fields (Name, Email, etc.)
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model SystemSettings {
+  id        Int      @id @default(autoincrement())
+  key       String   @unique // e.g., 'company_logo', 'company_name'
+  value     String   @db.Text
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }

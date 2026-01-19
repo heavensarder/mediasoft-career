@@ -3,31 +3,41 @@
 import { z } from 'zod';
 import { PrismaClient } from '@prisma/client';
 import { revalidatePath } from 'next/cache';
-import { redirect } from 'next/navigation';
+import slugify from 'slugify';
 
 const prisma = new PrismaClient();
 
 const JobSchema = z.object({
-  title: z.string().min(2),
-  description: z.string().min(10),
-  departmentId: z.coerce.number(),
-  typeId: z.coerce.number(),
-  locationId: z.coerce.number(),
-  expiryDate: z.string(),
-  isDraft: z.boolean().optional(),
+    title: z.string().min(2),
+    description: z.string().min(10),
+    departmentId: z.coerce.number().optional().nullable().transform(val => val || null),
+    typeId: z.coerce.number().optional().nullable().transform(val => val || null),
+    locationId: z.coerce.number().optional().nullable().transform(val => val || null),
+    expiryDate: z.string().optional().nullable(),
+    status: z.string().optional(),
 });
 
-export async function createJob(prevState: any, formData: FormData) {
-    // Validate fields using Zod
-    // We need to reconstruct the object from formData manually because of the rich text/checkbox quirks
-    
-    // Note: React Hook Form usually handles this on client, but for server actions we can accept raw data 
-    // OR we can pass the data directly if we use the client component to call this action.
-    // For simplicity with the existing client form, let's assume we pass the data object directly.
-    return { message: 'Use client-side submission for this rich form' };
+async function generateUniqueSlug(title: string, ignoreJobId?: number) {
+    let slug = slugify(title, { lower: true, strict: true });
+    let uniqueSlug = slug;
+    let count = 1;
+
+    while (true) {
+        const existing = await prisma.job.findUnique({
+            where: { slug: uniqueSlug } as any,
+            select: { id: true }
+        });
+
+        // If no job has this slug, OR the job that has it is the one we are ignoring (updating), it's safe
+        if (!existing || (ignoreJobId && existing.id === ignoreJobId)) {
+            return uniqueSlug;
+        }
+
+        uniqueSlug = `${slug}-${count}`;
+        count++;
+    }
 }
 
-// Actual action called from Client Component
 export async function createJobAction(data: any) {
     const validatedFields = JobSchema.safeParse(data);
 
@@ -38,20 +48,26 @@ export async function createJobAction(data: any) {
         };
     }
 
-    const { title, description, departmentId, typeId, locationId, expiryDate, isDraft } = validatedFields.data;
+    const { title, description, departmentId, typeId, locationId, expiryDate, status } = validatedFields.data;
 
     try {
+        const slug = await generateUniqueSlug(title);
+
+        // If status is Inactive, clear expiry date. Otherwise parse if present.
+        const finalExpiryDate = status === 'Inactive' ? null : (expiryDate ? new Date(expiryDate) : null);
+
         await prisma.job.create({
             data: {
                 title,
                 description,
-                departmentId,
-                typeId,
-                locationId,
-                expiryDate: new Date(expiryDate),
-                status: isDraft ? 'On Hold' : 'Active',
-                isDraft: isDraft || false,
-            },
+                departmentId: departmentId as any,
+                typeId: typeId as any,
+                locationId: locationId as any,
+                expiryDate: finalExpiryDate as any,
+                status: status || 'Active',
+                isDraft: status === 'Inactive',
+                slug,
+            } as any,
         });
     } catch (error) {
         console.error("Database Error:", error);
@@ -60,20 +76,20 @@ export async function createJobAction(data: any) {
 
     revalidatePath('/admin/dashboard/job-recruitment/job-list');
     revalidatePath('/'); // Update landing page
-    redirect('/admin/dashboard/job-recruitment/job-list');
+    return { success: true };
 }
 
 export async function deleteJobAction(id: number) {
-  try {
-    await prisma.job.delete({
-      where: { id },
-    });
-    revalidatePath('/admin/dashboard/job-recruitment/job-list');
-    return { success: true };
-  } catch (error) {
-    console.error("Database Error:", error);
-    return { error: "Failed to delete job." };
-  }
+    try {
+        await prisma.job.delete({
+            where: { id },
+        });
+        revalidatePath('/admin/dashboard/job-recruitment/job-list');
+        return { success: true };
+    } catch (error) {
+        console.error("Database Error:", error);
+        return { error: "Failed to delete job." };
+    }
 }
 
 export async function updateJobAction(id: number, data: any) {
@@ -86,21 +102,27 @@ export async function updateJobAction(id: number, data: any) {
         };
     }
 
-    const { title, description, departmentId, typeId, locationId, expiryDate, isDraft } = validatedFields.data;
+    const { title, description, departmentId, typeId, locationId, expiryDate, status } = validatedFields.data;
 
     try {
+        const slug = await generateUniqueSlug(title, id);
+
+        // If status is Inactive, clear expiry date. Otherwise parse if present.
+        const finalExpiryDate = status === 'Inactive' ? null : (expiryDate ? new Date(expiryDate) : null);
+
         await prisma.job.update({
             where: { id },
             data: {
                 title,
                 description,
-                departmentId,
-                typeId,
-                locationId,
-                expiryDate: new Date(expiryDate),
-                status: isDraft ? 'On Hold' : 'Active',
-                isDraft: isDraft || false,
-            },
+                departmentId: departmentId as any,
+                typeId: typeId as any,
+                locationId: locationId as any,
+                expiryDate: finalExpiryDate as any,
+                status: status || 'Active',
+                isDraft: status === 'Inactive',
+                slug,
+            } as any,
         });
     } catch (error) {
         console.error("Database Error:", error);
@@ -109,6 +131,6 @@ export async function updateJobAction(id: number, data: any) {
 
     revalidatePath('/admin/dashboard/job-recruitment/job-list');
     revalidatePath(`/admin/dashboard/job-recruitment/edit-job/${id}`);
-    revalidatePath('/'); 
-    redirect('/admin/dashboard/job-recruitment/job-list');
+    revalidatePath('/');
+    return { success: true };
 }

@@ -2,28 +2,28 @@ import Link from 'next/link';
 import { PrismaClient } from '@prisma/client';
 import { Button } from '@/components/ui/button';
 import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
+    Table,
+    TableBody,
+    TableCell,
+    TableHead,
+    TableHeader,
+    TableRow,
 } from "@/components/ui/table"
 import { Badge } from "@/components/ui/badge";
-import { 
-    PlusCircle, 
-    MoreHorizontal, 
-    Eye, 
-    Edit, 
-    Trash2 
+import {
+    PlusCircle,
+    MoreHorizontal,
+    Eye,
+    Edit,
+    Trash2
 } from 'lucide-react';
 import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuLabel,
+    DropdownMenuSeparator,
+    DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import JobActions from '@/components/admin/JobActions';
 
@@ -44,66 +44,84 @@ async function getJobs() {
 }
 
 export default async function JobListPage() {
-  const jobs = await getJobs();
+    const jobs = await getJobs();
 
-  return (
-    <div className="space-y-6">
-      <div className="flex justify-between items-center">
-        <h1 className="text-3xl font-bold tracking-tight">Job List</h1>
-        <Link href="/admin/dashboard/job-recruitment/add-new-job">
-            <Button>
-                <PlusCircle className="mr-2 h-4 w-4" />
-                Add New Job
-            </Button>
-        </Link>
-      </div>
+    return (
+        <div className="space-y-6">
+            <div className="flex justify-between items-center">
+                <h1 className="text-3xl font-bold tracking-tight text-slate-900">Job List</h1>
+                <Link href="/admin/dashboard/job-recruitment/add-new-job">
+                    <Button className="clay-button shadow-md hover:shadow-lg transition-all">
+                        <PlusCircle className="mr-2 h-4 w-4" />
+                        Add New Job
+                    </Button>
+                </Link>
+            </div>
 
-      <div className="rounded-md border bg-white">
-          <Table>
-            <TableHeader>
-                <TableRow>
-                <TableHead>Job Title</TableHead>
-                <TableHead>Department</TableHead>
-                <TableHead>Type</TableHead>
-                <TableHead>Status</TableHead>
-                <TableHead>Applications</TableHead>
-                <TableHead>Expiry Date</TableHead>
-                <TableHead className="text-right">Actions</TableHead>
-                </TableRow>
-            </TableHeader>
-            <TableBody>
-                {jobs.length === 0 ? (
-                    <TableRow>
-                        <TableCell colSpan={7} className="text-center py-10 text-gray-500">
-                            No jobs found. Create your first job posting!
-                        </TableCell>
-                    </TableRow>
-                ) : (
-                    jobs.map((job) => (
-                        <TableRow key={job.id}>
-                            <TableCell className="font-medium">
-                                <div>{job.title}</div>
-                                <div className="text-xs text-gray-500">ID: #{job.id}</div>
-                            </TableCell>
-                            <TableCell>{job.department.name}</TableCell>
-                            <TableCell>
-                                <Badge variant="outline">{job.jobType.name}</Badge>
-                            </TableCell>
-                            <TableCell>
-                                <Badge variant={job.status === 'Active' ? 'default' : 'secondary'}>
-                                    {job.status}
-                                </Badge>
-                            </TableCell>
-                            <TableCell>{job._count.applications}</TableCell>
-                            <TableCell>{new Date(job.expiryDate).toLocaleDateString()}</TableCell>
-                            <TableCell className="text-right">
-                                <JobActions jobId={job.id} />
-                            </TableCell>
-                        </TableRow>
-                )))}
-            </TableBody>
-            </Table>
-      </div>
-    </div>
-  );
+            <div className="clay-card bg-white p-6 overflow-hidden">
+                <div className="rounded-xl border border-slate-100 overflow-hidden">
+                    <Table>
+                        <TableHeader className="bg-slate-50">
+                            <TableRow>
+                                <TableHead className="font-semibold text-slate-700">Job Title</TableHead>
+                                <TableHead className="font-semibold text-slate-700">Department</TableHead>
+                                <TableHead className="font-semibold text-slate-700">Type</TableHead>
+                                <TableHead className="font-semibold text-slate-700">Status</TableHead>
+                                <TableHead className="font-semibold text-slate-700">Views</TableHead>
+                                <TableHead className="font-semibold text-slate-700">Applications</TableHead>
+                                <TableHead className="font-semibold text-slate-700">Expiry Date</TableHead>
+                                <TableHead className="text-right font-semibold text-slate-700">Actions</TableHead>
+                            </TableRow>
+                        </TableHeader>
+                        <TableBody>
+                            {jobs.length === 0 ? (
+                                <TableRow>
+                                    <TableCell colSpan={8} className="text-center py-12 text-gray-500">
+                                        No jobs found. Create your first job posting!
+                                    </TableCell>
+                                </TableRow>
+                            ) : (
+                                jobs.map((job) => (
+                                    <TableRow key={job.id} className="hover:bg-slate-50/80 transition-colors">
+                                        <TableCell className="font-medium">
+                                            <div className="text-slate-900">{job.title}</div>
+                                            <div className="text-xs text-slate-400 font-mono">ID: #{job.id}</div>
+                                        </TableCell>
+                                        <TableCell>{job.department?.name || <span className="text-gray-400 italic">Uncategorized</span>}</TableCell>
+                                        <TableCell>
+                                            <Badge variant="outline" className="bg-slate-50">{job.jobType?.name || 'Unspecified'}</Badge>
+                                        </TableCell>
+                                        <TableCell>
+                                            <Badge className={job.status === 'Active' ? 'bg-emerald-500 hover:bg-emerald-600' : 'bg-slate-500 hover:bg-slate-600'}>
+                                                {job.status}
+                                            </Badge>
+                                        </TableCell>
+                                        <TableCell>
+                                            <div className="flex items-center gap-1.5 text-slate-600">
+                                                <Eye className="h-3.5 w-3.5 text-slate-400" />
+                                                {job.views}
+                                            </div>
+                                        </TableCell>
+                                        <TableCell>
+                                            <Badge variant="secondary" className="bg-blue-50 text-blue-700 border-blue-100">
+                                                {job._count.applications} Applicants
+                                            </Badge>
+                                        </TableCell>
+                                        <TableCell className="text-sm text-slate-600">
+                                            {job.expiryDate
+                                                ? new Date(job.expiryDate).toLocaleDateString()
+                                                : <span className="text-slate-400 italic">N/A</span>
+                                            }
+                                        </TableCell>
+                                        <TableCell className="text-right">
+                                            <JobActions jobId={job.id} jobSlug={(job as any).slug} jobTitle={job.title} />
+                                        </TableCell>
+                                    </TableRow>
+                                )))}
+                        </TableBody>
+                    </Table>
+                </div>
+            </div>
+        </div>
+    );
 }

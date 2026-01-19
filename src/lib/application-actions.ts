@@ -1,34 +1,13 @@
 'use server';
 
 import { z } from 'zod';
-import { PrismaClient, Prisma } from '@prisma/client';
+import { prisma } from '@/lib/prisma';
+import { Prisma } from '@prisma/client';
 import { revalidatePath } from 'next/cache';
-import { redirect } from 'next/navigation';
 import { writeFile, mkdir } from 'fs/promises';
 import { join } from 'path';
 
-const prisma = new PrismaClient();
-
-const ApplicationSchema = z.object({
-    jobId: z.coerce.number(),
-    fullName: z.string().min(2, "Name is required"),
-    nid: z.string().min(1, "NID is required"),
-    dob: z.string().min(1, "Date of Birth is required"),
-    gender: z.string().min(1, "Gender is required"),
-    mobile: z.string().min(1, "Mobile number is required"),
-    email: z.string().email("Invalid email address"),
-    experience: z.string().min(1, "Experience is required"),
-    currentSalary: z.string().optional(),
-    expectedSalary: z.string().optional(),
-    education: z.string().min(1, "Education is required"),
-    source: z.string().min(1, "Source is required"),
-    objective: z.string().min(1, "Career Objective is required"),
-    achievements: z.string().optional(),
-    message: z.string().optional(),
-    linkedin: z.string().optional(),
-    facebook: z.string().optional(),
-    portfolio: z.string().optional(),
-});
+const ApplicationSchema = null; // Removed static schema
 
 async function saveFile(file: File, folder: string): Promise<string> {
     if (!file || file.size === 0) return '';
@@ -37,7 +16,9 @@ async function saveFile(file: File, folder: string): Promise<string> {
     const buffer = Buffer.from(bytes);
 
     const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
-    const extension = file.name.split('.').pop() || 'bin';
+    // Sanitize filename
+    const originalName = file.name.replace(/[^a-zA-Z0-9.-]/g, '');
+    const extension = originalName.split('.').pop() || 'bin';
     const filename = `${uniqueSuffix}.${extension}`;
 
     // Ensure directory exists
@@ -47,97 +28,121 @@ async function saveFile(file: File, folder: string): Promise<string> {
         await writeFile(join(uploadDir, filename), buffer);
     } catch (e) {
         console.error("File save error:", e);
-        return '';
+        throw new Error("Failed to save file");
     }
 
     return `/${folder}/${filename}`;
 }
 
 export async function submitApplication(prevState: any, formData: FormData) {
-    const rawData = {
-        jobId: formData.get('jobId'),
-        fullName: formData.get('fullName'),
-        nid: formData.get('nid'),
-        dob: formData.get('dob'),
-        gender: formData.get('gender'),
-        mobile: formData.get('mobile'),
-        email: formData.get('email'),
-        experience: formData.get('experience'),
-        currentSalary: formData.get('currentSalary'),
-        expectedSalary: formData.get('expectedSalary'),
-        education: formData.get('education'),
-        source: formData.get('source'),
-        objective: formData.get('objective'),
-        achievements: formData.get('achievements'),
-        message: formData.get('message'),
-        linkedin: formData.get('linkedin'),
-        facebook: formData.get('facebook'),
-        portfolio: formData.get('portfolio'),
-    };
-
-    const validatedFields = ApplicationSchema.safeParse(rawData);
-
-    if (!validatedFields.success) {
-        return {
-            error: "Validation Failed",
-            fieldErrors: validatedFields.error.flatten().fieldErrors,
-        };
-    }
-
-    const data = validatedFields.data;
-
-    // File Uploads
-    const photoFile = formData.get('photo') as File;
-    const resumeFile = formData.get('resume') as File;
-
-    let photoPath = '';
-    let resumePath = '';
-
     try {
-        if (photoFile && photoFile.size > 0) {
-            photoPath = await saveFile(photoFile, 'uploads');
-        }
-        if (resumeFile && resumeFile.size > 0) {
-            resumePath = await saveFile(resumeFile, 'uploads');
-        }
-    } catch (e) {
-        console.error("File upload failed", e);
-        return { error: "Failed to upload files" };
-    }
-
-    try {
-        await prisma.application.create({
-            data: {
-                jobId: data.jobId,
-                fullName: data.fullName,
-                nid: data.nid,
-                dob: new Date(data.dob),
-                gender: data.gender,
-                mobile: data.mobile,
-                email: data.email,
-                experience: data.experience,
-                currentSalary: data.currentSalary || null,
-                expectedSalary: data.expectedSalary || null,
-                education: data.education,
-                source: data.source,
-                objective: data.objective,
-                achievements: data.achievements || null,
-                message: data.message || null,
-                linkedin: data.linkedin || null,
-                facebook: data.facebook || null,
-                portfolio: data.portfolio || null,
-                photo: photoPath || null,
-                resume: resumePath || null,
-                status: 'New',
-            },
+        // 1. Fetch Active Job Settings from DB
+        const activeFields = await prisma.formField.findMany({
+            where: { isActive: true },
         });
-    } catch (error) {
-        console.error("Database Error:", error);
-        return { error: "Database Error: Failed to submit application." };
-    }
 
-    revalidatePath('/admin/dashboard/job-recruitment/applications');
-    return { success: true };
+        const fieldErrors: Record<string, string[]> = {};
+        const dbData: any = {
+            jobId: Number(formData.get('jobId')),
+            status: 'New',
+            fullName: '',
+            nid: '',
+            dob: new Date(),
+            gender: '',
+            mobile: '',
+            email: '',
+            experience: '',
+            education: '',
+            source: '',
+            objective: '',
+            dynamicData: {}
+        };
+
+        // 2. Validate and Map Fields
+        for (const field of activeFields) {
+            const rawValue = formData.get(field.name);
+
+            // Handle Files vs Text
+            if (field.type === 'file') {
+                const file = rawValue as File;
+                if (field.required && (!file || file.size === 0)) {
+                    fieldErrors[field.name] = [`${field.label} is required`];
+                }
+                // Uploads handled after validation success
+                continue;
+            }
+
+            const value = rawValue?.toString().trim();
+
+            // Check Required
+            if (field.required && !value) {
+                fieldErrors[field.name] = [`${field.label} is required`];
+                continue;
+            }
+
+            // Basic Type Check (Email)
+            if (value && field.type === 'email') {
+                const emailSchema = z.string().email();
+                if (!emailSchema.safeParse(value).success) {
+                    fieldErrors[field.name] = [`Invalid email address`];
+                }
+            }
+
+            // Map to Database Object
+            if (value !== undefined && value !== null) { // Allow empty strings for system fields
+                if (field.isSystem) {
+                    if (field.name === 'dob') {
+                        dbData[field.name] = new Date(value);
+                    } else if (field.name === 'jobId') {
+                        // already handled
+                    } else {
+                        dbData[field.name] = value;
+                    }
+                } else {
+                    dbData.dynamicData[field.name] = value;
+                }
+            }
+        }
+
+        if (Object.keys(fieldErrors).length > 0) {
+            return {
+                error: "Please check the form for errors.",
+                fieldErrors
+            };
+        }
+
+        // 3. Handle File Uploads (Only if validation passed)
+        for (const field of activeFields) {
+            if (field.type === 'file') {
+                const file = formData.get(field.name) as File;
+                if (file && file.size > 0) {
+                    try {
+                        const path = await saveFile(file, 'uploads');
+                        if (field.isSystem) {
+                            dbData[field.name] = path;
+                        } else {
+                            dbData.dynamicData[field.name] = path;
+                        }
+                    } catch (e) {
+                        console.error(`Failed to upload ${field.name}`, e);
+                        return { error: "File upload failed. Please try again." };
+                    }
+                }
+            }
+        }
+
+        // 4. Save to Database
+        await prisma.application.create({
+            data: dbData,
+        });
+
+        revalidatePath('/admin/dashboard/job-recruitment/applications');
+        return { success: true };
+
+    } catch (error) {
+        console.error("Submit Application Error:", error);
+        return { error: "An unexpected error occurred on the server. Please try again." };
+    }
 }
 
 export async function updateApplicationStatus(applicationId: number, status: string) {

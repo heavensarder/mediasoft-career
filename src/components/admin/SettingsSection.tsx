@@ -5,8 +5,7 @@ import { useRouter } from 'next/navigation';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Badge } from "@/components/ui/badge";
-import { X, Plus, Loader2 } from "lucide-react";
+import { X, Plus, Loader2, Pencil, Save } from "lucide-react";
 
 interface Item {
     id: number;
@@ -18,25 +17,38 @@ interface SettingsSectionProps {
     description: string;
     items: Item[];
     onCreate: (formData: FormData) => Promise<{ success?: boolean; error?: string }>;
+    onUpdate: (id: number, formData: FormData) => Promise<{ success?: boolean; error?: string }>;
     onDelete: (id: number) => Promise<{ success?: boolean; error?: string }>;
 }
 
 import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-  AlertDialogTrigger,
+    AlertDialog,
+    AlertDialogAction,
+    AlertDialogCancel,
+    AlertDialogContent,
+    AlertDialogDescription,
+    AlertDialogFooter,
+    AlertDialogHeader,
+    AlertDialogTitle,
+    AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
+import {
+    Dialog,
+    DialogContent,
+    DialogHeader,
+    DialogTitle,
+    DialogTrigger,
+    DialogFooter
+} from "@/components/ui/dialog";
 
-export default function SettingsSection({ title, description, items, onCreate, onDelete }: SettingsSectionProps) {
+export default function SettingsSection({ title, description, items, onCreate, onUpdate, onDelete }: SettingsSectionProps) {
     const [newItemName, setNewItemName] = useState('');
     const [isCreating, setIsCreating] = useState(false);
     const [deletingId, setDeletingId] = useState<number | null>(null);
+    const [editingItem, setEditingItem] = useState<Item | null>(null);
+    const [editName, setEditName] = useState('');
+    const [isUpdating, setIsUpdating] = useState(false);
+
     const router = useRouter();
 
     const handleCreate = async (e: React.FormEvent) => {
@@ -48,15 +60,36 @@ export default function SettingsSection({ title, description, items, onCreate, o
         formData.append('name', newItemName);
 
         try {
-           const result = await onCreate(formData);
-           if (result.success) {
-               setNewItemName('');
-               router.refresh();
-           } else {
-               alert(result.error);
-           }
+            const result = await onCreate(formData);
+            if (result.success) {
+                setNewItemName('');
+                router.refresh();
+            } else {
+                alert(result.error);
+            }
         } finally {
             setIsCreating(false);
+        }
+    }
+
+    const handleUpdate = async () => {
+        if (!editingItem || !editName.trim()) return;
+
+        setIsUpdating(true);
+        const formData = new FormData();
+        formData.append('name', editName);
+
+        try {
+            const result = await onUpdate(editingItem.id, formData);
+            if (result.success) {
+                setEditingItem(null);
+                setEditName('');
+                router.refresh();
+            } else {
+                alert(result.error);
+            }
+        } finally {
+            setIsUpdating(false);
         }
     }
 
@@ -75,64 +108,107 @@ export default function SettingsSection({ title, description, items, onCreate, o
     }
 
     return (
-        <Card>
+        <Card className="clay-card border-none">
             <CardHeader>
-                <CardTitle>{title}</CardTitle>
-                <CardDescription>{description}</CardDescription>
+                <CardTitle className="text-2xl text-primary">{title}</CardTitle>
+                <CardDescription className="text-base">{description}</CardDescription>
             </CardHeader>
-            <CardContent className="space-y-4">
+            <CardContent className="space-y-6">
                 {/* Add Form */}
-                <form onSubmit={handleCreate} className="flex gap-2">
-                    <Input 
-                        placeholder={`Add new ${title.slice(0, -1)}`}
+                <form onSubmit={handleCreate} className="flex gap-4">
+                    <Input
+                        placeholder={`Add new ${title.slice(0, -1)}...`}
                         value={newItemName}
                         onChange={(e) => setNewItemName(e.target.value)}
                         disabled={isCreating}
+                        className="h-12 text-lg clay-input"
                     />
-                    <Button type="submit" size="icon" disabled={isCreating}>
-                        {isCreating ? <Loader2 className="h-4 w-4 animate-spin" /> : <Plus className="h-4 w-4" />}
+                    <Button type="submit" size="lg" disabled={isCreating} className="h-12 px-8 clay-button">
+                        {isCreating ? <Loader2 className="h-5 w-5 animate-spin" /> : <><Plus className="h-5 w-5 mr-2" /> Add</>}
                     </Button>
                 </form>
 
-                {/* List */}
-                <div className="flex flex-wrap gap-2">
+                {/* List - Vertical Layout */}
+                <div className="space-y-3 mt-6">
                     {items.map(item => (
-                        <div key={item.id} className="group relative">
-                            <Badge variant="secondary" className="pl-3 pr-8 py-1.5 text-base">
-                                {item.name}
-                            </Badge>
-                            
-                            <AlertDialog>
-                                <AlertDialogTrigger asChild>
-                                    <button
-                                        disabled={deletingId === item.id}
-                                        className="absolute right-1 top-1/2 -translate-y-1/2 p-0.5 rounded-full hover:bg-slate-200 text-slate-500 opacity-60 group-hover:opacity-100 transition-all"
-                                    >
-                                        {deletingId === item.id ? (
-                                            <Loader2 className="h-3 w-3 animate-spin"/>
-                                        ) : (
-                                            <X className="h-3 w-3" />
-                                        )}
-                                    </button>
-                                </AlertDialogTrigger>
-                                <AlertDialogContent>
-                                    <AlertDialogHeader>
-                                        <AlertDialogTitle>Delete {item.name}?</AlertDialogTitle>
-                                        <AlertDialogDescription>
-                                            This action cannot be undone. This will permanently delete this {title.slice(0, -1).toLowerCase()}.
-                                        </AlertDialogDescription>
-                                    </AlertDialogHeader>
-                                    <AlertDialogFooter>
-                                        <AlertDialogCancel>Cancel</AlertDialogCancel>
-                                        <AlertDialogAction onClick={() => handleDelete(item.id)}>Delete</AlertDialogAction>
-                                    </AlertDialogFooter>
-                                </AlertDialogContent>
-                            </AlertDialog>
+                        <div key={item.id} className="group flex items-center justify-between p-4 rounded-xl hover:bg-muted/30 transition-colors border border-transparent hover:border-border/50">
+                            <span className="text-lg font-medium text-foreground/90">{item.name}</span>
+
+                            <div className="flex items-center gap-2 opacity-70 group-hover:opacity-100 transition-opacity">
+                                {/* Edit Button */}
+                                <Dialog open={editingItem?.id === item.id} onOpenChange={(open) => {
+                                    if (open) {
+                                        setEditingItem(item);
+                                        setEditName(item.name);
+                                    } else {
+                                        setEditingItem(null);
+                                    }
+                                }}>
+                                    <DialogTrigger asChild>
+                                        <Button variant="ghost" size="sm" className="hover:text-primary hover:bg-primary/10 transition-colors">
+                                            <Pencil className="h-4 w-4 mr-2" /> Edit
+                                        </Button>
+                                    </DialogTrigger>
+                                    <DialogContent className="clay-card">
+                                        <DialogHeader>
+                                            <DialogTitle>Edit {title.slice(0, -1)}</DialogTitle>
+                                        </DialogHeader>
+                                        <div className="py-4">
+                                            <Input
+                                                value={editName}
+                                                onChange={(e) => setEditName(e.target.value)}
+                                                className="clay-input"
+                                            />
+                                        </div>
+                                        <DialogFooter>
+                                            <Button variant="outline" onClick={() => setEditingItem(null)} className="clay-button bg-gray-200 text-gray-800 hover:bg-gray-300 shadow-none border-none">Cancel</Button>
+                                            <Button onClick={handleUpdate} disabled={isUpdating} className="clay-button">
+                                                {isUpdating ? <Loader2 className="h-4 w-4 animate-spin" /> : <><Save className="h-4 w-4 mr-2" /> Save Changes</>}
+                                            </Button>
+                                        </DialogFooter>
+                                    </DialogContent>
+                                </Dialog>
+
+                                {/* Delete Button */}
+                                <AlertDialog>
+                                    <AlertDialogTrigger asChild>
+                                        <Button
+                                            variant="ghost"
+                                            size="sm"
+                                            disabled={deletingId === item.id}
+                                            className="text-muted-foreground hover:text-destructive hover:bg-destructive/10 transition-colors"
+                                        >
+                                            {deletingId === item.id ? (
+                                                <Loader2 className="h-4 w-4 animate-spin mr-2" />
+                                            ) : (
+                                                <X className="h-4 w-4 mr-2" />
+                                            )}
+                                            Delete
+                                        </Button>
+                                    </AlertDialogTrigger>
+                                    <AlertDialogContent className="clay-card">
+                                        <AlertDialogHeader>
+                                            <AlertDialogTitle>Delete {item.name}?</AlertDialogTitle>
+                                            <AlertDialogDescription>
+                                                This action cannot be undone. This will permanently delete this {title.slice(0, -1).toLowerCase()}.
+                                            </AlertDialogDescription>
+                                        </AlertDialogHeader>
+                                        <AlertDialogFooter>
+                                            <AlertDialogCancel className="clay-button bg-gray-200 text-gray-800 hover:bg-gray-300 shadow-none border-none">Cancel</AlertDialogCancel>
+                                            <AlertDialogAction onClick={() => handleDelete(item.id)} className="bg-destructive text-destructive-foreground hover:bg-destructive/90 rounded-full shadow-md border-none">Delete</AlertDialogAction>
+                                        </AlertDialogFooter>
+                                    </AlertDialogContent>
+                                </AlertDialog>
+                            </div>
                         </div>
                     ))}
-                    {items.length === 0 && <span className="text-gray-400 text-sm">No items found.</span>}
+                    {items.length === 0 && (
+                        <div className="text-center py-10 text-muted-foreground">
+                            No items found. Add one above!
+                        </div>
+                    )}
                 </div>
             </CardContent>
         </Card>
-    );    
+    );
 }

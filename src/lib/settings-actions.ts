@@ -1,30 +1,105 @@
 'use server';
 
-import { PrismaClient } from '@prisma/client';
+import { prisma } from '@/lib/prisma';
 import { revalidatePath } from 'next/cache';
-import { z } from 'zod';
+import { writeFile, mkdir } from 'fs/promises';
+import { join } from 'path';
 
-const prisma = new PrismaClient();
+// --- System Settings (White Label) ---
 
-const SettingSchema = z.object({
-  name: z.string().min(1, "Name is required"),
-});
+async function saveFile(file: File, folder: string): Promise<string> {
+  if (!file || file.size === 0) return '';
 
-// --- Departments ---
-export async function createDepartment(formData: FormData) {
-  const name = formData.get('name') as string;
-  const validation = SettingSchema.safeParse({ name });
+  const bytes = await file.arrayBuffer();
+  const buffer = Buffer.from(bytes);
 
-  if (!validation.success) {
-    return { error: "Invalid name" };
+  const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
+  // Sanitize filename
+  const originalName = file.name.replace(/[^a-zA-Z0-9.-]/g, '');
+  const extension = originalName.split('.').pop() || 'png';
+  const filename = `logo-${uniqueSuffix}.${extension}`;
+
+  // Ensure directory exists
+  const uploadDir = join(process.cwd(), 'public', folder);
+  try {
+    await mkdir(uploadDir, { recursive: true });
+    await writeFile(join(uploadDir, filename), buffer);
+  } catch (e) {
+    console.error("File save error:", e);
+    throw new Error("Failed to save file");
   }
 
+  return `/${folder}/${filename}`;
+}
+
+export async function uploadLogo(prevState: any, formData: FormData) {
   try {
+    const file = formData.get('logo') as File;
+
+    if (!file || file.size === 0) {
+      return { error: "No file selected." };
+    }
+
+    // Validate file type
+    if (!file.type.startsWith('image/')) {
+      return { error: "File must be an image." };
+    }
+
+    const logoPath = await saveFile(file, 'branding');
+
+    // Upsert the setting
+    await prisma.systemSettings.upsert({
+      where: { key: 'company_logo' },
+      update: { value: logoPath },
+      create: { key: 'company_logo', value: logoPath }
+    });
+
+    revalidatePath('/admin');
+    revalidatePath('/auth/login');
+
+    return { success: true, logoPath };
+
+  } catch (error) {
+    console.error("Upload Logo Error:", error);
+    return { error: "Failed to upload logo." };
+  }
+}
+
+export async function getSystemSetting(key: string) {
+  try {
+    const setting = await prisma.systemSettings.findUnique({
+      where: { key }
+    });
+    return setting?.value || null;
+  } catch (error) {
+    console.error(`Error fetching setting ${key}:`, error);
+    return null;
+  }
+}
+
+// --- Departments ---
+
+export async function createDepartment(formData: FormData) {
+  try {
+    const name = formData.get('name') as string;
     await prisma.department.create({ data: { name } });
     revalidatePath('/admin/dashboard/job-recruitment/settings');
     return { success: true };
-  } catch (error) {
+  } catch (error: any) { // Type as any to safely check code
+    if (error.code === 'P2002') return { error: "Department already exists" };
     return { error: "Failed to create department" };
+  }
+}
+
+export async function updateDepartment(id: number, formData: FormData) {
+  try {
+    const name = formData.get('name') as string;
+    await prisma.department.update({ where: { id }, data: { name } });
+    revalidatePath('/admin/dashboard/job-recruitment/settings');
+    return { success: true };
+  } catch (error: any) {
+    if (error.code === 'P2002') return { error: "Department name already taken" };
+    return { error: "Failed to update department" };
   }
 }
 
@@ -34,25 +109,33 @@ export async function deleteDepartment(id: number) {
     revalidatePath('/admin/dashboard/job-recruitment/settings');
     return { success: true };
   } catch (error) {
-    return { error: "Failed to delete department. It might be in use." };
+    return { error: "Failed to delete department" };
   }
 }
 
 // --- Job Types ---
+
 export async function createJobType(formData: FormData) {
-  const name = formData.get('name') as string;
-  const validation = SettingSchema.safeParse({ name });
-
-  if (!validation.success) {
-    return { error: "Invalid name" };
-  }
-
   try {
+    const name = formData.get('name') as string;
     await prisma.jobType.create({ data: { name } });
     revalidatePath('/admin/dashboard/job-recruitment/settings');
     return { success: true };
-  } catch (error) {
-    return { error: "Failed to create job type" };
+  } catch (error: any) {
+    if (error.code === 'P2002') return { error: "Job Type already exists" };
+    return { error: "Failed to create Job Type" };
+  }
+}
+
+export async function updateJobType(id: number, formData: FormData) {
+  try {
+    const name = formData.get('name') as string;
+    await prisma.jobType.update({ where: { id }, data: { name } });
+    revalidatePath('/admin/dashboard/job-recruitment/settings');
+    return { success: true };
+  } catch (error: any) {
+    if (error.code === 'P2002') return { error: "Job Type name already taken" };
+    return { error: "Failed to update Job Type" };
   }
 }
 
@@ -62,25 +145,33 @@ export async function deleteJobType(id: number) {
     revalidatePath('/admin/dashboard/job-recruitment/settings');
     return { success: true };
   } catch (error) {
-    return { error: "Failed to delete job type." };
+    return { error: "Failed to delete Job Type" };
   }
 }
 
 // --- Locations ---
+
 export async function createLocation(formData: FormData) {
-  const name = formData.get('name') as string;
-  const validation = SettingSchema.safeParse({ name });
-
-  if (!validation.success) {
-    return { error: "Invalid name" };
-  }
-
   try {
+    const name = formData.get('name') as string;
     await prisma.location.create({ data: { name } });
     revalidatePath('/admin/dashboard/job-recruitment/settings');
     return { success: true };
-  } catch (error) {
-    return { error: "Failed to create location" };
+  } catch (error: any) {
+    if (error.code === 'P2002') return { error: "Location already exists" };
+    return { error: "Failed to create Location" };
+  }
+}
+
+export async function updateLocation(id: number, formData: FormData) {
+  try {
+    const name = formData.get('name') as string;
+    await prisma.location.update({ where: { id }, data: { name } });
+    revalidatePath('/admin/dashboard/job-recruitment/settings');
+    return { success: true };
+  } catch (error: any) {
+    if (error.code === 'P2002') return { error: "Location name already taken" };
+    return { error: "Failed to update Location" };
   }
 }
 
@@ -90,6 +181,6 @@ export async function deleteLocation(id: number) {
     revalidatePath('/admin/dashboard/job-recruitment/settings');
     return { success: true };
   } catch (error) {
-    return { error: "Failed to delete location." };
+    return { error: "Failed to delete Location" };
   }
 }
