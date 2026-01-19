@@ -11,7 +11,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Search, X } from "lucide-react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import { useDebouncedCallback } from "use-debounce"; 
+import { useDebouncedCallback } from "use-debounce";
 // Note: if use-debounce is not installed, I will use standard timeout. 
 // I'll assume standard timeout to avoid extra install unless needed.
 // Actually, I'll implementing a simple custom debounce or use timeout.
@@ -86,46 +86,69 @@ export default function ApplicationFilters({ jobs }: ApplicationFiltersProps) {
           className="pl-8"
           defaultValue={searchParams.get("query")?.toString()}
           onChange={(e) => {
-             debouncedSearch(e.target.value);
+            debouncedSearch(e.target.value);
           }}
         />
       </div>
-      
-      <Select 
-        defaultValue={searchParams.get("status")?.toString()} 
+
+      <Select
+        defaultValue={searchParams.get("status")?.toString()}
         onValueChange={handleStatusChange}
       >
         <SelectTrigger className="w-[180px]">
           <SelectValue placeholder="Filter by Status" />
         </SelectTrigger>
         <SelectContent>
-            <SelectItem value="all">All Statuses</SelectItem>
-            {STATUS_OPTIONS.map((status) => (
-                <SelectItem key={status} value={status}>
-                {status}
-                </SelectItem>
-            ))}
+          <SelectItem value="all">All Statuses</SelectItem>
+          {STATUS_OPTIONS.map((status) => (
+            <SelectItem key={status} value={status}>
+              {status}
+            </SelectItem>
+          ))}
         </SelectContent>
       </Select>
 
-      <Select 
-        defaultValue={searchParams.get("jobId")?.toString()} 
+      <Select
+        defaultValue={searchParams.get("jobId")?.toString()}
         onValueChange={handleJobChange}
       >
         <SelectTrigger className="w-[180px]">
           <SelectValue placeholder="Filter by Job" />
         </SelectTrigger>
         <SelectContent>
-            <SelectItem value="all">All Jobs</SelectItem>
-            {jobs.map((job) => (
-                <SelectItem key={job.id} value={job.id.toString()}>
-                {job.title}
-                </SelectItem>
-            ))}
+          <SelectItem value="all">All Jobs</SelectItem>
+          {jobs.map((job) => (
+            <SelectItem key={job.id} value={job.id.toString()}>
+              {job.title}
+            </SelectItem>
+          ))}
         </SelectContent>
       </Select>
 
-      {(searchParams.get("query") || searchParams.get("status") || searchParams.get("jobId")) && (
+      <Select
+        defaultValue={searchParams.get("gender")?.toString()}
+        onValueChange={(val) => {
+          const params = new URLSearchParams(searchParams);
+          if (val && val !== "all") {
+            params.set("gender", val);
+          } else {
+            params.delete("gender");
+          }
+          replace(`${pathname}?${params.toString()}`);
+        }}
+      >
+        <SelectTrigger className="w-[180px]">
+          <SelectValue placeholder="Filter by Gender" />
+        </SelectTrigger>
+        <SelectContent>
+          <SelectItem value="all">All Genders</SelectItem>
+          <SelectItem value="Male">Male</SelectItem>
+          <SelectItem value="Female">Female</SelectItem>
+          <SelectItem value="Other">Other</SelectItem>
+        </SelectContent>
+      </Select>
+
+      {(searchParams.get("query") || searchParams.get("status") || searchParams.get("jobId") || searchParams.get("gender")) && (
         <Button variant="ghost" onClick={clearFilters} className="px-2 lg:px-3">
           <X className="mr-2 h-4 w-4" />
           Clear

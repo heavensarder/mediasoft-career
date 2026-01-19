@@ -24,14 +24,18 @@ const menuItems = [
       { name: 'Overview', href: '/admin/dashboard/job-recruitment/overview', icon: LayoutDashboard },
       { name: 'Job List', href: '/admin/dashboard/job-recruitment/job-list', icon: Briefcase },
       { name: 'Add New Job', href: '/admin/dashboard/job-recruitment/add-new-job', icon: PlusCircle },
-      { name: 'Applications', href: '/admin/dashboard/job-recruitment/applications', icon: Users },
+      { name: 'Applications', href: '/admin/dashboard/job-recruitment/applications', icon: Users, showCount: true },
       { name: 'Settings', href: '/admin/dashboard/job-recruitment/settings', icon: Settings },
       { name: 'Export', href: '/admin/dashboard/job-recruitment/export', icon: Download },
     ],
   },
 ];
 
-export default function Sidebar() {
+interface SidebarProps {
+  newApplicationCount?: number;
+}
+
+export default function Sidebar({ newApplicationCount = 0 }: SidebarProps) {
   const pathname = usePathname();
   const [openMenus, setOpenMenus] = useState<string[]>(['Job Recruitment']);
 
@@ -73,14 +77,19 @@ export default function Sidebar() {
                       key={subItem.name}
                       href={subItem.href}
                       className={clsx(
-                        'block rounded-md px-3 py-2 text-sm font-medium hover:bg-slate-800 hover:text-white',
+                        'flex items-center justify-between rounded-md px-3 py-2 text-sm font-medium hover:bg-slate-800 hover:text-white',
                         {
                           'bg-slate-800 text-white': pathname === subItem.href,
                           'text-slate-400': pathname !== subItem.href,
                         }
                       )}
                     >
-                      {subItem.name}
+                      <span>{subItem.name}</span>
+                      {subItem.showCount && newApplicationCount > 0 && (
+                        <span className="ml-auto flex h-5 w-5 items-center justify-center rounded-full bg-green-500 text-xs font-bold text-white">
+                          {newApplicationCount}
+                        </span>
+                      )}
                     </Link>
                   ))}
                 </div>
@@ -91,10 +100,10 @@ export default function Sidebar() {
       </div>
       <div className="border-t border-slate-800 p-4">
         <form action={handleSignOut}>
-             <button className="flex w-full items-center rounded-md px-3 py-2 text-sm font-medium text-red-400 hover:bg-slate-800 hover:text-red-300">
-                <LogOut className="mr-3 h-5 w-5" />
-                Sign Out
-            </button>
+          <button className="flex w-full items-center rounded-md px-3 py-2 text-sm font-medium text-red-400 hover:bg-slate-800 hover:text-red-300">
+            <LogOut className="mr-3 h-5 w-5" />
+            Sign Out
+          </button>
         </form>
       </div>
     </div>
