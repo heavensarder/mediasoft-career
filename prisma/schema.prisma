@@ -1,0 +1,85 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model Admin {
+  id        Int      @id @default(autoincrement())
+  name      String
+  email     String   @unique
+  password  String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Department {
+  id   Int    @id @default(autoincrement())
+  name String @unique
+  jobs Job[]
+}
+
+model JobType {
+  id   Int    @id @default(autoincrement())
+  name String @unique
+  jobs Job[]
+}
+
+model Location {
+  id   Int    @id @default(autoincrement())
+  name String @unique
+  jobs Job[]
+}
+
+model Job {
+  id           Int           @id @default(autoincrement())
+  title        String
+  description  String        @db.Text
+  departmentId Int
+  department   Department    @relation(fields: [departmentId], references: [id])
+  typeId       Int
+  jobType      JobType       @relation(fields: [typeId], references: [id])
+  locationId   Int
+  location     Location      @relation(fields: [locationId], references: [id])
+  expiryDate   DateTime
+  salaryRange  String?
+  status       String        @default("Active") // Active, On Hold, Expired, Closed
+  isDraft      Boolean       @default(false)
+  positionFilled Int         @default(0)
+  views        Int           @default(0)
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+  applications Application[]
+}
+
+model Application {
+  id             Int      @id @default(autoincrement())
+  jobId          Int
+  job            Job      @relation(fields: [jobId], references: [id])
+  fullName       String
+  nid            String
+  dob            DateTime
+  gender         String
+  mobile         String
+  email          String
+  experience     String
+  currentSalary  String?
+  expectedSalary String?
+  education      String   // Latest Education Qualification
+  source         String   // Recruitment Source
+  objective      String   @db.Text
+  photo          String?  // Path to photo
+  resume         String?  // Path to resume
+  achievements   String?  @db.Text
+  message        String?  @db.Text
+  linkedin       String?
+  facebook       String?
+  portfolio      String?
+  status         String   @default("New") // New, Viewed, Shortlisted, Rejected, Selected
+  notes          String?  @db.Text
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+}
