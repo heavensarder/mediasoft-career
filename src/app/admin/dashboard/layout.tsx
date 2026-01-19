@@ -6,7 +6,7 @@ export default async function Layout({ children }: { children: React.ReactNode }
   const newApplicationCount = await getNewApplicationCount();
 
   return (
-    <div className="flex h-screen flex-col md:flex-row md:overflow-hidden bg-gray-50">
+    <div className="flex h-screen flex-col md:flex-row md:overflow-hidden bg-background">
       <div className="w-full flex-none md:w-64">
         <Sidebar newApplicationCount={newApplicationCount} />
       </div>

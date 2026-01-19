@@ -48,9 +48,9 @@ export default function Sidebar({ newApplicationCount = 0 }: SidebarProps) {
   };
 
   return (
-    <div className="flex h-full flex-col bg-slate-900 text-white w-64">
-      <div className="flex h-16 items-center justify-center border-b border-slate-800">
-        <h1 className="text-xl font-bold">Admin Panel</h1>
+    <div className="flex h-full flex-col bg-sidebar text-sidebar-foreground w-64 border-r border-sidebar-border shadow-lg z-10">
+      <div className="flex h-16 items-center justify-center border-b border-sidebar-border">
+        <h1 className="text-xl font-bold text-primary">Admin Panel</h1>
       </div>
       <div className="flex-1 overflow-y-auto py-4">
         <nav className="space-y-1 px-2">
@@ -58,7 +58,7 @@ export default function Sidebar({ newApplicationCount = 0 }: SidebarProps) {
             <div key={item.title}>
               <button
                 onClick={() => toggleMenu(item.title)}
-                className="flex w-full items-center justify-between rounded-md px-3 py-2 text-sm font-medium text-slate-300 hover:bg-slate-800 hover:text-white"
+                className="flex w-full items-center justify-between rounded-full px-3 py-2 text-sm font-medium text-muted-foreground hover:bg-sidebar-accent hover:text-primary transition-all"
               >
                 <div className="flex items-center">
                   <item.icon className="mr-3 h-5 w-5" />
@@ -77,16 +77,19 @@ export default function Sidebar({ newApplicationCount = 0 }: SidebarProps) {
                       key={subItem.name}
                       href={subItem.href}
                       className={clsx(
-                        'flex items-center justify-between rounded-md px-3 py-2 text-sm font-medium hover:bg-slate-800 hover:text-white',
+                        'flex items-center justify-between rounded-full px-3 py-2 text-sm font-medium transition-all duration-200',
                         {
-                          'bg-slate-800 text-white': pathname === subItem.href,
-                          'text-slate-400': pathname !== subItem.href,
+                          'clay-button text-white shadow-md': pathname === subItem.href,
+                          'text-muted-foreground hover:text-primary hover:bg-sidebar-accent': pathname !== subItem.href,
                         }
                       )}
                     >
                       <span>{subItem.name}</span>
                       {subItem.showCount && newApplicationCount > 0 && (
-                        <span className="ml-auto flex h-5 w-5 items-center justify-center rounded-full bg-green-500 text-xs font-bold text-white">
+                        <span className={clsx(
+                          "ml-auto flex h-5 w-5 items-center justify-center rounded-full text-xs font-bold",
+                          pathname === subItem.href ? "bg-white text-primary" : "bg-primary text-white"
+                        )}>
                           {newApplicationCount}
                         </span>
                       )}
@@ -98,9 +101,9 @@ export default function Sidebar({ newApplicationCount = 0 }: SidebarProps) {
           ))}
         </nav>
       </div>
-      <div className="border-t border-slate-800 p-4">
+      <div className="border-t border-sidebar-border p-4">
         <form action={handleSignOut}>
-          <button className="flex w-full items-center rounded-md px-3 py-2 text-sm font-medium text-red-400 hover:bg-slate-800 hover:text-red-300">
+          <button className="flex w-full items-center rounded-full px-3 py-2 text-sm font-medium text-destructive hover:bg-destructive/10 transition-colors">
             <LogOut className="mr-3 h-5 w-5" />
             Sign Out
           </button>
