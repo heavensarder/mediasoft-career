@@ -188,12 +188,16 @@ export default async function OverviewPage() {
               {recentApps.map((app) => (
                 <div key={app.id} className="group flex items-center justify-between p-3 rounded-xl bg-slate-50 hover:bg-white border border-slate-100 hover:border-blue-100 hover:shadow-md transition-all">
                   <div className="flex items-center gap-4">
-                    <Avatar className="h-10 w-10 border-2 border-white shadow-sm">
-                      <AvatarImage src={app.photo || undefined} />
-                      <AvatarFallback className="bg-slate-200 text-slate-600 font-bold">{app.fullName[0]}</AvatarFallback>
-                    </Avatar>
+                    <Link href={`/admin/dashboard/job-recruitment/applications/${app.id}`} className="transition-transform hover:scale-105">
+                      <Avatar className="h-10 w-10 border-2 border-white shadow-sm cursor-pointer">
+                        <AvatarImage src={app.photo || undefined} />
+                        <AvatarFallback className="bg-slate-200 text-slate-600 font-bold">{app.fullName[0]}</AvatarFallback>
+                      </Avatar>
+                    </Link>
                     <div>
-                      <p className="text-sm font-bold text-slate-800 group-hover:text-blue-600 transition-colors">{app.fullName}</p>
+                      <Link href={`/admin/dashboard/job-recruitment/applications/${app.id}`} className="text-sm font-bold text-slate-800 group-hover:text-blue-600 transition-colors hover:underline">
+                        {app.fullName}
+                      </Link>
                       <p className="text-xs text-slate-500 font-medium">{app.job.title}</p>
                     </div>
                   </div>
