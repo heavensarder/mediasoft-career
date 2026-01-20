@@ -22,6 +22,54 @@ interface FormField {
     isSystem: boolean;
 }
 
+const FileUploadInput = ({ field, commonProps }: { field: FormField, commonProps: any }) => {
+    const [fileName, setFileName] = useState<string | null>(null);
+
+    const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (file) setFileName(file.name);
+        else setFileName(null);
+    };
+
+    return (
+        <div className="relative group">
+            <div className={cn(
+                "flex items-center justify-between p-4 border-2 border-dashed rounded-xl transition-all cursor-pointer",
+                fileName 
+                    ? "border-[#00ADE7] bg-[#00ADE7]/5" 
+                    : "border-slate-200 bg-slate-50/50 hover:bg-white hover:border-[#00ADE7]/50 hover:shadow-sm"
+            )}>
+                <div className="flex items-center gap-4">
+                    <div className={cn(
+                        "p-3 rounded-full transition-colors",
+                        fileName ? "bg-[#00ADE7] text-white" : "bg-slate-100 text-slate-500 group-hover:bg-[#00ADE7]/10 group-hover:text-[#00ADE7]"
+                    )}>
+                        <UploadCloud className="w-6 h-6" />
+                    </div>
+                    <div className="flex flex-col">
+                         <span className={cn("text-sm font-semibold", fileName ? "text-[#00ADE7]" : "text-slate-700")}>
+                            {fileName || `Click to upload ${field.label}`}
+                         </span>
+                         {!fileName && <span className="text-xs text-slate-500 mt-0.5">PDF, DOC, DOCX up to 10MB</span>}
+                    </div>
+                </div>
+                {fileName && (
+                    <span className="text-xs font-bold text-[#00ADE7] bg-[#00ADE7]/10 px-3 py-1 rounded-full">
+                        Change
+                    </span>
+                )}
+            </div>
+            <Input 
+                {...commonProps}
+                type="file" 
+                className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
+                onChange={handleFileChange}
+                accept=".pdf,.doc,.docx,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+            />
+        </div>
+    );
+};
+
 export default function ApplicationForm({ jobId, jobTitle, fields }: { jobId: number, jobTitle: string, fields: FormField[] }) {
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [success, setSuccess] = useState(false);
@@ -146,9 +194,7 @@ export default function ApplicationForm({ jobId, jobTitle, fields }: { jobId: nu
                         </div>
                     );
                 } else {
-                    return (
-                        <Input {...commonProps} type="file" className="file:bg-primary/10 file:text-primary file:border-0 file:rounded-lg file:mr-4 file:px-4 file:py-1 hover:file:bg-primary/20 transition-all cursor-pointer pt-2" />
-                    )
+                    return <FileUploadInput field={field} commonProps={commonProps} />;
                 }
             default: // text, email, number, date
                 return <Input {...commonProps} type={field.type === 'phone' ? 'tel' : field.type} />;

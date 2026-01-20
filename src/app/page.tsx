@@ -1,87 +1,388 @@
-import Link from 'next/link';
-import { getActiveJobs } from '@/lib/data';
-import { Card, CardContent, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
-import { MapPin, Clock, Briefcase } from 'lucide-react';
+import Link from "next/link";
+import { getActiveJobs } from "@/lib/data";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  CardFooter,
+} from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import {
+  MapPin,
+  Clock,
+  Briefcase,
+  ChevronRight,
+  Zap,
+  Users,
+  Heart,
+  ArrowRight,
+  GraduationCap,
+  Trophy,
+  Smile,
+  Globe,
+  Monitor,
+  Award,
+  Shield,
+  PieChart,
+} from "lucide-react";
+import Image from "next/image";
+import { FloatingNav } from "@/components/FloatingNav";
 
 export default async function Home() {
   const jobs = await getActiveJobs();
 
   return (
-
-    <div className="min-h-screen bg-background font-sans selection:bg-primary/20">
-      {/* Hero Section */}
-      <div className="bg-slate-900 text-white py-24 text-center relative overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-r from-slate-900 to-slate-800" />
-        <div className="relative z-10 px-4">
-          <h1 className="text-4xl md:text-5xl font-bold mb-6 tracking-tight">Join Our Team</h1>
-          <p className="text-lg md:text-xl text-slate-300 max-w-2xl mx-auto leading-relaxed">
-            We are looking for talented individuals to help us build the future of technology.
-            Explore our open positions and find your next career opportunity.
-          </p>
+    <div className="min-h-screen bg-white font-sans selection:bg-[#00ADE7]/20">
+      <FloatingNav />
+      {/* 1. Hero Section - Light & Airy */}
+      <section id="hero" className="relative w-full min-h-screen flex items-center justify-center overflow-hidden">
+        {/* Background Image with Dark Overlay */}
+        <div className="absolute inset-0 z-0">
+          <Image
+            src="https://career.mediasoftbd.com/wp-content/uploads/2025/11/image-4.jpg"
+            alt="MediaSoft Office"
+            fill
+            className="object-cover"
+            priority
+          />
+          <div className="absolute inset-0 bg-black/60"></div>
         </div>
-      </div>
 
-      {/* Job List Section */}
-      <div className="max-w-6xl mx-auto py-16 px-4">
-        <h2 className="text-3xl font-bold mb-10 text-foreground text-center">Open Positions</h2>
-
-        {jobs.length === 0 ? (
-          <div className="premium-glass-card p-12 text-center text-muted-foreground max-w-lg mx-auto">
-            <div className="mb-4 bg-muted w-16 h-16 rounded-full flex items-center justify-center mx-auto">
-              <Briefcase className="w-8 h-8 text-muted-foreground px-1" />
-            </div>
-            <h3 className="text-lg font-semibold text-foreground mb-2">No Openings Right Now</h3>
-            <p>We are not actively hiring for any roles at the moment. Please check back later!</p>
+        {/* Hero Content */}
+        <div className="relative z-10 container mx-auto px-4 text-center max-w-4xl">
+          <Badge className="mb-6 bg-[#00ADE7] text-white border-none px-4 py-1.5 text-sm font-semibold uppercase tracking-wider shadow-sm">
+            We are Hiring
+          </Badge>
+          <h1 className="text-5xl md:text-7xl font-extrabold text-white leading-tight mb-8 tracking-tight">
+            Build the{" "}
+            <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#00ADE7] to-blue-400">
+              Future
+            </span>{" "}
+            With Us
+          </h1>
+          <p className="text-xl md:text-2xl text-slate-200 mb-10 max-w-2xl mx-auto leading-relaxed font-medium">
+            Join a team of visionaries, creators, and innovators. We are
+            crafting the next generation of digital experiences.
+          </p>
+          <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
+            <Link href="#open-positions">
+              <Button
+                size="lg"
+                className="h-14 px-10 text-lg rounded-full bg-white text-slate-900 font-bold tracking-wide hover:bg-slate-200 transition-all duration-300 shadow-[0_0_20px_rgba(255,255,255,0.3)] hover:scale-105"
+              >
+                View Open Roles <ChevronRight className="ml-2 w-5 h-5" />
+              </Button>
+            </Link>
           </div>
-        ) : (
-          <div className="grid gap-6">
-            {jobs.map((job: any) => (
-              <div key={job.id} className="premium-glass-card p-6 flex flex-col md:flex-row gap-5 items-start md:items-center justify-between group hover:border-primary/50 transition-colors">
-                {/* Left Side: Info */}
-                <div className="space-y-3 flex-1">
-                  <div>
-                    <Link href={`/jobs/${job.slug}`} className="block w-fit">
-                      <h3 className="text-lg md:text-xl font-bold text-slate-800 group-hover:text-primary transition-colors">
-                        {job.title}
-                      </h3>
-                    </Link>
-                    <div className="flex flex-wrap items-center gap-2.5 mt-2.5">
-                      <span className="bg-blue-50 text-blue-700 px-2.5 py-0.5 rounded-full text-sm font-medium flex items-center gap-1.5 border border-blue-100">
-                        <Briefcase className="w-3.5 h-3.5" />
-                        {job.department.name}
-                      </span>
-                      <span className="bg-slate-100 text-slate-600 px-2.5 py-0.5 rounded-full text-sm font-medium border border-slate-200">
-                        {job.jobType.name}
-                      </span>
-                      <span className="bg-slate-100 text-slate-600 px-2.5 py-0.5 rounded-full text-sm font-medium flex items-center gap-1.5 border border-slate-200">
-                        <MapPin className="w-3.5 h-3.5" />
-                        {job.location.name}
-                      </span>
-                      {job.status === 'Active' && job.expiryDate && (
-                        <span className="bg-orange-50 text-orange-700 px-2.5 py-0.5 rounded-full text-sm font-medium flex items-center gap-1.5 border border-orange-100">
-                          <Clock className="w-3.5 h-3.5" />
-                          Expires: {new Date(job.expiryDate).toLocaleDateString()}
+        </div>
+      </section>
+
+      {/* 2. Active Job List Section */}
+      <section id="open-positions" className="py-24 bg-slate-50 relative">
+        <div className="container mx-auto px-4 max-w-6xl">
+          <div className="text-center mb-16">
+            <h2 className="text-4xl md:text-5xl font-bold text-slate-900 mb-4">
+              Open Positions
+            </h2>
+            <p className="text-lg text-slate-600 max-w-2xl mx-auto">
+              Ready to take the next step in your career? Browse our current
+              openings and find the perfect fit for your skills.
+            </p>
+          </div>
+
+          {jobs.length === 0 ? (
+            <div className="bg-white/80 backdrop-blur-sm p-16 rounded-3xl text-center borderBorder border-dashed border-slate-300 max-w-2xl mx-auto">
+              <div className="mb-6 bg-slate-50 w-20 h-20 rounded-full flex items-center justify-center mx-auto shadow-inner">
+                <Briefcase className="w-10 h-10 text-slate-400" />
+              </div>
+              <h3 className="text-2xl font-bold text-slate-800 mb-3">
+                No Openings Right Now
+              </h3>
+              <p className="text-slate-500 text-lg">
+                We are not actively hiring for any roles at the moment. However,
+                we are always looking for talent. Feel free to send us your
+                resume!
+              </p>
+            </div>
+          ) : (
+            <div className="space-y-4">
+              {jobs.map((job: any) => (
+                <div
+                  key={job.id}
+                  className="group bg-white rounded-xl p-1 shadow-sm hover:shadow-lg hover:shadow-blue-500/10 border border-slate-100 transition-all duration-300"
+                >
+                  <div className="flex flex-col md:flex-row gap-6 p-6 items-start md:items-center">
+                    {/* Icon/Logo Placeholder */}
+                    <div className="w-16 h-16 rounded-lg bg-[#E0F7FF] text-[#00ADE7] flex items-center justify-center shrink-0 text-xl font-bold group-hover:bg-[#00ADE7] group-hover:text-white transition-colors duration-300">
+                      {job.title.charAt(0)}
+                    </div>
+
+                    <div className="flex-1 space-y-2">
+                      <Link href={`/jobs/${job.slug}`} className="block w-fit">
+                        <h3 className="text-xl font-bold text-slate-800 group-hover:text-[#00ADE7] transition-colors flex items-center gap-2">
+                          {job.title}
+                          <ArrowRight className="w-4 h-4 opacity-0 -translate-x-2 group-hover:translate-x-0 group-hover:opacity-100 transition-all text-[#00ADE7]" />
+                        </h3>
+                      </Link>
+                      <div className="flex flex-wrap items-center gap-3 text-sm text-slate-500">
+                        <span className="flex items-center gap-1.5 bg-slate-50 px-3 py-1 rounded-md border border-slate-100">
+                          <Briefcase className="w-4 h-4 text-slate-400" />
+                          {job.department.name}
                         </span>
-                      )}
+                        <span className="flex items-center gap-1.5 bg-slate-50 px-3 py-1 rounded-md border border-slate-100">
+                          <Clock className="w-4 h-4 text-slate-400" />
+                          {job.jobType.name}
+                        </span>
+                        <span className="flex items-center gap-1.5 bg-slate-50 px-3 py-1 rounded-md border border-slate-100">
+                          <MapPin className="w-4 h-4 text-slate-400" />
+                          {job.location.name}
+                        </span>
+                        {job.status === 'Active' && job.expiryDate && (
+                          <span className="flex items-center gap-1.5 bg-orange-50 text-orange-700 px-3 py-1 rounded-md border border-orange-100">
+                            <Clock className="w-4 h-4" />
+                            Expires: {new Date(job.expiryDate).toLocaleDateString()}
+                          </span>
+                        )}
+                      </div>
+                    </div>
+
+                    <div className="w-full md:w-auto mt-4 md:mt-0">
+                      <Link href={`/jobs/${job.slug}`} className="block">
+                        <Button className="w-full md:w-auto rounded-lg bg-white text-slate-700 border border-slate-200 hover:bg-[#00ADE7] hover:text-white hover:border-[#00ADE7] transition-all h-12 px-6 font-semibold shadow-sm">
+                          {job.status === 'Active' ? 'Apply Now' : 'View Details'}
+                        </Button>
+                      </Link>
                     </div>
                   </div>
                 </div>
+              ))}
+            </div>
+          )}
+        </div>
+      </section>
 
-                {/* Right Side: Action */}
-                <div className="flex items-center gap-4 shrink-0 w-full md:w-auto mt-2 md:mt-0">
-                  <Link href={`/jobs/${job.slug}`} className="w-full md:w-auto">
-                    <Button className="premium-btn w-full md:w-auto px-6 h-11 text-base shadow-none hover:shadow-none hover:translate-y-0 active:scale-100 active:shadow-inner">
-                      {job.status === 'Active' ? 'Apply Now' : 'View Details'}
-                    </Button>
-                  </Link>
+      {/* 3. New Stats Section */}
+      <section className="py-16 bg-white relative">
+        <div className="container mx-auto px-4">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+            {[
+              { label: "Female Employee", value: "25%", icon: Users, color: "text-pink-500", bg: "bg-pink-50" },
+              { label: "Friendly Environment", value: "100%", icon: Smile, color: "text-yellow-500", bg: "bg-yellow-50" },
+              { label: "Learning Opportunities", value: "Unlimited", icon: GraduationCap, color: "text-blue-500", bg: "bg-blue-50" },
+              { label: "Significant Projects", value: "50+", icon: Trophy, color: "text-purple-500", bg: "bg-purple-50" },
+            ].map((stat, i) => (
+              <div key={i} className="flex flex-col items-center justify-center p-6 rounded-2xl bg-slate-50 border border-slate-100 hover:shadow-lg transition-all group text-center">
+                <div className={`w-12 h-12 ${stat.bg} ${stat.color} rounded-full flex items-center justify-center mb-4 group-hover:scale-110 transition-transform`}>
+                   <stat.icon className="w-6 h-6" />
+                </div>
+                <h3 className="text-3xl font-bold text-slate-900 mb-1">{stat.value}</h3>
+                <p className="text-sm font-medium text-slate-500 uppercase tracking-wide">{stat.label}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* 4. Video Section */}
+      <section className="py-20 bg-slate-900 text-white relative overflow-hidden">
+        {/* Background Gradients */}
+        <div className="absolute top-0 left-0 w-full h-full bg-slate-900 z-0">
+           <div className="absolute top-0 right-0 w-96 h-96 bg-[#00ADE7]/20 rounded-full blur-[100px] -translate-y-1/2 translate-x-1/2"></div>
+           <div className="absolute bottom-0 left-0 w-80 h-80 bg-purple-600/20 rounded-full blur-[100px] translate-y-1/2 -translate-x-1/2"></div>
+        </div>
+
+        <div className="container mx-auto px-4 relative z-10 text-center">
+          <Badge className="mb-6 bg-slate-800 text-[#00ADE7] border-slate-700 px-4 py-1.5 text-sm font-semibold uppercase tracking-wider">
+            Life at MediaSoft
+          </Badge>
+          <h2 className="text-3xl md:text-5xl font-bold mb-8">See What It's Like</h2>
+          
+          <div className="max-w-4xl mx-auto aspect-video rounded-3xl overflow-hidden shadow-2xl border-4 border-slate-800 relative bg-black">
+             <iframe 
+                width="100%" 
+                height="100%" 
+                src="https://www.youtube.com/embed/A5hUTPU5EXo" 
+                title="Life at MediaSoft" 
+                frameBorder="0" 
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+                allowFullScreen
+                className="absolute inset-0"
+             ></iframe>
+          </div>
+        </div>
+      </section>
+
+      {/* 5. Benefits & Perks Section */}
+      <section id="values" className="py-24 bg-white relative">
+        <div className="container mx-auto px-4">
+           <div className="text-center mb-16 max-w-3xl mx-auto">
+            <h2 className="text-3xl md:text-4xl font-bold text-slate-900 mb-4">Why Join MediaSoft?</h2>
+            <p className="text-lg text-slate-600">
+              We offer more than just a job. We offer a career path filled with growth, innovation, and rewards.
+            </p>
+          </div>
+
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {[
+              { 
+                title: "Career Growth", 
+                desc: "Advance your career with numerous opportunities for professional development and growth within Mediasoft Data Systems Limited.",
+                icon: Trophy 
+              },
+              { 
+                title: "Innovative Projects", 
+                desc: "Engage in cutting-edge projects that push the boundaries of technology and innovation.",
+                icon: Zap 
+              },
+              { 
+                title: "Collaborative Culture", 
+                desc: "Join a supportive team environment that values collaboration, creativity, and mutual respect.",
+                icon: Users 
+              },
+              { 
+                title: "Competitive Compensation", 
+                desc: "Benefit from attractive salary packages, performance bonuses, and comprehensive benefits.",
+                icon: Award 
+              },
+              { 
+                title: "Flexible Work Environment", 
+                desc: "Enjoy flexible working hours and remote work options to maintain a healthy work-life balance.",
+                icon: Monitor 
+              },
+              { 
+                title: "Continuous Learning", 
+                desc: "Access to extensive training programs, workshops, and mentorship to enhance your skills and knowledge.",
+                icon: GraduationCap 
+              },
+              { 
+                title: "Impactful Work", 
+                desc: "Make a real difference by contributing to projects that have a significant impact on our clients and the industry.",
+                icon: Globe 
+              },
+              { 
+                title: "Inclusive Culture", 
+                desc: "Be part of a diverse and inclusive workplace where all employees are valued and respected.",
+                icon: Heart 
+              },
+              { 
+                title: "Employee Wellbeing", 
+                desc: "Participate in health and wellness programs designed to support your overall wellbeing.",
+                icon: Smile 
+              },
+              { 
+                title: "Recognition and Rewards", 
+                desc: "Receive recognition for your hard work and achievements through various reward programs.",
+                icon: Award 
+              },
+            ].map((item, i) => (
+              <div key={i} className="flex gap-5 p-6 rounded-2xl bg-white border border-slate-100 hover:border-blue-100 hover:shadow-lg transition-all group">
+                <div className="shrink-0 w-12 h-12 rounded-xl bg-[#E0F7FF] text-[#00ADE7] flex items-center justify-center group-hover:scale-110 transition-transform">
+                  <item.icon className="w-6 h-6" />
+                </div>
+                <div>
+                  <h3 className="text-xl font-bold text-slate-900 mb-2 group-hover:text-[#00ADE7] transition-colors">{item.title}</h3>
+                  <p className="text-slate-600 text-sm leading-relaxed">{item.desc}</p>
                 </div>
               </div>
             ))}
           </div>
-        )}
-      </div>
+        </div>
+      </section>
+
+      {/* 6. Culture Content Section */}
+      <section id="culture" className="py-24 bg-slate-50 relative">
+        <div className="container mx-auto px-4">
+          <div className="flex flex-col lg:flex-row items-center gap-16">
+            <div className="lg:w-1/2 relative">
+              <div className="relative rounded-3xl overflow-hidden shadow-2xl">
+                <Image
+                  src="https://career.mediasoftbd.com/wp-content/uploads/2025/11/image-7.jpg"
+                  alt="Team Collaboration"
+                  width={800}
+                  height={600}
+                  className="w-full object-cover"
+                />
+              </div>
+              {/* Floating Badge */}
+              <div className="absolute -bottom-6 -right-6 bg-white p-6 rounded-2xl shadow-xl flex items-center gap-4 max-w-xs animate-bounce md:animate-none">
+                <div className="bg-[#E0F7FF] p-3 rounded-full">
+                  <Users className="w-6 h-6 text-[#00ADE7]" />
+                </div>
+                <div>
+                  <p className="text-sm text-slate-500 font-medium">
+                    Join our community
+                  </p>
+                  <p className="text-lg font-bold text-slate-800">
+                    100+ Team Members
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            <div className="lg:w-1/2">
+              <h2 className="text-blue-600 font-bold tracking-wide uppercase text-sm mb-3">
+                Our Culture
+              </h2>
+              <h3 className="text-4xl md:text-5xl font-bold text-slate-900 mb-6 leading-tight">
+                More Than Just a <br className="hidden md:block" />
+                <span className="text-[#00ADE7]">Workplace</span>
+              </h3>
+              <p className="text-lg text-slate-600 mb-6 leading-relaxed">
+                At our company, we don't just write code; we create solutions.
+                Our culture is built on trust, autonomy, and a shared passion
+                for excellence. We provide the tools you need to succeed and the
+                freedom to innovate.
+              </p>
+              <ul className="space-y-4 mb-8">
+                {[
+                  "Continuous Learning & Development",
+                  "Inclusive & Diverse Team",
+                  "Regular Team Retreats & Events",
+                ].map((item, i) => (
+                  <li
+                    key={i}
+                    className="flex items-center gap-3 text-slate-700 font-medium"
+                  >
+                    <div className="w-6 h-6 rounded-full bg-[#E0F7FF] flex items-center justify-center shrink-0">
+                      <ChevronRight className="w-4 h-4 text-[#00ADE7]" />
+                    </div>
+                    {item}
+                  </li>
+                ))}
+              </ul>
+              <Button
+                variant="outline"
+                className="border-[#00ADE7] text-[#00ADE7] hover:bg-[#E0F7FF] hover:text-[#00ADE7] h-12 px-8 rounded-full"
+              >
+                Learn More About Us
+              </Button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Footer Call to Action */}
+      <section className="py-20 bg-[#00ADE7] text-white text-center relative overflow-hidden">
+        <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-10"></div>
+        <div className="container mx-auto px-4 relative z-10">
+          <h2 className="text-3xl md:text-4xl font-bold mb-6">
+            Didn't find the perfect role?
+          </h2>
+          <p className="text-xl md:text-2xl text-white/90 mb-10 max-w-2xl mx-auto">
+            We are always open to meeting talented individuals. Send us your
+            resume and we'll keep you in mind for future opportunities.
+          </p>
+          <Button
+            variant="secondary"
+            size="lg"
+            className="h-14 px-10 text-lg rounded-full bg-white text-[#00ADE7] hover:bg-slate-100 shadow-xl"
+          >
+            Join Talent Network
+          </Button>
+        </div>
+      </section>
     </div>
   );
 }
