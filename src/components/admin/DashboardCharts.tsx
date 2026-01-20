@@ -11,6 +11,7 @@ import { format, subDays } from 'date-fns';
 interface ChartData {
     name: string;
     value: number;
+    [key: string]: any;
 }
 
 interface TrendData {

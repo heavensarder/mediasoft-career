@@ -25,7 +25,7 @@ export default function RichTextEditor({ value, onChange, placeholder }: RichTex
     }), []);
 
     return (
-        <div className="clay-input p-2 bg-white/50">
+        <div className="premium-input p-2 bg-white/50">
             <style jsx global>{`
                 .ql-container.ql-snow {
                     border: none !important;

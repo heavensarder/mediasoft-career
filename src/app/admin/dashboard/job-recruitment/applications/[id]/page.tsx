@@ -110,9 +110,9 @@ export default async function ApplicationDetailsPage({ params }: { params: { id:
                             <div className="pt-2 border-t">
                                 <span className="font-semibold block text-sm text-gray-500">Social Profiles</span>
                                 <div className="flex flex-col gap-1 mt-1 text-sm">
-                                    {application.linkedin && <a href={application.linkedin} target="_blank" className="text-blue-600 hover:underline">LinkedIn Profile</a>}
-                                    {application.facebook && <a href={application.facebook} target="_blank" className="text-blue-600 hover:underline">Facebook Profile</a>}
-                                    {application.portfolio && <a href={application.portfolio} target="_blank" className="text-blue-600 hover:underline">Portfolio/Website</a>}
+                                    {application.linkedin && <a href={application.linkedin} target="_blank" className="text-blue-600 hover:text-blue-800 transition-colors">LinkedIn Profile</a>}
+                                    {application.facebook && <a href={application.facebook} target="_blank" className="text-blue-600 hover:text-blue-800 transition-colors">Facebook Profile</a>}
+                                    {application.portfolio && <a href={application.portfolio} target="_blank" className="text-blue-600 hover:text-blue-800 transition-colors">Portfolio/Website</a>}
                                     {!application.linkedin && !application.facebook && !application.portfolio && <span className="text-gray-400">No profiles provided.</span>}
                                 </div>
                             </div>
@@ -127,7 +127,7 @@ export default async function ApplicationDetailsPage({ params }: { params: { id:
                         <CardContent className="space-y-4">
                             <div>
                                 <span className="font-semibold block text-sm text-gray-500">Applied For</span>
-                                <Link href={`/admin/dashboard/job-recruitment/job-list`} className="text-blue-600 hover:underline text-lg font-medium">
+                                <Link href={`/admin/dashboard/job-recruitment/job-list`} className="text-blue-600 hover:text-blue-800 transition-colors text-lg font-medium">
                                     {application.job.title}
                                 </Link>
                             </div>
@@ -147,7 +147,7 @@ export default async function ApplicationDetailsPage({ params }: { params: { id:
                                 <span className="font-semibold block text-sm text-gray-500">Resume/CV</span>
                                 {application.resume ? (
                                     <div className="space-y-4">
-                                        <a href={application.resume} target="_blank" rel="noreferrer" className="text-blue-600 hover:underline flex items-center gap-1 mt-1">
+                                        <a href={application.resume} target="_blank" rel="noreferrer" className="text-blue-600 hover:text-blue-800 transition-colors flex items-center gap-1 mt-1">
                                             <Download className="h-4 w-4" /> Download Resume
                                         </a>
                                         <ResumeViewerWrapper url={application.resume} />
@@ -205,7 +205,7 @@ export default async function ApplicationDetailsPage({ params }: { params: { id:
                                         <div key={field.id}>
                                             <span className="font-semibold block text-sm text-gray-500 mb-1">{field.label}</span>
                                             {field.type === 'file' ? (
-                                                <a href={value} target="_blank" rel="noreferrer" className="text-blue-600 hover:underline flex items-center gap-1">
+                                                <a href={value} target="_blank" rel="noreferrer" className="text-blue-600 hover:text-blue-800 transition-colors flex items-center gap-1">
                                                     <Download className="h-4 w-4" /> Download File
                                                 </a>
                                             ) : (

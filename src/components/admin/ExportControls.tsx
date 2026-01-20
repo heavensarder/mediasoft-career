@@ -17,7 +17,7 @@ import { toast } from "sonner";
 
 interface ExportControlsProps {
     departments: { id: number; name: string }[];
-    jobs: { id: number; title: string; departmentId: number }[];
+    jobs: { id: number; title: string; departmentId: number | null }[];
 }
 
 export default function ExportControls({ departments, jobs }: ExportControlsProps) {
@@ -30,7 +30,7 @@ export default function ExportControls({ departments, jobs }: ExportControlsProp
     // Filter jobs based on selected department
     const filteredJobs = selectedDep === 'all'
         ? jobs
-        : jobs.filter(job => job.departmentId.toString() === selectedDep);
+        : jobs.filter(job => job.departmentId?.toString() === selectedDep);
 
     const handleExport = async (format: 'csv' | 'print') => {
         setLoading(true);
@@ -115,7 +115,7 @@ export default function ExportControls({ departments, jobs }: ExportControlsProp
                 <div className="space-y-2">
                     <Label>Department</Label>
                     <Select value={selectedDep} onValueChange={setSelectedDep}>
-                        <SelectTrigger className="clay-input">
+                        <SelectTrigger className="premium-input">
                             <SelectValue placeholder="Select Department" />
                         </SelectTrigger>
                         <SelectContent>
@@ -132,7 +132,7 @@ export default function ExportControls({ departments, jobs }: ExportControlsProp
                 <div className="space-y-2">
                     <Label>Job Post</Label>
                     <Select value={selectedJob} onValueChange={setSelectedJob}>
-                        <SelectTrigger className="clay-input">
+                        <SelectTrigger className="premium-input">
                             <SelectValue placeholder="Select Job" />
                         </SelectTrigger>
                         <SelectContent>
@@ -152,7 +152,7 @@ export default function ExportControls({ departments, jobs }: ExportControlsProp
                         type="date"
                         value={startDate}
                         onChange={(e) => setStartDate(e.target.value)}
-                        className="clay-input"
+                        className="premium-input"
                     />
                 </div>
 
@@ -162,7 +162,7 @@ export default function ExportControls({ departments, jobs }: ExportControlsProp
                         type="date"
                         value={endDate}
                         onChange={(e) => setEndDate(e.target.value)}
-                        className="clay-input"
+                        className="premium-input"
                     />
                 </div>
             </div>
@@ -170,7 +170,7 @@ export default function ExportControls({ departments, jobs }: ExportControlsProp
             <div className="flex gap-4 pt-4">
                 <Button
                     onClick={() => handleExport('csv')}
-                    className="flex-1 clay-button"
+                    className="flex-1 premium-btn"
                     disabled={loading}
                 >
                     <Download className="mr-2 h-4 w-4" />
@@ -178,7 +178,7 @@ export default function ExportControls({ departments, jobs }: ExportControlsProp
                 </Button>
                 <Button
                     onClick={() => handleExport('print')}
-                    className="flex-1 clay-button bg-gray-600 hover:bg-gray-700 text-white"
+                    className="flex-1 premium-btn bg-gray-600 hover:bg-gray-700 text-white"
                     disabled={loading}
                 >
                     <Printer className="mr-2 h-4 w-4" />

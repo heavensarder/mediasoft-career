@@ -28,7 +28,7 @@ export default async function Home() {
         <h2 className="text-3xl font-bold mb-10 text-foreground text-center">Open Positions</h2>
 
         {jobs.length === 0 ? (
-          <div className="clay-card p-12 text-center text-muted-foreground max-w-lg mx-auto bg-card">
+          <div className="premium-glass-card p-12 text-center text-muted-foreground max-w-lg mx-auto">
             <div className="mb-4 bg-muted w-16 h-16 rounded-full flex items-center justify-center mx-auto">
               <Briefcase className="w-8 h-8 text-muted-foreground px-1" />
             </div>
@@ -38,7 +38,7 @@ export default async function Home() {
         ) : (
           <div className="grid gap-6">
             {jobs.map((job: any) => (
-              <div key={job.id} className="clay-card p-6 flex flex-col md:flex-row gap-5 items-start md:items-center justify-between group hover:border-primary/50 transition-colors">
+              <div key={job.id} className="premium-glass-card p-6 flex flex-col md:flex-row gap-5 items-start md:items-center justify-between group hover:border-primary/50 transition-colors">
                 {/* Left Side: Info */}
                 <div className="space-y-3 flex-1">
                   <div>
@@ -72,7 +72,7 @@ export default async function Home() {
                 {/* Right Side: Action */}
                 <div className="flex items-center gap-4 shrink-0 w-full md:w-auto mt-2 md:mt-0">
                   <Link href={`/jobs/${job.slug}`} className="w-full md:w-auto">
-                    <Button className="clay-button w-full md:w-auto px-6 h-11 text-base shadow-none hover:shadow-none hover:translate-y-0 active:scale-100 active:shadow-inner">
+                    <Button className="premium-btn w-full md:w-auto px-6 h-11 text-base shadow-none hover:shadow-none hover:translate-y-0 active:scale-100 active:shadow-inner">
                       {job.status === 'Active' ? 'Apply Now' : 'View Details'}
                     </Button>
                   </Link>

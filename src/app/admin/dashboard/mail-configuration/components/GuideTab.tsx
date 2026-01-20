@@ -10,7 +10,7 @@ export default function GuideTab() {
         </CardHeader>
         <CardContent className="space-y-4 text-sm text-muted-foreground">
           <ol className="list-decimal list-inside space-y-2">
-            <li>Go to <a href="https://console.cloud.google.com" target="_blank" rel="noreferrer" className="text-primary hover:underline">Google Cloud Console</a> and create a <strong>New Project</strong>.</li>
+            <li>Go to <a href="https://console.cloud.google.com" target="_blank" rel="noreferrer" className="text-primary hover:text-blue-700 transition-colors">Google Cloud Console</a> and create a <strong>New Project</strong>.</li>
             <li>Navigate to <strong>APIs & Services {'>'} OAuth consent screen</strong>.</li>
             <li>Select <strong>External</strong> User Type and click Create.</li>
             <li>Fill in App Name and Support Email (required fields only). Save & Continue.</li>
@@ -46,7 +46,7 @@ export default function GuideTab() {
         </CardHeader>
         <CardContent className="space-y-4 text-sm text-muted-foreground">
           <ol className="list-decimal list-inside space-y-2">
-            <li>Go to <a href="https://developers.google.com/oauthplayground" target="_blank" rel="noreferrer" className="text-primary hover:underline">OAuth 2.0 Playground</a>.</li>
+            <li>Go to <a href="https://developers.google.com/oauthplayground" target="_blank" rel="noreferrer" className="text-primary hover:text-blue-700 transition-colors">OAuth 2.0 Playground</a>.</li>
             <li>Click the <strong>Settings (⚙️)</strong> icon on the top right.</li>
             <li>Check "Use your own OAuth credentials" and paste your Client ID/Secret.</li>
             <li>On the left, find "Input your own scopes", paste this, and click Authorize:

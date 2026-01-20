@@ -1,5 +1,7 @@
+import { join } from 'path';
+import { mkdir, writeFile } from 'fs/promises';
 
-async function saveFile(file: File, folder: string): Promise<string> {
+export async function saveFile(file: File, folder: string): Promise<string> {
     if (!file || file.size === 0) return '';
 
     const bytes = await file.arrayBuffer();

@@ -15,11 +15,14 @@ interface MailConfigurationClientProps {
 export default function MailConfigurationClient({ initialData }: MailConfigurationClientProps) {
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
-         <h1 className="text-3xl font-bold tracking-tight text-slate-900">Mail Configuration</h1>
+      <div className="flex items-center justify-between mb-10">
+         <div>
+            <h1 className="text-4xl font-extrabold tracking-tight gradient-text drop-shadow-sm">Mail Configuration</h1>
+            <p className="text-slate-500 mt-2 font-medium text-lg">Manage email notifications and auto-replies.</p>
+         </div>
       </div>
 
-      <div className="clay-card bg-white p-6 overflow-hidden">
+      <div className="premium-glass-card bg-white p-6 overflow-hidden">
         <Tabs defaultValue="credentials" className="space-y-6">
             <TabsList className="w-full justify-start h-12 bg-slate-100 p-1 border border-slate-200">
             <TabsTrigger value="credentials" className="gap-2 data-[state=active]:bg-white data-[state=active]:shadow-sm px-6 h-full rounded-md transition-all text-slate-600 data-[state=active]:text-primary">

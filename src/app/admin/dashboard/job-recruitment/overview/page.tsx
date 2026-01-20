@@ -195,7 +195,7 @@ export default async function OverviewPage() {
                       </Avatar>
                     </Link>
                     <div>
-                      <Link href={`/admin/dashboard/job-recruitment/applications/${app.id}`} className="text-sm font-bold text-slate-800 group-hover:text-blue-600 transition-colors hover:underline">
+                      <Link href={`/admin/dashboard/job-recruitment/applications/${app.id}`} className="text-sm font-bold text-slate-800 group-hover:text-[#00ADE7] transition-colors">
                         {app.fullName}
                       </Link>
                       <p className="text-xs text-slate-500 font-medium">{app.job.title}</p>

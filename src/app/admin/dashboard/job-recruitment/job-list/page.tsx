@@ -48,17 +48,20 @@ export default async function JobListPage() {
 
     return (
         <div className="space-y-6">
-            <div className="flex justify-between items-center">
-                <h1 className="text-3xl font-bold tracking-tight text-slate-900">Job List</h1>
+            <div className="flex justify-between items-center mb-10">
+                <div>
+                    <h1 className="text-4xl font-extrabold tracking-tight gradient-text drop-shadow-sm">Job List</h1>
+                    <p className="text-slate-500 mt-2 font-medium text-lg">Manage and track all your job openings.</p>
+                </div>
                 <Link href="/admin/dashboard/job-recruitment/add-new-job">
-                    <Button className="clay-button shadow-md hover:shadow-lg transition-all">
+                    <Button className="premium-btn shadow-md hover:shadow-lg transition-all">
                         <PlusCircle className="mr-2 h-4 w-4" />
                         Add New Job
                     </Button>
                 </Link>
             </div>
 
-            <div className="clay-card bg-white p-6 overflow-hidden">
+            <div className="premium-glass-card bg-white p-6 overflow-hidden">
                 <div className="rounded-xl border border-slate-100 overflow-hidden">
                     <Table>
                         <TableHeader className="bg-slate-50">

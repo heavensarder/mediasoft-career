@@ -18,8 +18,11 @@ export default async function SettingsPage() {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <h1 className="text-3xl font-bold tracking-tight text-primary">Settings</h1>
+      <div className="flex items-center justify-between mb-10">
+        <div>
+          <h1 className="text-4xl font-extrabold tracking-tight gradient-text drop-shadow-sm">Settings</h1>
+          <p className="text-slate-500 mt-2 font-medium text-lg">Configure system-wide settings and preferences.</p>
+        </div>
       </div>
 
       <Tabs defaultValue="departments" className="w-full space-y-6">

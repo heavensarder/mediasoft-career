@@ -108,7 +108,7 @@ export default function SettingsSection({ title, description, items, onCreate, o
     }
 
     return (
-        <Card className="clay-card border-none">
+        <Card className="premium-glass-card border-none">
             <CardHeader>
                 <CardTitle className="text-2xl text-primary">{title}</CardTitle>
                 <CardDescription className="text-base">{description}</CardDescription>
@@ -121,9 +121,9 @@ export default function SettingsSection({ title, description, items, onCreate, o
                         value={newItemName}
                         onChange={(e) => setNewItemName(e.target.value)}
                         disabled={isCreating}
-                        className="h-12 text-lg clay-input"
+                        className="h-12 text-lg premium-input"
                     />
-                    <Button type="submit" size="lg" disabled={isCreating} className="h-12 px-8 clay-button">
+                    <Button type="submit" size="lg" disabled={isCreating} className="h-12 px-8 premium-btn">
                         {isCreating ? <Loader2 className="h-5 w-5 animate-spin" /> : <><Plus className="h-5 w-5 mr-2" /> Add</>}
                     </Button>
                 </form>
@@ -149,7 +149,7 @@ export default function SettingsSection({ title, description, items, onCreate, o
                                             <Pencil className="h-4 w-4 mr-2" /> Edit
                                         </Button>
                                     </DialogTrigger>
-                                    <DialogContent className="clay-card">
+                                    <DialogContent className="premium-glass-card">
                                         <DialogHeader>
                                             <DialogTitle>Edit {title.slice(0, -1)}</DialogTitle>
                                         </DialogHeader>
@@ -157,12 +157,12 @@ export default function SettingsSection({ title, description, items, onCreate, o
                                             <Input
                                                 value={editName}
                                                 onChange={(e) => setEditName(e.target.value)}
-                                                className="clay-input"
+                                                className="premium-input"
                                             />
                                         </div>
                                         <DialogFooter>
-                                            <Button variant="outline" onClick={() => setEditingItem(null)} className="clay-button bg-gray-200 text-gray-800 hover:bg-gray-300 shadow-none border-none">Cancel</Button>
-                                            <Button onClick={handleUpdate} disabled={isUpdating} className="clay-button">
+                                            <Button variant="outline" onClick={() => setEditingItem(null)} className="premium-btn bg-gray-200 text-gray-800 hover:bg-gray-300 shadow-none border-none">Cancel</Button>
+                                            <Button onClick={handleUpdate} disabled={isUpdating} className="premium-btn">
                                                 {isUpdating ? <Loader2 className="h-4 w-4 animate-spin" /> : <><Save className="h-4 w-4 mr-2" /> Save Changes</>}
                                             </Button>
                                         </DialogFooter>
@@ -186,7 +186,7 @@ export default function SettingsSection({ title, description, items, onCreate, o
                                             Delete
                                         </Button>
                                     </AlertDialogTrigger>
-                                    <AlertDialogContent className="clay-card">
+                                    <AlertDialogContent className="premium-glass-card">
                                         <AlertDialogHeader>
                                             <AlertDialogTitle>Delete {item.name}?</AlertDialogTitle>
                                             <AlertDialogDescription>
@@ -194,7 +194,7 @@ export default function SettingsSection({ title, description, items, onCreate, o
                                             </AlertDialogDescription>
                                         </AlertDialogHeader>
                                         <AlertDialogFooter>
-                                            <AlertDialogCancel className="clay-button bg-gray-200 text-gray-800 hover:bg-gray-300 shadow-none border-none">Cancel</AlertDialogCancel>
+                                            <AlertDialogCancel className="premium-btn bg-gray-200 text-gray-800 hover:bg-gray-300 shadow-none border-none">Cancel</AlertDialogCancel>
                                             <AlertDialogAction onClick={() => handleDelete(item.id)} className="bg-destructive text-destructive-foreground hover:bg-destructive/90 rounded-full shadow-md border-none">Delete</AlertDialogAction>
                                         </AlertDialogFooter>
                                     </AlertDialogContent>

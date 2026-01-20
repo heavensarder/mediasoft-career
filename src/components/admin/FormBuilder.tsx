@@ -158,10 +158,10 @@ export default function FormBuilder({ fields, onSeed, onCreate, onUpdate, onDele
 
     if (fields.length === 0) {
         return (
-            <Card className="clay-card border-none text-center py-10">
+            <Card className="premium-glass-card border-none text-center py-10">
                 <CardContent className="flex flex-col items-center gap-4">
                     <p className="text-muted-foreground">No fields found. Initialize the default form configuration.</p>
-                    <Button onClick={() => { onSeed().then(() => router.refresh()) }} className="clay-button">
+                    <Button onClick={() => { onSeed().then(() => router.refresh()) }} className="premium-btn">
                         Initialize Default Fields
                     </Button>
                 </CardContent>
@@ -170,7 +170,7 @@ export default function FormBuilder({ fields, onSeed, onCreate, onUpdate, onDele
     }
 
     return (
-        <Card className="clay-card border-none">
+        <Card className="premium-glass-card border-none">
             <CardHeader className="flex flex-row items-center justify-between">
                 <div>
                     <CardTitle className="text-2xl text-primary">Application Form Builder</CardTitle>
@@ -178,11 +178,11 @@ export default function FormBuilder({ fields, onSeed, onCreate, onUpdate, onDele
                 </div>
                 <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
                     <DialogTrigger asChild>
-                        <Button className="clay-button bg-primary text-white hover:bg-primary/90">
+                        <Button className="premium-btn bg-primary text-white hover:bg-primary/90">
                             <Plus className="mr-2 h-4 w-4" /> Add Field
                         </Button>
                     </DialogTrigger>
-                    <DialogContent className="clay-card">
+                    <DialogContent className="premium-glass-card">
                         <DialogHeader>
                             <DialogTitle>Add New Field</DialogTitle>
                             <DialogDescription>Create a custom question for the application form.</DialogDescription>
@@ -219,7 +219,7 @@ export default function FormBuilder({ fields, onSeed, onCreate, onUpdate, onDele
                         </div>
                         <DialogFooter>
                             <Button variant="outline" onClick={() => setIsDialogOpen(false)} className="rounded-xl">Cancel</Button>
-                            <Button onClick={handleCreate} disabled={isCreating} className="clay-button">
+                            <Button onClick={handleCreate} disabled={isCreating} className="premium-btn">
                                 {isCreating ? <Loader2 className="h-4 w-4 animate-spin" /> : 'Create Field'}
                             </Button>
                         </DialogFooter>
@@ -282,7 +282,7 @@ export default function FormBuilder({ fields, onSeed, onCreate, onUpdate, onDele
                                             <Pencil className="h-4 w-4" />
                                         </Button>
                                     </DialogTrigger>
-                                    <DialogContent className="clay-card">
+                                    <DialogContent className="premium-glass-card">
                                         <DialogHeader>
                                             <DialogTitle>Edit Field</DialogTitle>
                                         </DialogHeader>
@@ -313,7 +313,7 @@ export default function FormBuilder({ fields, onSeed, onCreate, onUpdate, onDele
                                         </div>
                                         <DialogFooter>
                                             <Button variant="outline" onClick={() => setEditingField(null)} className="rounded-xl">Cancel</Button>
-                                            <Button onClick={handleUpdate} disabled={isUpdating} className="clay-button">
+                                            <Button onClick={handleUpdate} disabled={isUpdating} className="premium-btn">
                                                 {isUpdating ? <Loader2 className="h-4 w-4 animate-spin" /> : 'Save Changes'}
                                             </Button>
                                         </DialogFooter>
@@ -327,7 +327,7 @@ export default function FormBuilder({ fields, onSeed, onCreate, onUpdate, onDele
                                                 <Trash2 className="h-4 w-4" />
                                             </Button>
                                         </AlertDialogTrigger>
-                                        <AlertDialogContent className="clay-card">
+                                        <AlertDialogContent className="premium-glass-card">
                                             <AlertDialogHeader>
                                                 <AlertDialogTitle>Delete Field?</AlertDialogTitle>
                                                 <AlertDialogDescription>
@@ -335,7 +335,7 @@ export default function FormBuilder({ fields, onSeed, onCreate, onUpdate, onDele
                                                 </AlertDialogDescription>
                                             </AlertDialogHeader>
                                             <AlertDialogFooter>
-                                                <AlertDialogCancel className="clay-button bg-gray-200 text-gray-800 hover:bg-gray-300 shadow-none border-none">Cancel</AlertDialogCancel>
+                                                <AlertDialogCancel className="premium-btn bg-gray-200 text-gray-800 hover:bg-gray-300 shadow-none border-none">Cancel</AlertDialogCancel>
                                                 <AlertDialogAction onClick={() => handleDelete(field.id)} className="bg-destructive text-destructive-foreground hover:bg-destructive/90 rounded-full shadow-md border-none">Delete</AlertDialogAction>
                                             </AlertDialogFooter>
                                         </AlertDialogContent>

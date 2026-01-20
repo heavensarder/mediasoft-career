@@ -90,15 +90,15 @@ export default function ApplicationForm({ jobId, jobTitle, fields }: { jobId: nu
             name: field.name,
             required: field.required,
             placeholder: field.placeholder || undefined,
-            className: "h-11 clay-input bg-white/50"
+            className: "h-11 premium-input bg-white/50"
         };
 
         switch (field.type) {
             case 'textarea':
-                return <Textarea {...commonProps} className="min-h-[120px] clay-input bg-white/50" />;
+                return <Textarea {...commonProps} className="min-h-[120px] premium-input bg-white/50" />;;
             case 'select':
                 return (
-                    <select {...commonProps} className={cn("flex w-full rounded-md border border-input px-3 py-2 text-sm ring-offset-background clay-input bg-white/50", commonProps.className)}>
+                    <select {...commonProps} className={cn("flex w-full rounded-md border border-input px-3 py-2 text-sm ring-offset-background premium-input bg-white/50", commonProps.className)}>
                         <option value="">Select {field.label}</option>
                         {field.options?.split(',').map(opt => (
                             <option key={opt.trim()} value={opt.trim()}>{opt.trim()}</option>
@@ -156,7 +156,7 @@ export default function ApplicationForm({ jobId, jobTitle, fields }: { jobId: nu
     };
 
     return (
-        <Card className="clay-card border-none overflow-hidden">
+        <Card className="premium-glass-card border-none overflow-hidden">
             <div className="h-2 bg-gradient-to-r from-cyan-400 to-blue-500" />
             <CardContent className="pt-8 px-6 sm:px-10">
                 <div className="mb-8 text-center">
@@ -196,7 +196,7 @@ export default function ApplicationForm({ jobId, jobTitle, fields }: { jobId: nu
                         </label>
                     </div>
 
-                    <Button type="submit" size="lg" className="w-full text-lg h-14 font-semibold shadow-lg hover:shadow-xl transition-all clay-button bg-primary hover:bg-primary/90" disabled={isSubmitting}>
+                    <Button type="submit" size="lg" className="w-full text-lg h-14 font-semibold shadow-lg hover:shadow-xl transition-all premium-btn bg-primary hover:bg-primary/90" disabled={isSubmitting}>
                         {isSubmitting ? (
                             <>
                                 <Loader2 className="mr-2 h-5 w-5 animate-spin" />

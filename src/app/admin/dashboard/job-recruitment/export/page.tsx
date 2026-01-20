@@ -15,7 +15,10 @@ export default async function ExportPage() {
 
   return (
     <div className="space-y-6">
-      <h1 className="text-3xl font-bold tracking-tight">Export Data</h1>
+      <div className="mb-10">
+        <h1 className="text-4xl font-extrabold tracking-tight gradient-text drop-shadow-sm">Export Data</h1>
+        <p className="text-slate-500 mt-2 font-medium text-lg">Download your data for analysis and reporting.</p>
+      </div>
 
       <div className="grid gap-6 md:grid-cols-2">
         <Card className="clay-card">

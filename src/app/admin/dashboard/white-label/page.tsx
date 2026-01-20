@@ -20,9 +20,12 @@ export default function WhiteLabelPage() {
 
     return (
         <div className="space-y-6 max-w-2xl mx-auto">
-            <h1 className="text-3xl font-bold tracking-tight text-slate-900">White Label Branding</h1>
+            <div className="mb-10 text-center">
+                <h1 className="text-4xl font-extrabold tracking-tight gradient-text drop-shadow-sm">White Label Branding</h1>
+                <p className="text-slate-500 mt-2 font-medium text-lg">Customize the admin experience with your brand.</p>
+            </div>
 
-            <Card className="clay-card">
+            <Card className="premium-glass-card">
                 <CardHeader>
                     <CardTitle>Company Logo</CardTitle>
                     <CardDescription>Upload your company logo to replace the default MediaSoft branding in the Admin Dashboard and Login page.</CardDescription>
@@ -78,7 +81,7 @@ export default function WhiteLabelPage() {
                         )}
 
                         <div className="flex justify-end">
-                            <Button type="submit" disabled={isPending || !preview} className="clay-button">
+                            <Button type="submit" disabled={isPending || !preview} className="premium-btn">
                                 {isPending ? (
                                     <>
                                         <Loader2 className="mr-2 h-4 w-4 animate-spin" />

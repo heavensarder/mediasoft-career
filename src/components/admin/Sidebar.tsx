@@ -56,14 +56,9 @@ export default function Sidebar({ newApplicationCount = 0, logoUrl }: SidebarPro
     setAppCount(newApplicationCount);
   }, [newApplicationCount]);
 
-  useEffect(() => {
-    // Refresh count on navigation
-    const fetchCount = async () => {
-        const count = await getNewApplicationCount();
-        setAppCount(count);
-    };
-    fetchCount();
-  }, [pathname]);
+  // Removed redundant fetch on navigation to improve performance
+  // The count is updated via Server Actions calling router.refresh() 
+  // which updates the 'newApplicationCount' prop from layout.tsx
 
   const toggleMenu = (title: string) => {
     setOpenMenus((prev) =>
@@ -74,7 +69,7 @@ export default function Sidebar({ newApplicationCount = 0, logoUrl }: SidebarPro
   };
 
   return (
-    <div className="flex h-full flex-col bg-white/30 backdrop-blur-xl border-r border-white/40 w-64 z-20 shadow-xl">
+    <div className="flex h-full flex-col bg-white/40 backdrop-blur-xl border-r border-white/50 w-64 z-20 shadow-[0_4px_30px_rgba(0,0,0,0.1)]">
       {/* Header / Brand */}
       <div className="flex h-16 items-center px-6 border-b border-white/40 bg-white/20">
         <div className="flex items-center gap-2">

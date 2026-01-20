@@ -185,7 +185,7 @@ const Tiptap = ({ content, onChange }: { content: string, onChange: (content: st
   }, [content, editor]);
 
   return (
-    <div className="clay-input p-0 flex flex-col overflow-hidden bg-white/50 border border-input focus-within:ring-2 focus-within:ring-primary/20">
+    <div className="premium-input p-0 flex flex-col overflow-hidden bg-white/50 border border-input focus-within:ring-2 focus-within:ring-primary/20">
       <MenuBar editor={editor} />
       <div className="flex-1 overflow-y-auto max-h-[500px]">
         <EditorContent editor={editor} />

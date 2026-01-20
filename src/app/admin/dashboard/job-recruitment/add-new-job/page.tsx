@@ -15,7 +15,10 @@ export default async function AddJobPage() {
 
     return (
         <div className="space-y-6">
-            <h1 className="text-3xl font-bold">Post a New Job</h1>
+            <div className="mb-10">
+                <h1 className="text-4xl font-extrabold tracking-tight gradient-text drop-shadow-sm">Post a New Job</h1>
+                <p className="text-slate-500 mt-2 font-medium text-lg">Create a new job opportunity for your organization.</p>
+            </div>
             <AddJobForm 
                 departments={departments} 
                 jobTypes={jobTypes} 

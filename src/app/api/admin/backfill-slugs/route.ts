@@ -3,9 +3,7 @@ import slugify from "slugify";
 import { NextResponse } from "next/server";
 
 export async function GET() {
-    const jobs = await prisma.job.findMany({
-        where: { slug: null }, // or just findMany to update all
-    });
+    const jobs = await prisma.job.findMany({});
 
     const updates = [];
 

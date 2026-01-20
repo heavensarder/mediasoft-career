@@ -80,7 +80,7 @@ export default async function JobDetailsPage({ params }: { params: Promise<{ slu
               <div className="flex flex-wrap items-center gap-3 text-sm font-medium">
                 <span className="bg-slate-100 text-slate-700 px-3 py-1 rounded-full flex items-center gap-1.5 transition-colors hover:bg-slate-200">
                   <Building2 className="w-3.5 h-3.5" />
-                  {job.department.name}
+                  {job.department?.name}
                 </span>
 
                 {!showApplication ? (
@@ -103,11 +103,11 @@ export default async function JobDetailsPage({ params }: { params: Promise<{ slu
               <div className="flex flex-wrap gap-x-6 gap-y-3 text-slate-500 text-sm md:text-base pt-2">
                 <span className="flex items-center gap-2">
                   <MapPin className="w-4 h-4 text-slate-400" />
-                  {job.location.name}
+                  {job.location?.name}
                 </span>
                 <span className="flex items-center gap-2">
                   <Briefcase className="w-4 h-4 text-slate-400" />
-                  {job.jobType.name}
+                  {job.jobType?.name}
                 </span>
                 <span className="flex items-center gap-2">
                   <Clock className="w-4 h-4 text-slate-400" />
@@ -126,7 +126,7 @@ export default async function JobDetailsPage({ params }: { params: Promise<{ slu
 
           {/* Left Column: Job Description */}
           <div className="lg:col-span-7 space-y-8 min-w-0">
-            <div className="clay-card border-none bg-white p-4 md:p-10">
+            <div className="premium-glass-card border-none p-4 md:p-10">
               <h2 className="text-2xl font-bold mb-6 text-slate-900 border-b border-slate-100 pb-4 flex items-center gap-2">
                 Job Description
               </h2>
@@ -156,7 +156,7 @@ export default async function JobDetailsPage({ params }: { params: Promise<{ slu
                       ? 'This position is currently not accepting new applications.'
                       : 'The deadline for this position has passed. Please check our other openings.'}
                   </p>
-                  <Button asChild className="mt-4 clay-button">
+                  <Button asChild className="mt-4 premium-btn">
                     <Link href="/">Browse Other Jobs</Link>
                   </Button>
                 </div>
@@ -167,7 +167,7 @@ export default async function JobDetailsPage({ params }: { params: Promise<{ slu
               )}
 
               <div className="text-center text-xs text-muted-foreground mt-4">
-                Having trouble applying? <a href="mailto:support@mediasoft.com.bd" className="text-primary hover:underline">Contact Support</a>
+                Having trouble applying? <a href="mailto:support@mediasoft.com.bd" className="text-primary hover:text-blue-700 transition-colors">Contact Support</a>
               </div>
             </div>
           </div>

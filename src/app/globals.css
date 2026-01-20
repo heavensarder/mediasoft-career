@@ -129,11 +129,103 @@
 }
 
 @layer utilities {
+  /* Utility classes can go here if needed */
+}
 
-  /* Redefining "clay" classes to mapped to Modern Minimalist styles */
-  .clay-card {
-    @apply bg-card rounded-xl border border-border shadow-sm hover:shadow-md transition-shadow duration-200;
+/* --- PREMIUM MODERN DESIGN SYSTEM (Glassmorphism 2.0) --- */
+:root {
+  /* Premium Palette */
+  --premium-bg-gradient: linear-gradient(135deg, #f8fafc 0%, #e0e7ff 100%);
+  --glass-surface: rgba(255, 255, 255, 0.7);
+  --glass-border: rgba(255, 255, 255, 0.6);
+  --glass-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.07);
+  
+  /* Text Colors */
+  --text-primary: #1e293b;   /* Slate 800 */
+  --text-secondary: #64748b; /* Slate 500 */
+  --primary-gradient: linear-gradient(to right, #00ADE7, #2563eb); /* Cyan to Blue */
+}
+
+@layer utilities {
+  /* Base Background */
+  body {
+    background: var(--premium-bg-gradient);
+    color: var(--text-primary);
+    min-height: 100vh;
   }
+
+  /* --- Component Classes (Mapped for Backward Compatibility) --- */
+
+  /* Cards */
+  .premium-card, .skeuo-card, .clay-card {
+    background: var(--glass-surface);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid var(--glass-border);
+    box-shadow: var(--glass-shadow);
+    border-radius: 1rem; /* 16px */
+    @apply transition-all duration-300 p-6;
+  }
+
+  .premium-card:hover, .skeuo-card:hover, .clay-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 12px 40px 0 rgba(31, 38, 135, 0.12);
+    background: rgba(255, 255, 255, 0.85);
+    border-color: rgba(255, 255, 255, 0.8);
+  }
+
+  /* Buttons */
+  .premium-btn, .skeuo-btn, .clay-button {
+    background: rgba(255, 255, 255, 0.5);
+    border: 1px solid var(--glass-border);
+    color: #00ADE7; /* Brand Cyan */
+    backdrop-filter: blur(4px);
+    box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+    @apply px-4 py-2 rounded-lg font-semibold flex items-center justify-center gap-2 transition-all duration-200 active:scale-[0.98];
+  }
+
+  .premium-btn:hover, .skeuo-btn:hover, .clay-button:hover {
+    background: white;
+    box-shadow: 0 4px 15px rgba(0, 173, 231, 0.25); /* Cyan glow */
+    color: #0095c8; /* Darker Cyan */
+    transform: translateY(-1px);
+  }
+  
+  /* Primary Button Variant */
+  .premium-btn-primary, .skeuo-btn-primary {
+    background: var(--primary-gradient);
+    color: white;
+    border: none;
+    box-shadow: 0 4px 15px rgba(37, 99, 235, 0.3);
+    @apply px-4 py-2 rounded-lg font-semibold flex items-center justify-center gap-2 transition-all duration-200 active:scale-[0.98];
+  }
+
+  .premium-btn-primary:hover, .skeuo-btn-primary:hover {
+    opacity: 0.95;
+    box-shadow: 0 6px 20px rgba(37, 99, 235, 0.4);
+    transform: translateY(-1px);
+    color: white;
+  }
+
+  /* Inputs */
+  .premium-input, .skeuo-input, .clay-input {
+    background: rgba(255, 255, 255, 0.5);
+    border: 1px solid rgba(203, 213, 225, 0.6); /* Slate 300 equivalent */
+    color: var(--text-primary);
+    box-shadow: inset 0 2px 4px rgba(0,0,0,0.02);
+    @apply px-4 py-2.5 rounded-lg outline-none transition-all duration-200 w-full backdrop-blur-sm;
+  }
+
+  .premium-input:focus, .skeuo-input:focus, .clay-input:focus {
+    background: white;
+    border-color: #6366f1; /* Indigo 500 */
+    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1); /* Indigo ring */
+  }
+  
+  .premium-input::placeholder, .skeuo-input::placeholder, .clay-input::placeholder {
+    color: #94a3b8; /* Slate 400 */
+  }
+
 
   /* Glassmorphism Utilities */
   @layer components {
@@ -189,7 +281,6 @@
     animation-delay: 4s;
   }
 
-
   /* --- Premium Soft-Glass Theme (Light) --- */
   :root {
     --glass-border: rgba(255, 255, 255, 0.4);
@@ -209,7 +300,10 @@
     border: 1px solid var(--glass-border);
     box-shadow: var(--glass-shadow);
     border-radius: 16px;
-    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    transition:
+      transform 0.2s ease,
+      box-shadow 0.2s ease;
+    @apply p-6;
   }
 
   .premium-glass-card:hover {
@@ -218,9 +312,23 @@
     background: rgba(255, 255, 255, 0.85);
   }
 
+  /* Global Cursor Fix */
+  /* Global Cursor Fix - Aggressive Override */
+  button, 
+  [role="button"], 
+  [type="button"], 
+  [type="submit"], 
+  [type="reset"], 
+  .premium-btn, 
+  .premium-btn-primary, 
+  [role="tab"],
+  .cursor-pointer {
+    cursor: pointer !important;
+  }
+
   /* Gradient Text for Headings */
   .gradient-text {
-    background: linear-gradient(to right, #2563eb, #7c3aed);
+    background: linear-gradient(to right, #00ADE7, #2563eb);
     background-clip: text;
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
@@ -274,7 +382,11 @@
   }
 
   .neo-bg {
-    background: radial-gradient(circle at 10% 20%, rgba(30, 27, 75, 1) 0%, rgba(15, 23, 42, 1) 90%);
+    background: radial-gradient(
+      circle at 10% 20%,
+      rgba(30, 27, 75, 1) 0%,
+      rgba(15, 23, 42, 1) 90%
+    );
     min-height: 100vh;
   }
 
@@ -358,33 +470,7 @@
     }
   }
 
-  .dark .clay-card {
-    @apply shadow-none border-border;
-  }
 
-  .clay-button {
-    @apply bg-primary text-primary-foreground rounded-lg font-medium shadow-sm transition-all hover:opacity-90 active:scale-[0.98] border border-transparent;
-  }
-
-  .clay-button:hover {
-    @apply shadow-md;
-  }
-
-  .clay-button:active {
-    @apply shadow-none opacity-100;
-  }
-
-  .clay-input {
-    @apply bg-background border border-input rounded-lg transition-colors shadow-sm;
-  }
-
-  .dark .clay-input {
-    @apply bg-background border-input;
-  }
-
-  .clay-input:focus {
-    @apply ring-2 ring-primary/20 border-primary outline-none;
-  }
 }
 
 @layer base {

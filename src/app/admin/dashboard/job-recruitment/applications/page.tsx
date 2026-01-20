@@ -61,9 +61,12 @@ export default async function ApplicationsPage({
 
     return (
         <div className="space-y-6">
-            <div className="flex justify-between items-center">
-                <h1 className="text-3xl font-bold tracking-tight">Applications</h1>
-                <Button variant="outline">
+            <div className="flex justify-between items-center mb-10">
+                <div>
+                    <h1 className="text-4xl font-extrabold tracking-tight gradient-text drop-shadow-sm">Applications</h1>
+                    <p className="text-slate-500 mt-2 font-medium text-lg">Review and manage candidate applications.</p>
+                </div>
+                <Button variant="outline" className="premium-btn bg-white/50">
                     <Download className="mr-2 h-4 w-4" /> Export All
                 </Button>
             </div>
@@ -126,7 +129,7 @@ export default async function ApplicationsPage({
                                         </Dialog>
                                     </TableCell>
                                     <TableCell className="font-medium">
-                                        <Link href={`/admin/dashboard/job-recruitment/applications/${app.id}`} className="hover:underline hover:text-blue-600 block">
+                                        <Link href={`/admin/dashboard/job-recruitment/applications/${app.id}`} className="hover:text-[#00ADE7] block transition-colors">
                                             {app.fullName}
                                         </Link>
                                     </TableCell>
