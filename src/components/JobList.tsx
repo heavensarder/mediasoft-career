@@ -233,11 +233,17 @@ export function JobList({ jobs }: { jobs: any[] }) {
                                     </div>
 
                                     <div className="w-full md:w-auto mt-4 md:mt-0">
-                                        <Link href={`/jobs/${job.slug}`} className="block">
-                                            <Button className="w-full md:w-auto rounded-lg bg-white text-slate-700 border border-slate-200 hover:bg-[#00ADE7] hover:text-white hover:border-[#00ADE7] transition-all h-12 px-6 font-semibold shadow-sm">
+                                        <Button
+                                            asChild
+                                            className={`w-full md:w-auto h-11 px-8 font-bold tracking-wide rounded-full transition-all duration-300 transform hover:scale-105 shadow-md ${job.status === 'Active'
+                                                ? "!bg-[#00ADE7] !text-white hover:!bg-[#0095c8] shadow-blue-500/20 hover:shadow-blue-500/40 !border-none"
+                                                : "!bg-white !text-slate-500 !border-2 !border-slate-100 hover:!border-slate-300 hover:!bg-slate-50 hover:!text-slate-700"
+                                                }`}
+                                        >
+                                            <Link href={`/jobs/${job.slug}`}>
                                                 {job.status === 'Active' ? 'Apply Now' : 'View Details'}
-                                            </Button>
-                                        </Link>
+                                            </Link>
+                                        </Button>
                                     </div>
                                 </div>
                             </div>
