@@ -6,6 +6,7 @@ import ApplicationForm from "@/components/ApplicationForm";
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import ShareButton from '@/components/ShareButton';
+import ViewTracker from '@/components/ViewTracker';
 
 async function getJob(slug: string) {
   // Try to find by slug first
@@ -173,6 +174,9 @@ export default async function JobDetailsPage({ params }: { params: Promise<{ slu
 
         </div>
       </div>
+
+      
+      <ViewTracker jobId={job.id} />
     </div>
   );
 }

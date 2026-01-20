@@ -11,6 +11,7 @@ import ResumeViewerWrapper from '@/components/admin/ResumeViewerWrapper';
 import StatusSelector from '@/components/admin/StatusSelector';
 import MarkAsViewed from '@/components/admin/MarkAsViewed';
 import PrintButton from '@/components/admin/PrintButton';
+import ApplicantEmailModal from '@/components/admin/ApplicantEmailModal';
 import { prisma } from '@/lib/prisma';
 
 // const prisma = new PrismaClient();
@@ -51,6 +52,7 @@ export default async function ApplicationDetailsPage({ params }: { params: { id:
                         <h1 className="text-3xl font-bold tracking-tight text-slate-900">Application Details</h1>
                     </div>
                     <div className="flex items-center gap-3">
+                        <ApplicantEmailModal applicantEmail={application.email} applicantName={application.fullName} />
                         <PrintButton />
                         <StatusSelector id={application.id} currentStatus={application.status} />
                     </div>

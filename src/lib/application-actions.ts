@@ -6,8 +6,10 @@ import { Prisma } from '@prisma/client';
 import { revalidatePath } from 'next/cache';
 import { writeFile, mkdir } from 'fs/promises';
 import { join } from 'path';
+import nodemailer from "nodemailer";
+import { google } from "googleapis";
 
-const ApplicationSchema = null; // Removed static schema
+const REDIRECT_URI = "https://developers.google.com/oauthplayground";
 
 async function saveFile(file: File, folder: string): Promise<string> {
     if (!file || file.size === 0) return '';
@@ -132,9 +134,65 @@ export async function submitApplication(prevState: any, formData: FormData) {
         }
 
         // 4. Save to Database
-        await prisma.application.create({
+        const newApplication = await prisma.application.create({
             data: dbData,
         });
+
+        // 5. Trigger Auto-Reply (If enabled)
+        try {
+            // @ts-ignore - Prisma types might be syncing
+            const mailConfig = await prisma.mailConfig.findFirst({
+                include: { autoReplyTemplate: true }
+            });
+
+            if (mailConfig && mailConfig.isAutoReplyEnabled && mailConfig.autoReplyTemplate && dbData.email && mailConfig.senderEmail && mailConfig.clientId) {
+                 const { senderEmail, clientId, clientSecret, refreshToken } = mailConfig;
+                 
+                 // Dynamic Replacement
+                 let body = mailConfig.autoReplyTemplate.body || "";
+                 body = body.replace(/{{fullName}}/g, dbData.fullName || "Applicant")
+                            .replace(/{{email}}/g, dbData.email)
+                            .replace(/{{date}}/g, new Date().toLocaleDateString());
+                            
+                 // Ideally fetch job title
+                 const jobTitle = "this position"; // Placeholder or fetch job
+                 body = body.replace(/{{jobTitle}}/g, jobTitle);
+
+
+                 const oAuth2Client = new google.auth.OAuth2(
+                    clientId,
+                    clientSecret,
+                    REDIRECT_URI
+                 );
+        
+                 oAuth2Client.setCredentials({ refresh_token: refreshToken });
+                 
+                 // Refresh token logic handled by googleapis getAccessToken
+                 const accessToken = await oAuth2Client.getAccessToken();
+        
+                 const transport = nodemailer.createTransport({
+                    service: 'gmail',
+                    auth: {
+                        type: 'OAuth2',
+                        user: senderEmail,
+                        clientId: clientId,
+                        clientSecret: clientSecret,
+                        refreshToken: refreshToken,
+                        accessToken: accessToken.token || '',
+                    },
+                 });
+        
+                 await transport.sendMail({
+                    from: `MediaSoft <${senderEmail}>`,
+                    to: dbData.email,
+                    subject: mailConfig.autoReplyTemplate.subject || "Application Received",
+                    html: body,
+                 });
+            }
+        } catch (mailError) {
+             console.error("Auto-reply failed:", mailError);
+             // We don't block the submission success for email failure
+        }
 
         revalidatePath('/admin/dashboard/job-recruitment/applications');
         return { success: true };

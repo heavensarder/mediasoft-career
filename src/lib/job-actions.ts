@@ -130,7 +130,22 @@ export async function updateJobAction(id: number, data: any) {
     }
 
     revalidatePath('/admin/dashboard/job-recruitment/job-list');
+
     revalidatePath(`/admin/dashboard/job-recruitment/edit-job/${id}`);
     revalidatePath('/');
     return { success: true };
+}
+
+export async function incrementJobViews(id: number) {
+    try {
+        await prisma.job.update({
+            where: { id },
+            data: { views: { increment: 1 } },
+        });
+        revalidatePath('/admin/dashboard/job-recruitment/job-list');
+        return { success: true };
+    } catch (error) {
+        console.error("Failed to increment views:", error);
+        return { error: "Failed to increment views" };
+    }
 }

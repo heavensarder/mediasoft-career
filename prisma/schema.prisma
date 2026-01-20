@@ -111,3 +111,35 @@ model SystemSettings {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
+
+model MailConfig {
+  id            Int      @id @default(autoincrement())
+  senderEmail   String
+  clientId      String   @db.Text
+  clientSecret  String   @db.Text
+  refreshToken  String   @db.Text
+  
+  // Notification Template (Sent to Admin/Receiver)
+  notificationSubject String?
+  notificationBody    String? @db.Text
+
+  // Auto Reply
+  isAutoReplyEnabled Boolean @default(false)
+  autoReplyTemplateId Int?
+  autoReplyTemplate   MailTemplate? @relation("AutoReplyTemplate", fields: [autoReplyTemplateId], references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model MailTemplate {
+  id        Int      @id @default(autoincrement())
+  name      String   @unique
+  subject   String
+  body      String   @db.Text
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  
+  // Relations
+  mailConfigs MailConfig[] @relation("AutoReplyTemplate")
+}

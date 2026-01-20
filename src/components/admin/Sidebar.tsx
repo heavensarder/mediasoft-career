@@ -14,7 +14,8 @@ import {
   ChevronDown
 } from 'lucide-react';
 import { handleSignOut } from '@/lib/auth-actions';
-import { useState } from 'react';
+import { getNewApplicationCount } from '@/lib/application-actions';
+import { useState, useEffect } from 'react';
 
 
 const menuItems = [
@@ -35,6 +36,7 @@ const menuItems = [
     icon: Settings,
     submenu: [
       { name: 'Branding', href: '/admin/dashboard/white-label', icon: Settings },
+      { name: 'Mail Configuration', href: '/admin/dashboard/mail-configuration', icon: Users }, // Using Users icon temporarily, can switch to Mail if imported
     ]
   }
 ];
@@ -47,6 +49,21 @@ interface SidebarProps {
 export default function Sidebar({ newApplicationCount = 0, logoUrl }: SidebarProps) {
   const pathname = usePathname();
   const [openMenus, setOpenMenus] = useState<string[]>(['Job Recruitment', 'White Label']);
+  const [appCount, setAppCount] = useState(newApplicationCount);
+
+  useEffect(() => {
+    // Initial sync
+    setAppCount(newApplicationCount);
+  }, [newApplicationCount]);
+
+  useEffect(() => {
+    // Refresh count on navigation
+    const fetchCount = async () => {
+        const count = await getNewApplicationCount();
+        setAppCount(count);
+    };
+    fetchCount();
+  }, [pathname]);
 
   const toggleMenu = (title: string) => {
     setOpenMenus((prev) =>
@@ -115,12 +132,12 @@ export default function Sidebar({ newApplicationCount = 0, logoUrl }: SidebarPro
                           <subItem.icon className={clsx("h-4 w-4", isActive ? "text-primary" : "text-muted-foreground group-hover:text-foreground")} />
                           <span>{subItem.name}</span>
                         </div>
-                        {subItem.showCount && newApplicationCount > 0 && (
+                        {subItem.showCount && appCount > 0 && (
                           <span className={clsx(
                             "flex h-5 min-w-[1.25rem] items-center justify-center rounded-full text-[10px] font-bold px-1",
                             isActive ? "bg-primary text-primary-foreground" : "bg-primary/10 text-primary"
                           )}>
-                            {newApplicationCount}
+                            {appCount}
                           </span>
                         )}
                       </Link>

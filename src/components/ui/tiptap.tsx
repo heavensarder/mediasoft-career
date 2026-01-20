@@ -177,6 +177,13 @@ const Tiptap = ({ content, onChange }: { content: string, onChange: (content: st
     immediatelyRender: false
   })
 
+  // Update editor content if props change (and editor is ready)
+  useEffect(() => {
+    if (editor && content !== editor.getHTML()) {
+      editor.commands.setContent(content);
+    }
+  }, [content, editor]);
+
   return (
     <div className="clay-input p-0 flex flex-col overflow-hidden bg-white/50 border border-input focus-within:ring-2 focus-within:ring-primary/20">
       <MenuBar editor={editor} />
