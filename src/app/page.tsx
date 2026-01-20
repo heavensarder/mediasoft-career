@@ -1,41 +1,32 @@
 import Link from "next/link";
 import { getActiveJobs } from "@/lib/data";
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-  CardFooter,
-} from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
-  MapPin,
-  Clock,
-  Briefcase,
-  ChevronRight,
-  Zap,
   Users,
   Heart,
-  ArrowRight,
+  Zap,
   GraduationCap,
   Trophy,
   Smile,
   Globe,
   Monitor,
   Award,
-  Shield,
-  PieChart,
+  ChevronRight,
+  Briefcase
 } from "lucide-react";
 import Image from "next/image";
 import { FloatingNav } from "@/components/FloatingNav";
+import { getSystemSetting } from "@/lib/settings-actions";
+import { JobList } from "@/components/JobList";
 
 export default async function Home() {
   const jobs = await getActiveJobs();
+  const logoPath = await getSystemSetting('company_logo');
 
   return (
     <div className="min-h-screen bg-white font-sans selection:bg-[#00ADE7]/20">
-      <FloatingNav />
+      <FloatingNav logoPath={logoPath} />
       {/* 1. Hero Section - Light & Airy */}
       <section id="hero" className="relative w-full min-h-screen flex items-center justify-center overflow-hidden">
         {/* Background Image with Dark Overlay */}
@@ -67,15 +58,24 @@ export default async function Home() {
             crafting the next generation of digital experiences.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
-            <Link href="#open-positions">
-              <Button
-                size="lg"
-                className="h-14 px-10 text-lg rounded-full bg-white text-slate-900 font-bold tracking-wide hover:bg-slate-200 transition-all duration-300 shadow-[0_0_20px_rgba(255,255,255,0.3)] hover:scale-105"
-              >
-                View Open Roles <ChevronRight className="ml-2 w-5 h-5" />
-              </Button>
+            <Link
+              href="#open-positions"
+              className="
+      h-14 px-10 text-md rounded-full 
+      bg-gradient-to-r from-[#00ADE7] to-[#0066ff]
+      text-white font-bold tracking-wide 
+      hover:from-[#0095c8] hover:to-[#0052cc]
+      transition-all duration-300 
+      shadow-lg shadow-blue-500/30 
+      hover:scale-105 hover:shadow-blue-500/50
+      flex items-center justify-center
+    "
+            >
+              View Open Positions
             </Link>
           </div>
+
+
         </div>
       </section>
 
@@ -107,58 +107,7 @@ export default async function Home() {
               </p>
             </div>
           ) : (
-            <div className="space-y-4">
-              {jobs.map((job: any) => (
-                <div
-                  key={job.id}
-                  className="group bg-white rounded-xl p-1 shadow-sm hover:shadow-lg hover:shadow-blue-500/10 border border-slate-100 transition-all duration-300"
-                >
-                  <div className="flex flex-col md:flex-row gap-6 p-6 items-start md:items-center">
-                    {/* Icon/Logo Placeholder */}
-                    <div className="w-16 h-16 rounded-lg bg-[#E0F7FF] text-[#00ADE7] flex items-center justify-center shrink-0 text-xl font-bold group-hover:bg-[#00ADE7] group-hover:text-white transition-colors duration-300">
-                      {job.title.charAt(0)}
-                    </div>
-
-                    <div className="flex-1 space-y-2">
-                      <Link href={`/jobs/${job.slug}`} className="block w-fit">
-                        <h3 className="text-xl font-bold text-slate-800 group-hover:text-[#00ADE7] transition-colors flex items-center gap-2">
-                          {job.title}
-                          <ArrowRight className="w-4 h-4 opacity-0 -translate-x-2 group-hover:translate-x-0 group-hover:opacity-100 transition-all text-[#00ADE7]" />
-                        </h3>
-                      </Link>
-                      <div className="flex flex-wrap items-center gap-3 text-sm text-slate-500">
-                        <span className="flex items-center gap-1.5 bg-slate-50 px-3 py-1 rounded-md border border-slate-100">
-                          <Briefcase className="w-4 h-4 text-slate-400" />
-                          {job.department.name}
-                        </span>
-                        <span className="flex items-center gap-1.5 bg-slate-50 px-3 py-1 rounded-md border border-slate-100">
-                          <Clock className="w-4 h-4 text-slate-400" />
-                          {job.jobType.name}
-                        </span>
-                        <span className="flex items-center gap-1.5 bg-slate-50 px-3 py-1 rounded-md border border-slate-100">
-                          <MapPin className="w-4 h-4 text-slate-400" />
-                          {job.location.name}
-                        </span>
-                        {job.status === 'Active' && job.expiryDate && (
-                          <span className="flex items-center gap-1.5 bg-orange-50 text-orange-700 px-3 py-1 rounded-md border border-orange-100">
-                            <Clock className="w-4 h-4" />
-                            Expires: {new Date(job.expiryDate).toLocaleDateString()}
-                          </span>
-                        )}
-                      </div>
-                    </div>
-
-                    <div className="w-full md:w-auto mt-4 md:mt-0">
-                      <Link href={`/jobs/${job.slug}`} className="block">
-                        <Button className="w-full md:w-auto rounded-lg bg-white text-slate-700 border border-slate-200 hover:bg-[#00ADE7] hover:text-white hover:border-[#00ADE7] transition-all h-12 px-6 font-semibold shadow-sm">
-                          {job.status === 'Active' ? 'Apply Now' : 'View Details'}
-                        </Button>
-                      </Link>
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
+            <JobList jobs={jobs} />
           )}
         </div>
       </section>
@@ -174,8 +123,8 @@ export default async function Home() {
               { label: "Significant Projects", value: "50+", icon: Trophy, color: "text-purple-500", bg: "bg-purple-50" },
             ].map((stat, i) => (
               <div key={i} className="flex flex-col items-center justify-center p-6 rounded-2xl bg-slate-50 border border-slate-100 hover:shadow-lg transition-all group text-center">
-                <div className={`w-12 h-12 ${stat.bg} ${stat.color} rounded-full flex items-center justify-center mb-4 group-hover:scale-110 transition-transform`}>
-                   <stat.icon className="w-6 h-6" />
+                <div className={`w - 12 h - 12 ${stat.bg} ${stat.color} rounded - full flex items - center justify - center mb - 4 group - hover: scale - 110 transition - transform`}>
+                  <stat.icon className="w-6 h-6" />
                 </div>
                 <h3 className="text-3xl font-bold text-slate-900 mb-1">{stat.value}</h3>
                 <p className="text-sm font-medium text-slate-500 uppercase tracking-wide">{stat.label}</p>
@@ -189,8 +138,8 @@ export default async function Home() {
       <section className="py-20 bg-slate-900 text-white relative overflow-hidden">
         {/* Background Gradients */}
         <div className="absolute top-0 left-0 w-full h-full bg-slate-900 z-0">
-           <div className="absolute top-0 right-0 w-96 h-96 bg-[#00ADE7]/20 rounded-full blur-[100px] -translate-y-1/2 translate-x-1/2"></div>
-           <div className="absolute bottom-0 left-0 w-80 h-80 bg-purple-600/20 rounded-full blur-[100px] translate-y-1/2 -translate-x-1/2"></div>
+          <div className="absolute top-0 right-0 w-96 h-96 bg-[#00ADE7]/20 rounded-full blur-[100px] -translate-y-1/2 translate-x-1/2"></div>
+          <div className="absolute bottom-0 left-0 w-80 h-80 bg-purple-600/20 rounded-full blur-[100px] translate-y-1/2 -translate-x-1/2"></div>
         </div>
 
         <div className="container mx-auto px-4 relative z-10 text-center">
@@ -198,18 +147,18 @@ export default async function Home() {
             Life at MediaSoft
           </Badge>
           <h2 className="text-3xl md:text-5xl font-bold mb-8">See What It's Like</h2>
-          
+
           <div className="max-w-4xl mx-auto aspect-video rounded-3xl overflow-hidden shadow-2xl border-4 border-slate-800 relative bg-black">
-             <iframe 
-                width="100%" 
-                height="100%" 
-                src="https://www.youtube.com/embed/A5hUTPU5EXo" 
-                title="Life at MediaSoft" 
-                frameBorder="0" 
-                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
-                allowFullScreen
-                className="absolute inset-0"
-             ></iframe>
+            <iframe
+              width="100%"
+              height="100%"
+              src="https://www.youtube.com/embed/A5hUTPU5EXo"
+              title="Life at MediaSoft"
+              frameBorder="0"
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+              allowFullScreen
+              className="absolute inset-0"
+            ></iframe>
           </div>
         </div>
       </section>
@@ -217,7 +166,7 @@ export default async function Home() {
       {/* 5. Benefits & Perks Section */}
       <section id="values" className="py-24 bg-white relative">
         <div className="container mx-auto px-4">
-           <div className="text-center mb-16 max-w-3xl mx-auto">
+          <div className="text-center mb-16 max-w-3xl mx-auto">
             <h2 className="text-3xl md:text-4xl font-bold text-slate-900 mb-4">Why Join MediaSoft?</h2>
             <p className="text-lg text-slate-600">
               We offer more than just a job. We offer a career path filled with growth, innovation, and rewards.
@@ -226,55 +175,55 @@ export default async function Home() {
 
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
             {[
-              { 
-                title: "Career Growth", 
+              {
+                title: "Career Growth",
                 desc: "Advance your career with numerous opportunities for professional development and growth within Mediasoft Data Systems Limited.",
-                icon: Trophy 
+                icon: Trophy
               },
-              { 
-                title: "Innovative Projects", 
+              {
+                title: "Innovative Projects",
                 desc: "Engage in cutting-edge projects that push the boundaries of technology and innovation.",
-                icon: Zap 
+                icon: Zap
               },
-              { 
-                title: "Collaborative Culture", 
+              {
+                title: "Collaborative Culture",
                 desc: "Join a supportive team environment that values collaboration, creativity, and mutual respect.",
-                icon: Users 
+                icon: Users
               },
-              { 
-                title: "Competitive Compensation", 
+              {
+                title: "Competitive Compensation",
                 desc: "Benefit from attractive salary packages, performance bonuses, and comprehensive benefits.",
-                icon: Award 
+                icon: Award
               },
-              { 
-                title: "Flexible Work Environment", 
+              {
+                title: "Flexible Work Environment",
                 desc: "Enjoy flexible working hours and remote work options to maintain a healthy work-life balance.",
-                icon: Monitor 
+                icon: Monitor
               },
-              { 
-                title: "Continuous Learning", 
+              {
+                title: "Continuous Learning",
                 desc: "Access to extensive training programs, workshops, and mentorship to enhance your skills and knowledge.",
-                icon: GraduationCap 
+                icon: GraduationCap
               },
-              { 
-                title: "Impactful Work", 
+              {
+                title: "Impactful Work",
                 desc: "Make a real difference by contributing to projects that have a significant impact on our clients and the industry.",
-                icon: Globe 
+                icon: Globe
               },
-              { 
-                title: "Inclusive Culture", 
+              {
+                title: "Inclusive Culture",
                 desc: "Be part of a diverse and inclusive workplace where all employees are valued and respected.",
-                icon: Heart 
+                icon: Heart
               },
-              { 
-                title: "Employee Wellbeing", 
+              {
+                title: "Employee Wellbeing",
                 desc: "Participate in health and wellness programs designed to support your overall wellbeing.",
-                icon: Smile 
+                icon: Smile
               },
-              { 
-                title: "Recognition and Rewards", 
+              {
+                title: "Recognition and Rewards",
                 desc: "Receive recognition for your hard work and achievements through various reward programs.",
-                icon: Award 
+                icon: Award
               },
             ].map((item, i) => (
               <div key={i} className="flex gap-5 p-6 rounded-2xl bg-white border border-slate-100 hover:border-blue-100 hover:shadow-lg transition-all group">
