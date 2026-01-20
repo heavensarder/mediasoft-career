@@ -19,6 +19,8 @@ import Image from "next/image";
 import { FloatingNav } from "@/components/FloatingNav";
 import { getSystemSetting } from "@/lib/settings-actions";
 import { JobList } from "@/components/JobList";
+import { StatsSection } from "@/components/StatsSection";
+import { BenefitsSection } from "@/components/BenefitsSection";
 
 export default async function Home() {
   const jobs = await getActiveJobs();
@@ -117,26 +119,7 @@ export default async function Home() {
       </section>
 
       {/* 3. New Stats Section */}
-      <section className="py-16 bg-white relative">
-        <div className="container mx-auto px-4">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
-            {[
-              { label: "Female Employee", value: "25%", icon: Users, color: "text-pink-500", bg: "bg-pink-50" },
-              { label: "Friendly Environment", value: "100%", icon: Smile, color: "text-yellow-500", bg: "bg-yellow-50" },
-              { label: "Learning Opportunities", value: "Unlimited", icon: GraduationCap, color: "text-blue-500", bg: "bg-blue-50" },
-              { label: "Significant Projects", value: "50+", icon: Trophy, color: "text-purple-500", bg: "bg-purple-50" },
-            ].map((stat, i) => (
-              <div key={i} className="flex flex-col items-center justify-center p-6 rounded-2xl bg-slate-50 border border-slate-100 hover:shadow-lg transition-all group text-center">
-                <div className={`w - 12 h - 12 ${stat.bg} ${stat.color} rounded - full flex items - center justify - center mb - 4 group - hover: scale - 110 transition - transform`}>
-                  <stat.icon className="w-6 h-6" />
-                </div>
-                <h3 className="text-3xl font-bold text-slate-900 mb-1">{stat.value}</h3>
-                <p className="text-sm font-medium text-slate-500 uppercase tracking-wide">{stat.label}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
+      <StatsSection />
 
       {/* 4. Video Section */}
       <section className="py-20 bg-slate-900 text-white relative overflow-hidden">
@@ -167,82 +150,8 @@ export default async function Home() {
         </div>
       </section>
 
-      {/* 5. Benefits & Perks Section */}
-      <section id="values" className="py-24 bg-white relative">
-        <div className="container mx-auto px-4">
-          <div className="text-center mb-16 max-w-3xl mx-auto">
-            <h2 className="text-3xl md:text-4xl font-bold text-slate-900 mb-4">Why Join MediaSoft?</h2>
-            <p className="text-lg text-slate-600">
-              We offer more than just a job. We offer a career path filled with growth, innovation, and rewards.
-            </p>
-          </div>
-
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {[
-              {
-                title: "Career Growth",
-                desc: "Advance your career with numerous opportunities for professional development and growth within Mediasoft Data Systems Limited.",
-                icon: Trophy
-              },
-              {
-                title: "Innovative Projects",
-                desc: "Engage in cutting-edge projects that push the boundaries of technology and innovation.",
-                icon: Zap
-              },
-              {
-                title: "Collaborative Culture",
-                desc: "Join a supportive team environment that values collaboration, creativity, and mutual respect.",
-                icon: Users
-              },
-              {
-                title: "Competitive Compensation",
-                desc: "Benefit from attractive salary packages, performance bonuses, and comprehensive benefits.",
-                icon: Award
-              },
-              {
-                title: "Flexible Work Environment",
-                desc: "Enjoy flexible working hours and remote work options to maintain a healthy work-life balance.",
-                icon: Monitor
-              },
-              {
-                title: "Continuous Learning",
-                desc: "Access to extensive training programs, workshops, and mentorship to enhance your skills and knowledge.",
-                icon: GraduationCap
-              },
-              {
-                title: "Impactful Work",
-                desc: "Make a real difference by contributing to projects that have a significant impact on our clients and the industry.",
-                icon: Globe
-              },
-              {
-                title: "Inclusive Culture",
-                desc: "Be part of a diverse and inclusive workplace where all employees are valued and respected.",
-                icon: Heart
-              },
-              {
-                title: "Employee Wellbeing",
-                desc: "Participate in health and wellness programs designed to support your overall wellbeing.",
-                icon: Smile
-              },
-              {
-                title: "Recognition and Rewards",
-                desc: "Receive recognition for your hard work and achievements through various reward programs.",
-                icon: Award
-              },
-            ].map((item, i) => (
-              <div key={i} className="flex gap-5 p-6 rounded-2xl bg-white border border-slate-100 hover:border-blue-100 hover:shadow-lg transition-all group">
-                <div className="shrink-0 w-12 h-12 rounded-xl bg-[#E0F7FF] text-[#00ADE7] flex items-center justify-center group-hover:scale-110 transition-transform">
-                  <item.icon className="w-6 h-6" />
-                </div>
-                <div>
-                  <h3 className="text-xl font-bold text-slate-900 mb-2 group-hover:text-[#00ADE7] transition-colors">{item.title}</h3>
-                  <p className="text-slate-600 text-sm leading-relaxed">{item.desc}</p>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
+      {/* 5. Benefits / Values Section */}
+      <BenefitsSection />
 
       {/* 6. Culture Content Section */}
       <section id="culture" className="py-24 bg-slate-50 relative">
@@ -308,34 +217,27 @@ export default async function Home() {
               <Button
                 variant="outline"
                 className="border-[#00ADE7] text-[#00ADE7] hover:bg-[#E0F7FF] hover:text-[#00ADE7] h-12 px-8 rounded-full"
+                asChild
               >
-                Learn More About Us
+                <Link href="https://mediasoftbd.com/about-us/" target="_blank" rel="noopener noreferrer">
+                  Learn More About Us
+                </Link>
               </Button>
             </div>
           </div>
         </div>
       </section>
 
-      {/* Footer Call to Action */}
-      <section className="py-20 bg-[#00ADE7] text-white text-center relative overflow-hidden">
-        <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-10"></div>
-        <div className="container mx-auto px-4 relative z-10">
-          <h2 className="text-3xl md:text-4xl font-bold mb-6">
-            Didn't find the perfect role?
-          </h2>
-          <p className="text-xl md:text-2xl text-white/90 mb-10 max-w-2xl mx-auto">
-            We are always open to meeting talented individuals. Send us your
-            resume and we'll keep you in mind for future opportunities.
+
+
+      {/* 7. Copyright Footer */}
+      <footer className="bg-black py-8 text-center text-white/50 text-sm">
+        <div className="container mx-auto px-4">
+          <p>
+            &copy; {new Date().getFullYear()} <a href="https://www.mediasoftbd.com" target="_blank" rel="noopener noreferrer" className="text-white hover:text-[#00ADE7] transition-colors">Mediasoft Data Systems Limited</a>. All rights reserved.
           </p>
-          <Button
-            variant="secondary"
-            size="lg"
-            className="h-14 px-10 text-lg rounded-full bg-white text-[#00ADE7] hover:bg-slate-100 shadow-xl"
-          >
-            Join Talent Network
-          </Button>
         </div>
-      </section>
+      </footer>
     </div>
   );
 }

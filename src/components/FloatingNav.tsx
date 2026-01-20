@@ -66,7 +66,7 @@ export function FloatingNav({ logoPath }: FloatingNavProps) {
       >
         {/* Logo */}
         <div className="pl-4 pr-2">
-          <Link href="/" onClick={(e) => handleScrollTo(e, "#hero")}>
+          <Link href="https://www.mediasoftbd.com" target="_blank" rel="noopener noreferrer">
             <Image
               src={logoPath || "https://mediasoftbd.com/wp-content/uploads/2025/06/mediasoft-logo.png"}
               alt="Company Logo"

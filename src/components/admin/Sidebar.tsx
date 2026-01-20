@@ -73,16 +73,18 @@ export default function Sidebar({ newApplicationCount = 0, logoUrl }: SidebarPro
       {/* Header / Brand */}
       <div className="flex h-16 items-center px-6 border-b border-white/40 bg-white/20">
         <div className="flex items-center gap-2">
-          {logoUrl ? (
-            <img src={logoUrl} alt="Company Logo" className="h-8 max-w-[150px] object-contain" />
-          ) : (
-            <>
-              <div className="h-8 w-8 bg-primary/80 backdrop-blur-sm rounded-lg flex items-center justify-center text-white font-bold shadow-lg shadow-primary/20">
-                M
+          <Link href="/admin/dashboard/job-recruitment/overview">
+            {logoUrl ? (
+              <img src={logoUrl} alt="Company Logo" className="h-10 max-w-[160px] object-contain" />
+            ) : (
+              <div className="flex items-center gap-2">
+                <div className="h-8 w-8 bg-primary/80 backdrop-blur-sm rounded-lg flex items-center justify-center text-white font-bold shadow-lg shadow-primary/20">
+                  M
+                </div>
+                <span className="text-lg font-bold text-slate-800 tracking-tight">MediaSoft</span>
               </div>
-              <span className="text-lg font-bold text-slate-800 tracking-tight">MediaSoft</span>
-            </>
-          )}
+            )}
+          </Link>
         </div>
       </div>
 

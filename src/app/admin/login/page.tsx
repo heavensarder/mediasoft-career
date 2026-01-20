@@ -9,7 +9,9 @@ export default async function LoginPage() {
       <div className="w-full max-w-md p-8 bg-white rounded-lg shadow-md">
         <div className="mb-6 flex flex-col items-center justify-center">
           {logoUrl ? (
-            <img src={logoUrl} alt="Company Logo" className="h-20 object-contain mb-4" />
+            <a href="https://www.mediasoftbd.com" target="_blank" rel="noopener noreferrer">
+              <img src={logoUrl} alt="Company Logo" className="h-20 object-contain mb-4" />
+            </a>
           ) : null}
           <h1 className="text-2xl font-bold text-center">Admin Login</h1>
         </div>
