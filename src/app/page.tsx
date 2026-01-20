@@ -43,7 +43,11 @@ export default async function Home() {
 
         {/* Hero Content */}
         <div className="relative z-10 container mx-auto px-4 text-center max-w-4xl">
-          <Badge className="mb-6 bg-[#00ADE7] text-white border-none px-4 py-1.5 text-sm font-semibold uppercase tracking-wider shadow-sm">
+          <Badge className="mb-6 bg-white text-black border-none px-4 py-1.5 text-sm font-semibold uppercase tracking-wider shadow-sm flex items-center gap-2 mx-auto w-fit">
+            <span className="relative flex h-2 w-2">
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
+              <span className="relative inline-flex rounded-full h-2 w-2 bg-green-500"></span>
+            </span>
             We are Hiring
           </Badge>
           <h1 className="text-5xl md:text-7xl font-extrabold text-white leading-tight mb-8 tracking-tight">

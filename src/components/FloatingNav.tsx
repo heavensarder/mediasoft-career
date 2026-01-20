@@ -80,53 +80,47 @@ export function FloatingNav({ logoPath }: FloatingNavProps) {
         {/* Nav Items - Desktop */}
         <div className="hidden md:flex items-center gap-1">
           {navItems.map((item) => (
-            <Link
+            <Button
               key={item.name}
-              href={item.href}
-              target={item.external ? "_blank" : undefined}
-              rel={item.external ? "noopener noreferrer" : undefined}
-              onClick={(e) => !item.external && handleScrollTo(e, item.href)}
-              className="group"
+              variant="ghost"
+              size="sm"
+              asChild
+              className="rounded-full px-5 text-slate-600 hover:text-white hover:bg-[#00ADE7] transition-all text-sm font-bold cursor-pointer"
             >
-              <Button
-                variant="ghost"
-                size="sm"
-                className="rounded-full px-5 text-slate-600 hover:text-white hover:bg-[#00ADE7] transition-all text-sm font-bold"
+              <Link
+                href={item.href}
+                target={item.external ? "_blank" : undefined}
+                rel={item.external ? "noopener noreferrer" : undefined}
+                onClick={(e) => !item.external && handleScrollTo(e, item.href)}
               >
                 {item.name}
-              </Button>
-            </Link>
+              </Link>
+            </Button>
           ))}
         </div>
 
         {/* Call to Action (Desktop Only) */}
         <div className="pl-2 pr-1 hidden md:block">
           <Button
-            asChild
             size="sm"
+            asChild
             className="
-      !rounded-full 
-      h-10 px-6 
-      !bg-gradient-to-r from-[#00ADE7] to-[#0066ff] 
-      hover:from-[#0095c8] hover:to-[#0052cc]
-      !text-white 
-      shadow-lg shadow-blue-500/30 
-      hover:shadow-blue-500/50 
-      transition-all duration-300 
-      hover:scale-105 
-      font-bold tracking-wide
-      overflow-visible
-    "
+                !rounded-full 
+                !bg-gradient-to-r from-[#00ADE7] to-[#0066ff] 
+                hover:from-[#0095c8] hover:to-[#0052cc]
+                !text-white 
+                !border-none
+                shadow-lg shadow-blue-500/30 
+                hover:shadow-blue-500/50 
+                transition-all duration-300 
+                hover:scale-105 
+                px-6 h-10 font-bold tracking-wide
+                cursor-pointer
+              "
           >
             <Link
               href="#open-positions"
               onClick={(e) => handleScrollTo(e, "#open-positions")}
-              className="
-        flex items-center justify-center 
-        !rounded-full 
-        !text-white
-        w-full h-full
-      "
             >
               Apply Now
             </Link>
@@ -205,29 +199,17 @@ export function FloatingNav({ logoPath }: FloatingNavProps) {
                   {/* Footer CTA */}
                   <div className="p-6 bg-slate-50/50 backdrop-blur-sm border-t border-slate-100">
                     <p className="text-center text-sm text-slate-400 mb-4 font-medium">Ready to start your journey?</p>
-                    <Link
-                      href="#open-positions"
-                      onClick={(e) => handleScrollTo(e, "#open-positions")}
+                    <Button
+                      asChild
+                      className="w-full !rounded-xl !bg-gradient-to-r from-[#00ADE7] to-blue-500 !text-white !border-none shadow-lg shadow-blue-500/25 h-14 text-lg font-bold hover:shadow-blue-500/40 hover:scale-[1.02] transition-all cursor-pointer"
                     >
-                      <Button
-                        className="
-    w-full 
-    !rounded-xl 
-    h-14 px-6 
-    !bg-gradient-to-r from-[#00ADE7] to-blue-500 
-    hover:from-[#0095c8] hover:to-[#0052cc]
-    !text-white 
-    text-lg font-bold tracking-wide
-    shadow-lg shadow-blue-500/25 
-    hover:shadow-blue-500/40 
-    hover:scale-[1.02] 
-    transition-all duration-300
-  "
+                      <Link
+                        href="#open-positions"
+                        onClick={(e) => handleScrollTo(e, "#open-positions")}
                       >
                         Apply Now
-                      </Button>
-
-                    </Link>
+                      </Link>
+                    </Button>
                   </div>
                 </div>
               </SheetContent>
