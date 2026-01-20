@@ -51,12 +51,12 @@ export default async function JobListPage() {
 
     return (
         <div className="space-y-8">
-            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-10">
                 <div>
-                    <h1 className="text-3xl md:text-4xl font-extrabold tracking-tight text-slate-900">
+                    <h1 className="text-4xl font-extrabold tracking-tight gradient-text drop-shadow-sm">
                         Job Recruitment
                     </h1>
-                    <p className="text-slate-500 mt-2 font-medium">
+                    <p className="text-slate-500 mt-2 font-medium text-lg">
                         Manage your job postings and track candidate applications.
                     </p>
                 </div>

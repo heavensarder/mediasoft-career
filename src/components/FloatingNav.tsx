@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
-import { Briefcase, Home, Users, Heart, Menu } from "lucide-react";
+import { Briefcase, Home, Users, Heart, Menu, FileText, MessageSquare } from "lucide-react";
 import { Sheet, SheetContent, SheetTrigger, SheetTitle } from "@/components/ui/sheet";
 import { cn } from "@/lib/utils";
 
@@ -37,9 +37,12 @@ export function FloatingNav({ logoPath }: FloatingNavProps) {
     { name: "Positions", href: "#open-positions", icon: Briefcase },
     { name: "Values", href: "#values", icon: Heart },
     { name: "Culture", href: "#culture", icon: Users },
+    { name: "Blog", href: "https://mediasoftbd.com/blog/", icon: FileText, external: true },
+    { name: "Contact Us", href: "https://mediasoftbd.com/contact-us-mediasoft-data-systems-for-best-point-of-sale-software/", icon: MessageSquare, external: true },
   ];
 
   const handleScrollTo = (e: React.MouseEvent<HTMLAnchorElement>, href: string) => {
+    if (href.startsWith("http")) return; // Let external links just work naturally
     e.preventDefault();
     const target = document.querySelector(href);
     if (target) {
@@ -57,7 +60,7 @@ export function FloatingNav({ logoPath }: FloatingNavProps) {
     >
       <nav
         className={cn(
-          "w-full max-w-5xl flex items-center justify-between p-2 rounded-full transition-all duration-300 border",
+          "w-full max-w-6xl flex items-center justify-between p-2 rounded-full transition-all duration-300 border", // Increased max-width for more items
           "bg-white shadow-md border-gray-200/50"
         )}
       >
@@ -80,13 +83,15 @@ export function FloatingNav({ logoPath }: FloatingNavProps) {
             <Link
               key={item.name}
               href={item.href}
-              onClick={(e) => handleScrollTo(e, item.href)}
+              target={item.external ? "_blank" : undefined}
+              rel={item.external ? "noopener noreferrer" : undefined}
+              onClick={(e) => !item.external && handleScrollTo(e, item.href)}
               className="group"
             >
               <Button
                 variant="ghost"
                 size="sm"
-                className="rounded-full px-4 text-slate-600 hover:text-[#00ADE7] hover:bg-slate-50 transition-all text-sm font-semibold"
+                className="rounded-full px-5 text-slate-600 hover:text-white hover:bg-[#00ADE7] transition-all text-sm font-bold"
               >
                 {item.name}
               </Button>
@@ -96,18 +101,39 @@ export function FloatingNav({ logoPath }: FloatingNavProps) {
 
         {/* Call to Action (Desktop Only) */}
         <div className="pl-2 pr-1 hidden md:block">
-          <Link
-            href="#open-positions"
-            onClick={(e) => handleScrollTo(e, "#open-positions")}
+          <Button
+            asChild
+            size="sm"
+            className="
+      !rounded-full 
+      h-10 px-6 
+      !bg-gradient-to-r from-[#00ADE7] to-[#0066ff] 
+      hover:from-[#0095c8] hover:to-[#0052cc]
+      !text-white 
+      shadow-lg shadow-blue-500/30 
+      hover:shadow-blue-500/50 
+      transition-all duration-300 
+      hover:scale-105 
+      font-bold tracking-wide
+      overflow-visible
+    "
           >
-            <Button
-              size="sm"
-              className="rounded-full bg-[#00ADE7] hover:bg-[#0095c8] text-white shadow-md shadow-[#00ADE7]/20 transition-all px-6 h-9"
+            <Link
+              href="#open-positions"
+              onClick={(e) => handleScrollTo(e, "#open-positions")}
+              className="
+        flex items-center justify-center 
+        !rounded-full 
+        !text-white
+        w-full h-full
+      "
             >
               Apply Now
-            </Button>
-          </Link>
+            </Link>
+          </Button>
         </div>
+
+
 
         {/* Mobile Menu Toggle (Right Aligned) */}
         <div className="md:hidden flex items-center">
@@ -156,7 +182,9 @@ export function FloatingNav({ logoPath }: FloatingNavProps) {
                       <Link
                         key={item.name}
                         href={item.href}
-                        onClick={(e) => handleScrollTo(e, item.href)}
+                        target={item.external ? "_blank" : undefined}
+                        rel={item.external ? "noopener noreferrer" : undefined}
+                        onClick={(e) => !item.external && handleScrollTo(e, item.href)}
                         className="group block"
                         style={{ animationDelay: `${index * 100}ms` }}
                       >
@@ -182,10 +210,23 @@ export function FloatingNav({ logoPath }: FloatingNavProps) {
                       onClick={(e) => handleScrollTo(e, "#open-positions")}
                     >
                       <Button
-                        className="w-full rounded-xl bg-gradient-to-r from-[#00ADE7] to-blue-500 text-white shadow-lg shadow-blue-500/25 h-14 text-lg font-bold hover:shadow-blue-500/40 hover:scale-[1.02] transition-all"
+                        className="
+    w-full 
+    !rounded-xl 
+    h-14 px-6 
+    !bg-gradient-to-r from-[#00ADE7] to-blue-500 
+    hover:from-[#0095c8] hover:to-[#0052cc]
+    !text-white 
+    text-lg font-bold tracking-wide
+    shadow-lg shadow-blue-500/25 
+    hover:shadow-blue-500/40 
+    hover:scale-[1.02] 
+    transition-all duration-300
+  "
                       >
                         Apply Now
                       </Button>
+
                     </Link>
                   </div>
                 </div>
