@@ -109,10 +109,10 @@ function StatCard({ icon: Icon, value, label, color, bg, delay }: StatCardProps)
 
 export function StatsSection() {
     const stats = [
-        { label: "Female Employee", value: "25%", icon: Users, color: "text-pink-600", bg: "bg-pink-100" },
-        { label: "Friendly Environment", value: "100%", icon: Smile, color: "text-yellow-600", bg: "bg-yellow-100" },
-        { label: "Learning Opportunities", value: "Unlimited", icon: GraduationCap, color: "text-blue-600", bg: "bg-blue-100" },
-        { label: "Significant Projects", value: "80+", icon: Trophy, color: "text-purple-600", bg: "bg-purple-100" },
+        { label: "Female Employee", value: "25%", icon: Users, color: "text-[#00ADE7]", bg: "bg-slate-50" },
+        { label: "Friendly Environment", value: "100%", icon: Smile, color: "text-[#00ADE7]", bg: "bg-slate-50" },
+        { label: "Learning Opportunities", value: "Unlimited", icon: GraduationCap, color: "text-[#00ADE7]", bg: "bg-slate-50" },
+        { label: "Significant Projects", value: "80+", icon: Trophy, color: "text-[#00ADE7]", bg: "bg-slate-50" },
     ];
 
     return (
