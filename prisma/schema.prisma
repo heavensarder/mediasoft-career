@@ -155,3 +155,9 @@ model PageSeo {
   updatedAt   DateTime @updatedAt
 }
 
+model SliderImage {
+  id        Int      @id @default(autoincrement())
+  url       String
+  createdAt DateTime @default(now())
+}
+

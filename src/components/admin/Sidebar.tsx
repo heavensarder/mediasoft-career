@@ -36,9 +36,9 @@ const menuItems = [
     title: 'White Label',
     icon: Settings,
     submenu: [
-      { name: 'Branding', href: '/admin/dashboard/white-label', icon: Settings },
+      { name: 'Branding', href: '/admin/dashboard/white-label', icon: Settings, exact: true },
+      { name: 'Image Slider', href: '/admin/dashboard/white-label/image-slider', icon: LayoutDashboard }, // Using LayoutDashboard for visuals
       { name: 'SEO Manager', href: '/admin/dashboard/seo-manager', icon: Globe },
-      { name: 'Mail Configuration', href: '/admin/dashboard/mail-configuration', icon: Users }, // Using Users icon temporarily, can switch to Mail if imported
     ]
   }
 ];
@@ -114,7 +114,10 @@ export default function Sidebar({ newApplicationCount = 0, logoUrl }: SidebarPro
               {openMenus.includes(item.title) && (
                 <div className="space-y-1">
                   {item.submenu.map((subItem) => {
-                    const isActive = pathname === subItem.href || pathname.startsWith(subItem.href + '/');
+                    const isActive = (subItem as any).exact
+                         ? pathname === subItem.href
+                         : pathname === subItem.href || pathname.startsWith(subItem.href + '/');
+
                     return (
                       <Link
                         key={subItem.name}

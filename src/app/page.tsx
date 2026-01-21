@@ -21,6 +21,7 @@ import { getBrandingSettings } from "@/lib/settings-actions";
 import { JobList } from "@/components/JobList";
 import { StatsSection } from "@/components/StatsSection";
 import { BenefitsSection } from "@/components/BenefitsSection";
+import { ImageSliderSection } from "@/components/home/ImageSliderSection";
 
 import { Metadata } from 'next';
 import { getPageSeo } from '@/lib/seo-actions';
@@ -139,6 +140,9 @@ export default async function Home() {
 
       {/* 3. New Stats Section */}
       <StatsSection />
+
+      {/* 4. Image Slider Section */}
+      <ImageSliderSection />
 
       {/* 4. Video Section */}
       <section className="py-20 bg-slate-900 text-white relative overflow-hidden">

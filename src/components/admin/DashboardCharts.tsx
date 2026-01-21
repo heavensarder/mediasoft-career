@@ -77,35 +77,53 @@ export function DepartmentDistributionChart({ data }: { data: ChartData[] }) {
         <div className="h-[300px] w-full flex items-center justify-center">
             <ResponsiveContainer width="100%" height="100%">
                 <PieChart>
+                    <defs>
+                        {data.map((_, index) => (
+                            <linearGradient key={`gradient-${index}`} id={`gradient-${index}`} x1="0" y1="0" x2="0" y2="1">
+                                <stop offset="0%" stopColor={COLORS[index % COLORS.length]} stopOpacity={1} />
+                                <stop offset="100%" stopColor={COLORS[index % COLORS.length]} stopOpacity={0.6} />
+                            </linearGradient>
+                        ))}
+                    </defs>
                     <Pie
                         data={data}
                         cx="50%"
                         cy="50%"
-                        innerRadius={60}
-                        outerRadius={100}
-                        paddingAngle={5}
+                        innerRadius={65} // Slightly thinner ring
+                        outerRadius={105}
+                        paddingAngle={6}
                         dataKey="value"
+                        stroke="none" // Remove default stroke for cleaner look
+                        cornerRadius={8} // Rounded edges for segments
                     >
                         {data.map((entry, index) => (
-                            <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} stroke="rgba(0,0,0,0)" />
+                            <Cell 
+                                key={`cell-${index}`} 
+                                fill={`url(#gradient-${index})`} 
+                                stroke="rgba(255,255,255,0.2)" 
+                                strokeWidth={2}
+                            />
                         ))}
                     </Pie>
                     <Tooltip
                         contentStyle={{ 
-                            backgroundColor: '#ffffff', 
+                            backgroundColor: 'rgba(255, 255, 255, 0.95)', 
+                            backdropFilter: 'blur(8px)',
                             border: '1px solid #e2e8f0', 
-                            borderRadius: '12px', 
+                            borderRadius: '16px', 
                             color: '#1e293b',
-                            boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)',
-                            padding: '8px 12px'
+                            boxShadow: '0 10px 30px -5px rgba(0, 0, 0, 0.15)',
+                            padding: '12px 16px'
                         }}
-                        itemStyle={{ color: '#0f172a', fontWeight: '600' }}
+                        itemStyle={{ color: '#0f172a', fontWeight: 'bold', fontSize: '14px' }}
                         cursor={{ fill: 'transparent' }}
+                        formatter={(value: number) => [`${value} Jobs`, 'Vol']}
                     />
                     <Legend
                         verticalAlign="bottom"
                         height={36}
-                        formatter={(value) => <span style={{ color: '#475569', fontWeight: 500 }}>{value}</span>}
+                        iconType="circle"
+                        formatter={(value) => <span className="text-slate-600 font-medium ml-1">{value}</span>}
                     />
                 </PieChart>
             </ResponsiveContainer>
