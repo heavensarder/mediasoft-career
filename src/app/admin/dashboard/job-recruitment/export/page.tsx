@@ -3,6 +3,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Download } from "lucide-react";
 import { prisma } from "@/lib/prisma";
 import ExportControls from "@/components/admin/ExportControls";
+import DownloadDataButton from "@/components/admin/DownloadDataButton";
 
 export default async function ExportPage() {
   const departments = await prisma.department.findMany({
@@ -40,9 +41,11 @@ export default async function ExportPage() {
             <div className="p-4 text-center text-muted-foreground text-sm border rounded-lg clay-input mb-4">
               Simple list of all job postings.
             </div>
-            <Button variant="outline" className="w-full clay-button bg-secondary text-secondary-foreground hover:text-white">
-              <Download className="mr-2 h-4 w-4" /> Download Job List
-            </Button>
+            <DownloadDataButton 
+              mode="jobs" 
+              label="Download Job List" 
+              className="w-full clay-button bg-secondary text-secondary-foreground hover:text-white" 
+            />
           </CardContent>
         </Card>
       </div>

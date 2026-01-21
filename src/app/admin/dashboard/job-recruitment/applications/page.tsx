@@ -24,6 +24,7 @@ import DeleteApplicationButton from '@/components/admin/DeleteApplicationButton'
 import { prisma } from '@/lib/prisma';
 import { getApplications } from '@/lib/application-actions';
 import PaginationControls from '@/components/ui/pagination-controls';
+import DownloadDataButton from '@/components/admin/DownloadDataButton';
 
 async function getJobs() {
     return await prisma.job.findMany({
@@ -71,9 +72,12 @@ export default async function ApplicationsPage({
                         Review and manage candidate applications ({totalCount} total).
                     </p>
                 </div>
-                <Button variant="outline" className="premium-btn bg-white/50 border-primary/20 text-primary hover:bg-primary/5">
-                    <Download className="mr-2 h-4 w-4" /> Export All
-                </Button>
+                <DownloadDataButton 
+                    mode="applications" 
+                    filters={{ query, status, jobId, gender }} 
+                    label="Export All" 
+                    className="premium-btn bg-white/50 border-primary/20 text-primary hover:bg-primary/5" 
+                />
             </div>
 
             <Suspense fallback={<div>Loading filters...</div>}>

@@ -7,17 +7,40 @@ export async function getExportData(
     departmentId?: string,
     jobId?: string,
     startDate?: string,
-    endDate?: string
+    endDate?: string,
+    query?: string,
+    status?: string,
+    gender?: string
 ) {
     const where: Prisma.ApplicationWhereInput = {};
 
-    // Filter by Job and optionally Department (via Job)
+    // Filter by Job and optionally Department
     if (jobId && jobId !== 'all') {
         where.jobId = parseInt(jobId);
     } else if (departmentId && departmentId !== 'all') {
         where.job = {
             departmentId: parseInt(departmentId)
         };
+    }
+
+    // Filter by Status
+    if (status && status !== 'all') {
+        where.status = status;
+    }
+
+    // Filter by Gender
+    if (gender && gender !== 'all') {
+        where.gender = gender;
+    }
+
+    // Search Query (Name, Email, Mobile, NID)
+    if (query) {
+        where.OR = [
+            { fullName: { contains: query } },
+            { email: { contains: query } },
+            { mobile: { contains: query } },
+            { nid: { contains: query } },
+        ];
     }
 
     // Filter by Date Range
@@ -73,5 +96,38 @@ export async function getExportData(
     } catch (error) {
         console.error("Export Error:", error);
         return { success: false, error: "Failed to fetch data." };
+    }
+}
+
+export async function getJobExportData() {
+    try {
+        const jobs = await prisma.job.findMany({
+            include: {
+                department: true,
+                _count: {
+                    select: { applications: true }
+                }
+            },
+            orderBy: {
+                createdAt: 'desc'
+            }
+        });
+
+        const flattenedData = jobs.map(job => ({
+            "Job ID": job.id,
+            "Title": job.title,
+            "Department": job.department?.name || 'N/A',
+            "Status": job.status,
+            "Applications": job._count.applications,
+            "Views": job.views,
+            "Created Date": job.createdAt.toLocaleDateString(),
+            "Expiry Date": job.expiryDate ? job.expiryDate.toLocaleDateString() : 'N/A'
+        }));
+
+        return { success: true, data: flattenedData };
+
+    } catch (error) {
+        console.error("Job Export Error:", error);
+        return { success: false, error: "Failed to fetch jobs." };
     }
 }
