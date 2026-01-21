@@ -91,12 +91,21 @@ export function DepartmentDistributionChart({ data }: { data: ChartData[] }) {
                         ))}
                     </Pie>
                     <Tooltip
-                        contentStyle={{ backgroundColor: 'rgba(15, 23, 42, 0.9)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '8px', color: '#fff' }}
+                        contentStyle={{ 
+                            backgroundColor: '#ffffff', 
+                            border: '1px solid #e2e8f0', 
+                            borderRadius: '12px', 
+                            color: '#1e293b',
+                            boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)',
+                            padding: '8px 12px'
+                        }}
+                        itemStyle={{ color: '#0f172a', fontWeight: '600' }}
+                        cursor={{ fill: 'transparent' }}
                     />
                     <Legend
                         verticalAlign="bottom"
                         height={36}
-                        formatter={(value) => <span style={{ color: '#cbd5e1' }}>{value}</span>}
+                        formatter={(value) => <span style={{ color: '#475569', fontWeight: 500 }}>{value}</span>}
                     />
                 </PieChart>
             </ResponsiveContainer>

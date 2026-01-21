@@ -232,7 +232,7 @@ export default async function OverviewPage() {
 
             <div className="w-full space-y-3 mt-4">
               {chartData.slice(0, 4).map((item, idx) => (
-                <div key={idx} className="flex justify-between items-center text-sm p-2 rounded hover:bg-slate-50 transition-colors">
+                <div key={idx} className="flex justify-between items-center text-sm p-2 rounded hover:bg-slate-20 transition-colors">
                   <div className="flex items-center gap-2">
                     <div className="h-3 w-3 rounded-md shadow-sm" style={{ backgroundColor: ['#0ea5e9', '#8b5cf6', '#10b981', '#f43f5e', '#f59e0b'][idx] }}></div>
                     <span className="text-slate-600 font-medium truncate max-w-[140px]">{item.name}</span>
