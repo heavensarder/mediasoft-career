@@ -111,15 +111,13 @@ export default function AdminJobList({ jobs }: { jobs: Job[] }) {
                                         <div className="h-12 w-12 rounded-xl bg-blue-50 flex items-center justify-center text-[#00ADE7]">
                                             <Briefcase className="h-6 w-6" />
                                         </div>
-                                    </div>
-                                    <div className="flex items-start gap-2 mb-1">
-                                        <h3 className="text-lg font-bold text-slate-900 leading-tight group-hover:text-[#00ADE7] transition-colors line-clamp-2">
-                                            {job.title}
-                                        </h3>
-                                        <div className="shrink-0 mt-0.5">
+                                        <div>
                                             <JobStatusToggle jobId={job.id} initialStatus={job.status || 'Active'} />
                                         </div>
                                     </div>
+                                    <h3 className="text-lg font-bold text-slate-900 leading-tight group-hover:text-[#00ADE7] transition-colors line-clamp-2 mb-1">
+                                        {job.title}
+                                    </h3>
                                     <p className="text-xs text-slate-400 font-mono mt-1">ID: #{job.id}</p>
                                 </div>
 
