@@ -82,90 +82,71 @@ export default async function OverviewPage() {
         </div>
       </div>
 
-      {/* Metric Cards Row */}
+      {/* metric Cards Row */}
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4 mb-8">
+        
         {/* Total Apps */}
-        <div className="premium-glass-card p-6 border-l-4 border-blue-500">
-          <div className="flex justify-between items-start">
-            <div>
-              <p className="text-slate-500 text-sm font-bold uppercase tracking-wider">Total Application</p>
-              <h3 className="text-4xl font-extrabold text-slate-800 mt-1">{totalApps}</h3>
+        <div className="relative overflow-hidden rounded-2xl p-6 bg-gradient-to-br from-blue-600 to-blue-500 shadow-xl shadow-blue-200 transition-transform hover:-translate-y-1">
+          <div className="relative z-10 text-white">
+            <div className="flex items-center justify-between mb-4">
+               <div className="p-3 bg-white/10 rounded-xl backdrop-blur-sm shadow-inner">
+                  <Users className="h-6 w-6 text-white" />
+               </div>
+               <span className="text-xs font-bold uppercase tracking-wider bg-white/20 px-3 py-1 rounded-full text-white shadow-sm border border-white/10">Total</span>
             </div>
-            <div className="h-10 w-10 rounded-xl bg-blue-100 flex items-center justify-center text-blue-600 shadow-sm">
-              <Users className="h-5 w-5" />
-            </div>
+            <h3 className="text-5xl font-black tracking-tight mb-1 drop-shadow-sm">{totalApps}</h3>
+            <p className="text-blue-50 font-bold text-lg tracking-wide opacity-90">Applications</p>
           </div>
-          <div className="mt-4 flex items-end justify-between">
-            <span className="text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded text-xs flex items-center gap-1 font-bold">
-              <TrendingUp className="h-3 w-3" /> +12%
-            </span>
-            <div className="h-10 w-24 opacity-80">
-              <MetricSparkline color="#2563eb" />
-            </div>
-          </div>
+          {/* Watermark Icon */}
+          <Users className="absolute -bottom-6 -right-6 h-40 w-40 text-white/10 rotate-12" />
         </div>
 
         {/* Active Jobs */}
-        <div className="premium-glass-card p-6 border-l-4 border-emerald-500">
-          <div className="flex justify-between items-start">
-            <div>
-              <p className="text-slate-500 text-sm font-bold uppercase tracking-wider">Active Jobs</p>
-              <h3 className="text-4xl font-extrabold text-slate-800 mt-1">{activeJobs}</h3>
+        <div className="relative overflow-hidden rounded-2xl p-6 bg-gradient-to-br from-emerald-600 to-emerald-500 shadow-xl shadow-emerald-200 transition-transform hover:-translate-y-1">
+          <div className="relative z-10 text-white">
+            <div className="flex items-center justify-between mb-4">
+               <div className="p-3 bg-white/10 rounded-xl backdrop-blur-sm shadow-inner">
+                  <Briefcase className="h-6 w-6 text-white" />
+               </div>
+               <span className="text-xs font-bold uppercase tracking-wider bg-white/20 px-3 py-1 rounded-full text-white shadow-sm border border-white/10">Active</span>
             </div>
-            <div className="h-10 w-10 rounded-xl bg-emerald-100 flex items-center justify-center text-emerald-600 shadow-sm">
-              <Briefcase className="h-5 w-5" />
-            </div>
+            <h3 className="text-5xl font-black tracking-tight mb-1 drop-shadow-sm">{activeJobs}</h3>
+            <p className="text-emerald-50 font-bold text-lg tracking-wide opacity-90">Positions Open</p>
           </div>
-          <div className="mt-4 flex items-end justify-between">
-            <span className="text-slate-500 text-xs font-semibold">
-              Positions Open
-            </span>
-            <div className="h-10 w-24 opacity-80">
-              <MetricSparkline color="#059669" />
-            </div>
-          </div>
+          {/* Watermark Icon */}
+          <Briefcase className="absolute -bottom-6 -right-6 h-40 w-40 text-white/10 rotate-12" />
         </div>
 
         {/* Shortlisted */}
-        <div className="premium-glass-card p-6 border-l-4 border-violet-500">
-          <div className="flex justify-between items-start">
-            <div>
-              <p className="text-slate-500 text-sm font-bold uppercase tracking-wider">Shortlisted</p>
-              <h3 className="text-4xl font-extrabold text-slate-800 mt-1">{shortlistedApps}</h3>
+        <div className="relative overflow-hidden rounded-2xl p-6 bg-gradient-to-br from-violet-600 to-violet-500 shadow-xl shadow-violet-200 transition-transform hover:-translate-y-1">
+          <div className="relative z-10 text-white">
+            <div className="flex items-center justify-between mb-4">
+               <div className="p-3 bg-white/10 rounded-xl backdrop-blur-sm shadow-inner">
+                  <UserCheck className="h-6 w-6 text-white" />
+               </div>
+               <span className="text-xs font-bold uppercase tracking-wider bg-white/20 px-3 py-1 rounded-full text-white shadow-sm border border-white/10">Qualified</span>
             </div>
-            <div className="h-10 w-10 rounded-xl bg-violet-100 flex items-center justify-center text-violet-600 shadow-sm">
-              <UserCheck className="h-5 w-5" />
-            </div>
+            <h3 className="text-5xl font-black tracking-tight mb-1 drop-shadow-sm">{shortlistedApps}</h3>
+            <p className="text-violet-50 font-bold text-lg tracking-wide opacity-90">Candidates</p>
           </div>
-          <div className="mt-4 flex items-end justify-between">
-            <span className="text-violet-600 bg-violet-50 px-2 py-0.5 rounded text-xs font-bold">
-              Qualified
-            </span>
-            <div className="h-10 w-24 opacity-80">
-              <MetricSparkline color="#7c3aed" />
-            </div>
-          </div>
+          {/* Watermark Icon */}
+          <UserCheck className="absolute -bottom-6 -right-6 h-40 w-40 text-white/10 rotate-12" />
         </div>
 
         {/* Rejected */}
-        <div className="premium-glass-card p-6 border-l-4 border-rose-500">
-          <div className="flex justify-between items-start">
-            <div>
-              <p className="text-slate-500 text-sm font-bold uppercase tracking-wider">Rejected</p>
-              <h3 className="text-4xl font-extrabold text-slate-800 mt-1">{rejectedApps}</h3>
+        <div className="relative overflow-hidden rounded-2xl p-6 bg-gradient-to-br from-rose-600 to-rose-500 shadow-xl shadow-rose-200 transition-transform hover:-translate-y-1">
+          <div className="relative z-10 text-white">
+            <div className="flex items-center justify-between mb-4">
+               <div className="p-3 bg-white/10 rounded-xl backdrop-blur-sm shadow-inner">
+                  <UserX className="h-6 w-6 text-white" />
+               </div>
+               <span className="text-xs font-bold uppercase tracking-wider bg-white/20 px-3 py-1 rounded-full text-white shadow-sm border border-white/10">Archived</span>
             </div>
-            <div className="h-10 w-10 rounded-xl bg-rose-100 flex items-center justify-center text-rose-600 shadow-sm">
-              <UserX className="h-5 w-5" />
-            </div>
+            <h3 className="text-5xl font-black tracking-tight mb-1 drop-shadow-sm">{rejectedApps}</h3>
+            <p className="text-rose-50 font-bold text-lg tracking-wide opacity-90">Rejected</p>
           </div>
-          <div className="mt-4 flex items-end justify-between">
-            <span className="text-slate-500 text-xs font-semibold">
-              Archived
-            </span>
-            <div className="h-10 w-24 opacity-80">
-              <MetricSparkline color="#e11d48" />
-            </div>
-          </div>
+          {/* Watermark Icon */}
+          <UserX className="absolute -bottom-6 -right-6 h-40 w-40 text-white/10 rotate-12" />
         </div>
       </div>
 
@@ -198,7 +179,7 @@ export default async function OverviewPage() {
                       <Link href={`/admin/dashboard/job-recruitment/applications/${app.id}`} className="text-sm font-bold text-slate-800 group-hover:text-[#00ADE7] transition-colors">
                         {app.fullName}
                       </Link>
-                      <p className="text-xs text-slate-500 font-medium">{app.job.title}</p>
+                      <p className="text-xs text-slate-500 font-medium">Applied for <span className="text-[#00ADE7]">{app.job.title}</span></p>
                     </div>
                   </div>
                   <div className="flex items-center gap-4">
