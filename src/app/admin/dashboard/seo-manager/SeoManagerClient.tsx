@@ -156,7 +156,7 @@ function SeoForm({ pageId, initialData, onSave, loading, description }: any) {
                                 <div className="h-7 w-7 rounded-full bg-slate-100 flex items-center justify-center text-slate-400 text-xs font-bold">M</div>
                                 <div>
                                     <div className="text-xs text-slate-800 font-medium">MediaSoft Career</div>
-                                    <div className="text-[10px] text-slate-500">https://career.mediasoftbd.com</div>
+                                    <div className="text-[10px] text-slate-500">https://example.com/page-url</div>
                                 </div>
                             </div>
                             <h3 className="text-xl text-[#1a0dab] hover:underline cursor-pointer font-medium truncate">

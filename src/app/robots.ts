@@ -3,7 +3,7 @@ import { getSystemSetting } from '@/lib/settings-actions';
 
 export default async function robots(): Promise<MetadataRoute.Robots> {
   const baseUrlVal = await getSystemSetting('site_base_url');
-  const baseUrl = baseUrlVal || 'https://career.mediasoftbd.com';
+  const baseUrl = baseUrlVal || process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
 
   return {
     rules: {

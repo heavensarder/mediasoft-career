@@ -23,7 +23,7 @@ export default function BrandingForm({ initialSettings }: BrandingFormProps) {
     const [preview, setPreview] = useState<string | null>(initialSettings.logoPath);
     const [faviconPreview, setFaviconPreview] = useState<string | null>(initialSettings.faviconPath);
     const [redirectUrl, setRedirectUrl] = useState(initialSettings.logoRedirectUrl || '');
-    const [siteBaseUrl, setSiteBaseUrl] = useState(initialSettings.siteBaseUrl || 'https://career.mediasoftbd.com');
+    const [siteBaseUrl, setSiteBaseUrl] = useState(initialSettings.siteBaseUrl || '');
 
     // Sync state with action result if successful
     useEffect(() => {
@@ -154,7 +154,7 @@ export default function BrandingForm({ initialSettings }: BrandingFormProps) {
                                 <Input 
                                     id="site_base_url"
                                     name="site_base_url"
-                                    placeholder="https://career.mediasoftbd.com"
+                                    placeholder="https://example.com"
                                     className="pl-10 h-11"
                                     value={siteBaseUrl}
                                     onChange={(e) => setSiteBaseUrl(e.target.value)}

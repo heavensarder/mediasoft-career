@@ -104,11 +104,13 @@ export async function getBrandingSettings() {
     const faviconSrc = await prisma.systemSettings.findUnique({ where: { key: 'site_favicon' } });
     const baseSiteUrl = await prisma.systemSettings.findUnique({ where: { key: 'site_base_url' } });
     
+    const defaultBaseUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
+    
     return {
       logoPath: logoSrc?.value || null,
       logoRedirectUrl: redirectUrl?.value || '',
       faviconPath: faviconSrc?.value || null,
-      siteBaseUrl: baseSiteUrl?.value || 'https://career.mediasoftbd.com'
+      siteBaseUrl: baseSiteUrl?.value || defaultBaseUrl
     };
   } catch (error) {
     console.error("Error fetching branding settings:", error);
