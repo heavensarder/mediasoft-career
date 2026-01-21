@@ -29,6 +29,7 @@ import {
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import JobActions from '@/components/admin/JobActions';
+import JobStatusToggle from '@/components/admin/JobStatusToggle';
 
 const prisma = new PrismaClient();
 
@@ -103,19 +104,7 @@ export default async function JobListPage() {
                                             <Briefcase className="h-6 w-6" />
                                         </div>
                                         <div>
-                                            {job.status === 'Active' ? (
-                                                <Badge className="bg-emerald-50 text-emerald-600 border-emerald-100 hover:bg-emerald-100 px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider flex w-fit items-center gap-1.5">
-                                                    <span className="relative flex h-1.5 w-1.5">
-                                                        <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-                                                        <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-emerald-500"></span>
-                                                    </span>
-                                                    Active
-                                                </Badge>
-                                            ) : (
-                                                <Badge variant="secondary" className="bg-slate-100 text-slate-500 text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full">
-                                                    Inactive
-                                                </Badge>
-                                            )}
+                                            <JobStatusToggle jobId={job.id} initialStatus={job.status || 'Active'} />
                                         </div>
                                     </div>
                                     <h3 className="text-lg font-bold text-slate-900 leading-tight group-hover:text-[#00ADE7] transition-colors line-clamp-2">

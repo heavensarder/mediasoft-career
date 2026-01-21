@@ -149,3 +149,23 @@ export async function incrementJobViews(id: number) {
         return { error: "Failed to increment views" };
     }
 }
+
+export async function toggleJobStatusAction(id: number, status: 'Active' | 'Inactive') {
+    try {
+        await prisma.job.update({
+            where: { id },
+            data: {
+                status,
+                isDraft: status === 'Inactive'
+            }
+        });
+
+        revalidatePath('/admin/dashboard/job-recruitment/job-list');
+        revalidatePath(`/admin/dashboard/job-recruitment/edit-job/${id}`);
+        revalidatePath('/'); // Update landing page if needed
+        return { success: true };
+    } catch (error) {
+        console.error("Database Error:", error);
+        return { error: "Failed to update job status." };
+    }
+}
