@@ -30,6 +30,8 @@ import {
     Monitor,
     Search,
     Filter,
+    LayoutGrid,
+    LayoutList,
 } from "lucide-react";
 
 // Helper function to get icon based on job title
@@ -57,6 +59,7 @@ export function JobList({ jobs }: { jobs: any[] }) {
     const [selectedDepartment, setSelectedDepartment] = useState("All");
     const [selectedJobType, setSelectedJobType] = useState("All");
     const [selectedStatus, setSelectedStatus] = useState("All");
+    const [viewMode, setViewMode] = useState<'list' | 'grid'>('list');
 
     // Extract unique departments and job types for filters
     const departments = useMemo(() => {
@@ -100,6 +103,32 @@ export function JobList({ jobs }: { jobs: any[] }) {
                         />
                     </div>
                     <div className="flex gap-3 flex-col sm:flex-row overflow-x-auto pb-2 sm:pb-0 items-center">
+                        {/* View Mode Toggle */}
+                        <div className="flex items-center gap-1 bg-slate-50 p-1 rounded-xl border border-slate-200 mr-2">
+                            <Button
+                                variant="ghost"
+                                size="sm"
+                                onClick={() => setViewMode('list')}
+                                className={`h-10 px-3 rounded-lg hover:bg-white transition-all ${viewMode === 'list'
+                                        ? 'bg-white text-[#00ADE7] shadow-sm'
+                                        : 'text-slate-400 hover:text-slate-600'
+                                    }`}
+                            >
+                                <LayoutList className="h-4 w-4" />
+                            </Button>
+                            <Button
+                                variant="ghost"
+                                size="sm"
+                                onClick={() => setViewMode('grid')}
+                                className={`h-10 px-3 rounded-lg hover:bg-white transition-all ${viewMode === 'grid'
+                                        ? 'bg-white text-[#00ADE7] shadow-sm'
+                                        : 'text-slate-400 hover:text-slate-600'
+                                    }`}
+                            >
+                                <LayoutGrid className="h-4 w-4" />
+                            </Button>
+                        </div>
+
                         {/* Status Filter */}
                         <Select value={selectedStatus} onValueChange={setSelectedStatus}>
                             <SelectTrigger className="w-full sm:w-[150px] h-12 bg-white border-slate-200 rounded-xl shadow-sm hover:border-[#00ADE7]/50 focus:ring-4 focus:ring-[#00ADE7]/10 transition-all font-medium text-slate-600">
@@ -161,9 +190,9 @@ export function JobList({ jobs }: { jobs: any[] }) {
             </div>
 
             {/* Job List */}
-            <div className="grid gap-5">
+            <div className={viewMode === 'list' ? "grid gap-5" : "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"}>
                 {filteredJobs.length === 0 ? (
-                    <div className="text-center py-20 px-6 bg-white rounded-3xl border border-dashed border-slate-200 shadow-sm">
+                    <div className="text-center py-20 px-6 bg-white rounded-3xl border border-dashed border-slate-200 shadow-sm col-span-full">
                         <div className="w-20 h-20 bg-blue-50 rounded-full flex items-center justify-center mx-auto mb-6 animate-pulse">
                             <Search className="h-10 w-10 text-blue-300" />
                         </div>
@@ -189,17 +218,19 @@ export function JobList({ jobs }: { jobs: any[] }) {
                         return (
                             <div
                                 key={job.id}
-                                className="group bg-white rounded-xl p-1 shadow-sm hover:shadow-lg hover:shadow-blue-500/10 border border-slate-100 transition-all duration-300"
+                                className={`group bg-white rounded-xl shadow-sm hover:shadow-lg hover:shadow-blue-500/10 border border-slate-100 transition-all duration-300 ${viewMode === 'list' ? 'p-1' : 'p-6 flex flex-col h-full'
+                                    }`}
                             >
-                                <div className="flex flex-col md:flex-row gap-6 p-6 items-start md:items-center">
+                                <div className={`flex gap-6 ${viewMode === 'list' ? 'flex-col md:flex-row p-6 items-start md:items-center' : 'flex-col h-full'}`}>
                                     {/* Icon/Logo Placeholder */}
-                                    <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-[#E0F7FF] to-blue-50 text-[#00ADE7] flex items-center justify-center shrink-0 shadow-sm border border-blue-100 group-hover:scale-110 group-hover:rotate-3 transition-all duration-300">
-                                        <JobIcon className="w-8 h-8 group-hover:text-[#0095c8] transition-colors" />
+                                    <div className={`rounded-2xl bg-gradient-to-br from-[#E0F7FF] to-blue-50 text-[#00ADE7] flex items-center justify-center shrink-0 shadow-sm border border-blue-100 group-hover:scale-110 group-hover:rotate-3 transition-all duration-300 ${viewMode === 'list' ? 'w-16 h-16' : 'w-14 h-14 mb-2'
+                                        }`}>
+                                        <JobIcon className={`${viewMode === 'list' ? 'w-8 h-8' : 'w-7 h-7'} group-hover:text-[#0095c8] transition-colors`} />
                                     </div>
 
-                                    <div className="flex-1 space-y-2">
+                                    <div className="flex-1 space-y-2 w-full">
                                         <Link href={`/jobs/${job.slug}`} className="block w-fit">
-                                            <h3 className="text-xl font-bold text-slate-800 group-hover:text-[#00ADE7] transition-colors flex items-center gap-2">
+                                            <h3 className="text-xl font-bold text-slate-800 group-hover:text-[#00ADE7] transition-colors flex items-center gap-2 line-clamp-1">
                                                 {job.title}
                                                 {job.status === 'Active' && (
                                                     <span className="relative flex h-2 w-2">
@@ -207,7 +238,9 @@ export function JobList({ jobs }: { jobs: any[] }) {
                                                         <span className="relative inline-flex rounded-full h-2 w-2 bg-green-500"></span>
                                                     </span>
                                                 )}
-                                                <ArrowRight className="w-4 h-4 opacity-0 -translate-x-2 group-hover:translate-x-0 group-hover:opacity-100 transition-all text-[#00ADE7]" />
+                                                {viewMode === 'list' && (
+                                                    <ArrowRight className="w-4 h-4 opacity-0 -translate-x-2 group-hover:translate-x-0 group-hover:opacity-100 transition-all text-[#00ADE7]" />
+                                                )}
                                             </h3>
                                         </Link>
                                         <div className="flex flex-wrap items-center gap-3 text-sm text-slate-500">
@@ -219,29 +252,39 @@ export function JobList({ jobs }: { jobs: any[] }) {
                                                 <Clock className="w-4 h-4 text-slate-400" />
                                                 {job.jobType?.name}
                                             </span>
-                                            <span className="flex items-center gap-1.5 bg-slate-50 px-3 py-1 rounded-md border border-slate-100">
-                                                <MapPin className="w-4 h-4 text-slate-400" />
-                                                {job.location?.name}
-                                            </span>
-                                            {job.status === 'Active' && job.expiryDate && (
-                                                <span className="flex items-center gap-1.5 bg-orange-50 text-orange-700 px-3 py-1 rounded-md border border-orange-100">
-                                                    <Clock className="w-4 h-4" />
-                                                    Expires: {new Date(job.expiryDate).toLocaleDateString('en-GB')}
+                                            {viewMode === 'list' && (
+                                                <span className="flex items-center gap-1.5 bg-slate-50 px-3 py-1 rounded-md border border-slate-100">
+                                                    <MapPin className="w-4 h-4 text-slate-400" />
+                                                    {job.location?.name}
                                                 </span>
                                             )}
                                         </div>
+                                        {viewMode === 'grid' && (
+                                            <div className="flex items-center gap-1.5 text-sm text-slate-500 mt-2">
+                                                <MapPin className="w-4 h-4 text-slate-400" />
+                                                {job.location?.name}
+                                            </div>
+                                        )}
+                                        {job.status === 'Active' && job.expiryDate && (
+                                            <div className={`flex items-center gap-1.5 text-xs text-orange-600 bg-orange-50 px-2.5 py-1 rounded-full border border-orange-100 w-fit ${viewMode === 'grid' ? 'mt-2' : 'hidden'}`}>
+                                                <Clock className="w-3 h-3" />
+                                                Expires: {new Date(job.expiryDate).toLocaleDateString('en-GB')}
+                                            </div>
+                                        )}
                                     </div>
 
-                                    <div className="w-full md:w-auto mt-4 md:mt-0">
+                                    <div className={`w-full ${viewMode === 'list' ? 'md:w-auto mt-4 md:mt-0' : 'mt-auto pt-4'}`}>
                                         <Button
                                             asChild
-                                            className={`w-full md:w-auto h-11 px-8 font-bold tracking-wide rounded-full transition-all duration-300 transform hover:scale-105 shadow-md ${job.status === 'Active'
-                                                ? "!bg-[#00ADE7] !text-white hover:!bg-[#0095c8] shadow-blue-500/20 hover:shadow-blue-500/40 !border-none"
-                                                : "!bg-white !text-slate-500 !border-2 !border-slate-100 hover:!border-slate-300 hover:!bg-slate-50 hover:!text-slate-700"
+                                            className={`w-full font-bold tracking-wide rounded-full transition-all duration-300 transform group-hover:scale-[1.02] shadow-md ${viewMode === 'list' ? 'md:w-auto h-11 px-8' : 'h-10'
+                                                } ${job.status === 'Active'
+                                                    ? "!bg-[#00ADE7] !text-white hover:!bg-[#0095c8] shadow-blue-500/20 hover:shadow-blue-500/40 !border-none"
+                                                    : "!bg-white !text-slate-500 !border-2 !border-slate-100 hover:!border-slate-300 hover:!bg-slate-50 hover:!text-slate-700"
                                                 }`}
                                         >
-                                            <Link href={`/jobs/${job.slug}`}>
+                                            <Link href={`/jobs/${job.slug}`} className="flex items-center justify-center gap-2">
                                                 {job.status === 'Active' ? 'Apply Now' : 'View Details'}
+                                                {viewMode === 'grid' && <ArrowRight className="w-4 h-4" />}
                                             </Link>
                                         </Button>
                                     </div>

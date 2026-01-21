@@ -7,7 +7,7 @@
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
+  --font-sans: var(--font-inter), var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
   --color-sidebar-ring: var(--sidebar-ring);
   --color-sidebar-border: var(--sidebar-border);
@@ -139,14 +139,18 @@
   --glass-surface: rgba(255, 255, 255, 0.7);
   --glass-border: rgba(255, 255, 255, 0.6);
   --glass-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.07);
-  
+
   /* Text Colors */
-  --text-primary: #1e293b;   /* Slate 800 */
-  --text-secondary: #64748b; /* Slate 500 */
-  --primary-gradient: linear-gradient(to right, #00ADE7, #2563eb); /* Cyan to Blue */
+  --text-primary: #1e293b;
+  /* Slate 800 */
+  --text-secondary: #64748b;
+  /* Slate 500 */
+  --primary-gradient: linear-gradient(to right, #00ADE7, #2563eb);
+  /* Cyan to Blue */
 }
 
 @layer utilities {
+
   /* Base Background */
   body {
     background: var(--premium-bg-gradient);
@@ -157,17 +161,22 @@
   /* --- Component Classes (Mapped for Backward Compatibility) --- */
 
   /* Cards */
-  .premium-card, .skeuo-card, .clay-card {
+  .premium-card,
+  .skeuo-card,
+  .clay-card {
     background: var(--glass-surface);
     backdrop-filter: blur(12px);
     -webkit-backdrop-filter: blur(12px);
     border: 1px solid var(--glass-border);
     box-shadow: var(--glass-shadow);
-    border-radius: 1rem; /* 16px */
+    border-radius: 1rem;
+    /* 16px */
     @apply transition-all duration-300 p-6;
   }
 
-  .premium-card:hover, .skeuo-card:hover, .clay-card:hover {
+  .premium-card:hover,
+  .skeuo-card:hover,
+  .clay-card:hover {
     transform: translateY(-4px);
     box-shadow: 0 12px 40px 0 rgba(31, 38, 135, 0.12);
     background: rgba(255, 255, 255, 0.85);
@@ -175,24 +184,32 @@
   }
 
   /* Buttons */
-  .premium-btn, .skeuo-btn, .clay-button {
+  .premium-btn,
+  .skeuo-btn,
+  .clay-button {
     background: rgba(255, 255, 255, 0.5);
     border: 1px solid var(--glass-border);
-    color: #00ADE7; /* Brand Cyan */
+    color: #00ADE7;
+    /* Brand Cyan */
     backdrop-filter: blur(4px);
-    box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
     @apply px-4 py-2 rounded-lg font-semibold flex items-center justify-center gap-2 transition-all duration-200 active:scale-[0.98];
   }
 
-  .premium-btn:hover, .skeuo-btn:hover, .clay-button:hover {
+  .premium-btn:hover,
+  .skeuo-btn:hover,
+  .clay-button:hover {
     background: white;
-    box-shadow: 0 4px 15px rgba(0, 173, 231, 0.25); /* Cyan glow */
-    color: #0095c8; /* Darker Cyan */
+    box-shadow: 0 4px 15px rgba(0, 173, 231, 0.25);
+    /* Cyan glow */
+    color: #0095c8;
+    /* Darker Cyan */
     transform: translateY(-1px);
   }
-  
+
   /* Primary Button Variant */
-  .premium-btn-primary, .skeuo-btn-primary {
+  .premium-btn-primary,
+  .skeuo-btn-primary {
     background: var(--primary-gradient);
     color: white;
     border: none;
@@ -200,7 +217,8 @@
     @apply px-4 py-2 rounded-lg font-semibold flex items-center justify-center gap-2 transition-all duration-200 active:scale-[0.98];
   }
 
-  .premium-btn-primary:hover, .skeuo-btn-primary:hover {
+  .premium-btn-primary:hover,
+  .skeuo-btn-primary:hover {
     opacity: 0.95;
     box-shadow: 0 6px 20px rgba(37, 99, 235, 0.4);
     transform: translateY(-1px);
@@ -208,22 +226,32 @@
   }
 
   /* Inputs */
-  .premium-input, .skeuo-input, .clay-input {
+  .premium-input,
+  .skeuo-input,
+  .clay-input {
     background: rgba(255, 255, 255, 0.5);
-    border: 1px solid rgba(203, 213, 225, 0.6); /* Slate 300 equivalent */
+    border: 1px solid rgba(203, 213, 225, 0.6);
+    /* Slate 300 equivalent */
     color: var(--text-primary);
-    box-shadow: inset 0 2px 4px rgba(0,0,0,0.02);
+    box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.02);
     @apply px-4 py-2.5 rounded-lg outline-none transition-all duration-200 w-full backdrop-blur-sm;
   }
 
-  .premium-input:focus, .skeuo-input:focus, .clay-input:focus {
+  .premium-input:focus,
+  .skeuo-input:focus,
+  .clay-input:focus {
     background: white;
-    border-color: #6366f1; /* Indigo 500 */
-    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1); /* Indigo ring */
+    border-color: #6366f1;
+    /* Indigo 500 */
+    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+    /* Indigo ring */
   }
-  
-  .premium-input::placeholder, .skeuo-input::placeholder, .clay-input::placeholder {
-    color: #94a3b8; /* Slate 400 */
+
+  .premium-input::placeholder,
+  .skeuo-input::placeholder,
+  .clay-input::placeholder {
+    color: #94a3b8;
+    /* Slate 400 */
   }
 
 
@@ -314,13 +342,13 @@
 
   /* Global Cursor Fix */
   /* Global Cursor Fix - Aggressive Override */
-  button, 
-  [role="button"], 
-  [type="button"], 
-  [type="submit"], 
-  [type="reset"], 
-  .premium-btn, 
-  .premium-btn-primary, 
+  button,
+  [role="button"],
+  [type="button"],
+  [type="submit"],
+  [type="reset"],
+  .premium-btn,
+  .premium-btn-primary,
   [role="tab"],
   .cursor-pointer {
     cursor: pointer !important;
@@ -382,11 +410,9 @@
   }
 
   .neo-bg {
-    background: radial-gradient(
-      circle at 10% 20%,
-      rgba(30, 27, 75, 1) 0%,
-      rgba(15, 23, 42, 1) 90%
-    );
+    background: radial-gradient(circle at 10% 20%,
+        rgba(30, 27, 75, 1) 0%,
+        rgba(15, 23, 42, 1) 90%);
     min-height: 100vh;
   }
 
