@@ -150,14 +150,22 @@ export async function incrementJobViews(id: number) {
     }
 }
 
-export async function toggleJobStatusAction(id: number, status: 'Active' | 'Inactive') {
+export async function toggleJobStatusAction(id: number, status: 'Active' | 'Inactive', expiryDate?: string | null) {
     try {
+        const data: any = {
+            status,
+            isDraft: status === 'Inactive'
+        };
+
+        if (status === 'Inactive') {
+            data.expiryDate = null;
+        } else if (expiryDate !== undefined) {
+            data.expiryDate = expiryDate ? new Date(expiryDate) : null;
+        }
+
         await prisma.job.update({
             where: { id },
-            data: {
-                status,
-                isDraft: status === 'Inactive'
-            }
+            data
         });
 
         revalidatePath('/admin/dashboard/job-recruitment/job-list');

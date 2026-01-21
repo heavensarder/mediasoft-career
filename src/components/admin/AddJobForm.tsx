@@ -14,13 +14,15 @@ import { Department, JobType, Location } from '@prisma/client'; // Import types
 
 const RichTextEditor = dynamic(() => import('@/components/ui/rich-text-editor'), { ssr: false });
 
+import { JobActivationModal } from '@/components/admin/JobActivationModal';
+
 const jobSchema = z.object({
     title: z.string().min(2, 'Title must be at least 2 characters'),
     description: z.string().min(10, 'Description must be at least 10 characters'),
     departmentId: z.string().min(1, 'Please select a department'),
     typeId: z.string().min(1, 'Please select a job type'),
     locationId: z.string().min(1, 'Please select a location'),
-    expiryDate: z.string().refine((date) => new Date(date) > new Date(), {
+    expiryDate: z.string().optional().refine((date) => !date || new Date(date) > new Date(), {
         message: "Expiry date must be in the future"
     }),
     status: z.string().min(1, 'Please select a status'),
@@ -42,6 +44,7 @@ import { useRouter } from 'next/navigation';
 
 export default function AddJobForm({ departments, jobTypes, locations, initialData, jobId }: AddJobFormProps) {
     const [loading, setLoading] = useState(false);
+    const [showActivationModal, setShowActivationModal] = useState(false);
     const router = useRouter(); // Initialize router
     const form = useForm<JobFormValues>({
         resolver: zodResolver(jobSchema),
@@ -51,12 +54,27 @@ export default function AddJobForm({ departments, jobTypes, locations, initialDa
             departmentId: '',
             typeId: '',
             locationId: '',
-            status: 'Active'
+            status: 'Inactive'
         }
     });
 
     const { register, handleSubmit, setValue, watch, formState: { errors } } = form;
     const status = watch('status');
+
+    const handleStatusChange = (checked: boolean) => {
+        if (checked) {
+            setShowActivationModal(true);
+        } else {
+            setValue('status', 'Inactive');
+            setValue('expiryDate', ''); // Clear expiry on deactivation
+        }
+    };
+
+    const handleActivationConfirm = (expiryDate: string | null) => {
+        setValue('status', 'Active');
+        setValue('expiryDate', expiryDate || '');
+        setShowActivationModal(false);
+    };
 
     const onSubmit = async (data: JobFormValues) => {
         setLoading(true);
@@ -109,11 +127,17 @@ export default function AddJobForm({ departments, jobTypes, locations, initialDa
                             <span className={`text-sm font-medium ${status === 'Active' ? 'text-slate-400' : 'text-slate-900'}`}>Inactive</span>
                             <Switch
                                 checked={status === 'Active'}
-                                onCheckedChange={(checked) => setValue('status', checked ? 'Active' : 'Inactive')}
+                                onCheckedChange={handleStatusChange}
                             />
                             <span className={`text-sm font-medium ${status === 'Active' ? 'text-green-600' : 'text-slate-400'}`}>Active</span>
                         </div>
                     </div>
+                    
+                    <JobActivationModal 
+                        isOpen={showActivationModal}
+                        onClose={() => setShowActivationModal(false)}
+                        onConfirm={handleActivationConfirm}
+                    />
 
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div className="space-y-2">

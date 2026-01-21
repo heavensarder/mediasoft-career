@@ -72,61 +72,74 @@ export function ApplicationTrendChart() {
 }
 
 // --- 2. Department Distribution (Donut) ---
+// --- 2. Department Distribution (Donut) ---
+// --- 2. Department Distribution (Donut) ---
 export function DepartmentDistributionChart({ data }: { data: ChartData[] }) {
     return (
-        <div className="h-[300px] w-full flex items-center justify-center">
-            <ResponsiveContainer width="100%" height="100%">
-                <PieChart>
-                    <defs>
-                        {data.map((_, index) => (
-                            <linearGradient key={`gradient-${index}`} id={`gradient-${index}`} x1="0" y1="0" x2="0" y2="1">
-                                <stop offset="0%" stopColor={COLORS[index % COLORS.length]} stopOpacity={1} />
-                                <stop offset="100%" stopColor={COLORS[index % COLORS.length]} stopOpacity={0.6} />
-                            </linearGradient>
-                        ))}
-                    </defs>
-                    <Pie
-                        data={data}
-                        cx="50%"
-                        cy="50%"
-                        innerRadius={65} // Slightly thinner ring
-                        outerRadius={105}
-                        paddingAngle={6}
-                        dataKey="value"
-                        stroke="none" // Remove default stroke for cleaner look
-                        cornerRadius={8} // Rounded edges for segments
-                    >
-                        {data.map((entry, index) => (
-                            <Cell 
-                                key={`cell-${index}`} 
-                                fill={`url(#gradient-${index})`} 
-                                stroke="rgba(255,255,255,0.2)" 
-                                strokeWidth={2}
-                            />
-                        ))}
-                    </Pie>
-                    <Tooltip
-                        contentStyle={{ 
-                            backgroundColor: 'rgba(255, 255, 255, 0.95)', 
-                            backdropFilter: 'blur(8px)',
-                            border: '1px solid #e2e8f0', 
-                            borderRadius: '16px', 
-                            color: '#1e293b',
-                            boxShadow: '0 10px 30px -5px rgba(0, 0, 0, 0.15)',
-                            padding: '12px 16px'
-                        }}
-                        itemStyle={{ color: '#0f172a', fontWeight: 'bold', fontSize: '14px' }}
-                        cursor={{ fill: 'transparent' }}
-                        formatter={(value: number) => [`${value} Jobs`, 'Vol']}
-                    />
-                    <Legend
-                        verticalAlign="bottom"
-                        height={36}
-                        iconType="circle"
-                        formatter={(value) => <span className="text-slate-600 font-medium ml-1">{value}</span>}
-                    />
-                </PieChart>
-            </ResponsiveContainer>
+        <div className="w-full font-sans">
+             {/* Chart Area - Fixed Height for the Pie */}
+            <div className="h-[300px] w-full flex items-center justify-center">
+                <ResponsiveContainer width="100%" height="100%">
+                    <PieChart>
+                        <defs>
+                            {data.map((_, index) => (
+                                <linearGradient key={`gradient-${index}`} id={`gradient-${index}`} x1="0" y1="0" x2="0" y2="1">
+                                    <stop offset="0%" stopColor={COLORS[index % COLORS.length]} stopOpacity={1} />
+                                    <stop offset="100%" stopColor={COLORS[index % COLORS.length]} stopOpacity={0.6} />
+                                </linearGradient>
+                            ))}
+                        </defs>
+                        <Pie
+                            data={data}
+                            cx="50%"
+                            cy="50%"
+                            innerRadius={65}
+                            outerRadius={105}
+                            paddingAngle={6}
+                            dataKey="value"
+                            stroke="none"
+                            cornerRadius={8}
+                        >
+                            {data.map((entry, index) => (
+                                <Cell 
+                                    key={`cell-${index}`} 
+                                    fill={`url(#gradient-${index})`} 
+                                    stroke="rgba(255,255,255,0.2)" 
+                                    strokeWidth={2}
+                                />
+                            ))}
+                        </Pie>
+                        <Tooltip
+                            contentStyle={{ 
+                                backgroundColor: 'rgba(255, 255, 255, 0.95)', 
+                                backdropFilter: 'blur(8px)',
+                                border: '1px solid #e2e8f0', 
+                                borderRadius: '16px', 
+                                color: '#1e293b',
+                                boxShadow: '0 10px 30px -5px rgba(0, 0, 0, 0.15)',
+                                padding: '12px 16px'
+                            }}
+                            itemStyle={{ color: '#0f172a', fontWeight: 'bold', fontSize: '14px' }}
+                            cursor={{ fill: 'transparent' }}
+                            formatter={(value: number) => [`${value} Jobs`, 'Vol']}
+                        />
+                    </PieChart>
+                </ResponsiveContainer>
+            </div>
+
+            {/* Custom HTML Legend - Grows Naturally */}
+            <div className="flex flex-wrap justify-center gap-x-6 gap-y-3 px-4 pb-6 mt-2 border-t border-slate-50 pt-6">
+                {data.map((entry, index) => (
+                    <div key={`legend-${index}`} className="flex items-center gap-2 text-sm font-medium text-slate-600">
+                        <span 
+                            className="h-3 w-3 rounded-full shrink-0 shadow-sm"
+                            style={{ backgroundColor: COLORS[index % COLORS.length] }}
+                        />
+                        <span>{entry.name}</span>
+                        <span className="text-slate-400 text-xs ml-0.5">({entry.value})</span>
+                    </div>
+                ))}
+            </div>
         </div>
     );
 }

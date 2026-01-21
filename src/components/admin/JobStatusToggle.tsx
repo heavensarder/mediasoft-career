@@ -1,10 +1,12 @@
 'use client';
 
 import { useState, useTransition } from 'react';
+// 4: import { Switch } from '@/components/ui/switch';
 import { Switch } from '@/components/ui/switch';
 import { Badge } from "@/components/ui/badge";
 import { toggleJobStatusAction } from '@/lib/job-actions';
 import { Loader2 } from 'lucide-react';
+import { JobActivationModal } from '@/components/admin/JobActivationModal';
 
 interface JobStatusToggleProps {
     jobId: number;
@@ -14,22 +16,40 @@ interface JobStatusToggleProps {
 export default function JobStatusToggle({ jobId, initialStatus }: JobStatusToggleProps) {
     const [status, setStatus] = useState<string>(initialStatus);
     const [isPending, startTransition] = useTransition();
+    const [showActivationModal, setShowActivationModal] = useState(false);
+
+    // Dynamic import to avoid circular dependencies if any, but regular import is fine here
+    // import { JobActivationModal } from '@/components/admin/JobActivationModal'; -> I need to add this import to the top
 
     const handleToggle = (checked: boolean) => {
-        const newStatus = checked ? 'Active' : 'Inactive';
+        if (checked) {
+            // Turning ON: Show modal
+            setShowActivationModal(true);
+        } else {
+            // Turning OFF: Just do it
+            performToggle('Inactive', null);
+        }
+    };
+
+    const performToggle = (newStatus: 'Active' | 'Inactive', expiryDate?: string | null) => {
+        const previousStatus = status;
         
         // Optimistic update
         setStatus(newStatus);
 
         startTransition(async () => {
-            const result = await toggleJobStatusAction(jobId, newStatus);
+            const result = await toggleJobStatusAction(jobId, newStatus, expiryDate);
             if (result?.error) {
                 // Revert on error
-                setStatus(initialStatus);
+                setStatus(previousStatus);
                 console.error(result.error);
-                // Optionally show a toast here
             }
         });
+    };
+
+    const handleActivationConfirm = (expiryDate: string | null) => {
+        performToggle('Active', expiryDate);
+        setShowActivationModal(false);
     };
 
     const isActive = status === 'Active';
@@ -59,6 +79,12 @@ export default function JobStatusToggle({ jobId, initialStatus }: JobStatusToggl
                     className="data-[state=checked]:bg-emerald-500"
                 />
             </div>
+            
+            <JobActivationModal 
+                isOpen={showActivationModal} 
+                onClose={() => setShowActivationModal(false)}
+                onConfirm={handleActivationConfirm}
+            />
         </div>
     );
 }
