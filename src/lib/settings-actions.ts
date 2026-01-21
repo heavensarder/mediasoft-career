@@ -32,36 +32,58 @@ async function saveFile(file: File, folder: string): Promise<string> {
   return `/${folder}/${filename}`;
 }
 
-export async function uploadLogo(prevState: any, formData: FormData) {
+export async function updateBrandingSettings(prevState: any, formData: FormData) {
   try {
     const file = formData.get('logo') as File;
+    const redirectUrl = formData.get('logo_redirect_url') as string;
+    let logoPath = null;
 
-    if (!file || file.size === 0) {
-      return { error: "No file selected." };
+    // Handle Logo Upload
+    if (file && file.size > 0) {
+      if (!file.type.startsWith('image/')) {
+        return { error: "File must be an image." };
+      }
+      logoPath = await saveFile(file, 'branding');
+      
+      await prisma.systemSettings.upsert({
+        where: { key: 'company_logo' },
+        update: { value: logoPath },
+        create: { key: 'company_logo', value: logoPath }
+      });
     }
 
-    // Validate file type
-    if (!file.type.startsWith('image/')) {
-      return { error: "File must be an image." };
+    // Handle Redirect URL
+    if (redirectUrl !== null) { // Allow empty string to clear it
+      await prisma.systemSettings.upsert({
+        where: { key: 'logo_redirect_url' },
+        update: { value: redirectUrl },
+        create: { key: 'logo_redirect_url', value: redirectUrl }
+      });
     }
-
-    const logoPath = await saveFile(file, 'branding');
-
-    // Upsert the setting
-    await prisma.systemSettings.upsert({
-      where: { key: 'company_logo' },
-      update: { value: logoPath },
-      create: { key: 'company_logo', value: logoPath }
-    });
 
     revalidatePath('/admin');
     revalidatePath('/auth/login');
 
-    return { success: true, logoPath };
+    return { success: true, logoPath, redirectUrl };
 
   } catch (error) {
-    console.error("Upload Logo Error:", error);
-    return { error: "Failed to upload logo." };
+    console.error("Update Branding Error:", error);
+    return { error: "Failed to update branding settings." };
+  }
+}
+
+export async function getBrandingSettings() {
+  try {
+    const logoSrc = await prisma.systemSettings.findUnique({ where: { key: 'company_logo' } });
+    const redirectUrl = await prisma.systemSettings.findUnique({ where: { key: 'logo_redirect_url' } });
+    
+    return {
+      logoPath: logoSrc?.value || null,
+      logoRedirectUrl: redirectUrl?.value || ''
+    };
+  } catch (error) {
+    console.error("Error fetching branding settings:", error);
+    return { logoPath: null, logoRedirectUrl: '' };
   }
 }
 

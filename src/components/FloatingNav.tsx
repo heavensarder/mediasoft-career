@@ -12,9 +12,10 @@ import { cn } from "@/lib/utils";
 
 interface FloatingNavProps {
   logoPath?: string | null;
+  logoRedirectUrl?: string | null;
 }
 
-export function FloatingNav({ logoPath }: FloatingNavProps) {
+export function FloatingNav({ logoPath, logoRedirectUrl }: FloatingNavProps) {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isMounted, setIsMounted] = useState(false);
@@ -51,6 +52,8 @@ export function FloatingNav({ logoPath }: FloatingNavProps) {
     }
   };
 
+  const homeLink = logoRedirectUrl || "https://www.mediasoftbd.com";
+
   return (
     <div
       className={cn(
@@ -66,7 +69,7 @@ export function FloatingNav({ logoPath }: FloatingNavProps) {
       >
         {/* Logo */}
         <div className="pl-4 pr-2">
-          <Link href="https://www.mediasoftbd.com" target="_blank" rel="noopener noreferrer">
+          <Link href={homeLink} target={logoRedirectUrl ? "_blank" : "_self"} rel={logoRedirectUrl ? "noopener noreferrer" : ""}>
             <Image
               src={logoPath || "https://mediasoftbd.com/wp-content/uploads/2025/06/mediasoft-logo.png"}
               alt="Company Logo"

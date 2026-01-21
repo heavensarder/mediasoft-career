@@ -1,16 +1,17 @@
-import { getSystemSetting } from '@/lib/settings-actions';
+import { getBrandingSettings } from '@/lib/settings-actions';
 import LoginForm from './LoginForm';
 
 export default async function LoginPage() {
-  const logoUrl = await getSystemSetting('company_logo');
+  const { logoPath, logoRedirectUrl } = await getBrandingSettings();
+  const homeLink = logoRedirectUrl || "https://www.mediasoftbd.com";
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-gray-100">
       <div className="w-full max-w-md p-8 bg-white rounded-lg shadow-md">
         <div className="mb-6 flex flex-col items-center justify-center">
-          {logoUrl ? (
-            <a href="https://www.mediasoftbd.com" target="_blank" rel="noopener noreferrer">
-              <img src={logoUrl} alt="Company Logo" className="h-20 object-contain mb-4" />
+          {logoPath ? (
+            <a href={homeLink} target={logoRedirectUrl ? "_blank" : "_self"} rel={logoRedirectUrl ? "noopener noreferrer" : ""}>
+               <img src={logoPath} alt="Company Logo" className="h-20 object-contain mb-4" />
             </a>
           ) : null}
           <h1 className="text-2xl font-bold text-center">Admin Login</h1>

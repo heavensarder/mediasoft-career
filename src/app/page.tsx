@@ -17,18 +17,18 @@ import {
 } from "lucide-react";
 import Image from "next/image";
 import { FloatingNav } from "@/components/FloatingNav";
-import { getSystemSetting } from "@/lib/settings-actions";
+import { getBrandingSettings } from "@/lib/settings-actions";
 import { JobList } from "@/components/JobList";
 import { StatsSection } from "@/components/StatsSection";
 import { BenefitsSection } from "@/components/BenefitsSection";
 
 export default async function Home() {
   const jobs = await getActiveJobs();
-  const logoPath = await getSystemSetting('company_logo');
+  const settings = await getBrandingSettings();
 
   return (
     <div className="min-h-screen bg-white font-sans selection:bg-[#00ADE7]/20">
-      <FloatingNav logoPath={logoPath} />
+      <FloatingNav logoPath={settings.logoPath} logoRedirectUrl={settings.logoRedirectUrl} />
       {/* 1. Hero Section - Light & Airy */}
       <section id="hero" className="relative w-full min-h-screen flex items-center justify-center overflow-hidden">
         {/* Background Image with Dark Overlay */}
