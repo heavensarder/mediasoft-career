@@ -53,7 +53,7 @@ export default async function Home() {
         {/* Background Image with Dark Overlay */}
         <div className="absolute inset-0 z-0">
           <Image
-            src="https://career.mediasoftbd.com/wp-content/uploads/2025/11/image-4.jpg"
+            src="https://i.postimg.cc/Zq0mccxw/career-hero-background.webp"
             alt="MediaSoft Office"
             fill
             className="object-cover"
@@ -179,7 +179,7 @@ export default async function Home() {
             <div className="lg:w-1/2 relative">
               <div className="relative rounded-3xl overflow-hidden shadow-2xl">
                 <Image
-                  src="https://career.mediasoftbd.com/wp-content/uploads/2025/11/image-7.jpg"
+                  src="https://i.postimg.cc/ZqJBK1Zy/career-section-img.webp"
                   alt="Team Collaboration"
                   width={800}
                   height={600}

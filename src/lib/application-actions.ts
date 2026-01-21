@@ -8,6 +8,7 @@ import { writeFile, mkdir } from 'fs/promises';
 import { join } from 'path';
 import nodemailer from "nodemailer";
 import { google } from "googleapis";
+import { deleteFile } from './file-actions';
 
 const REDIRECT_URI = "https://developers.google.com/oauthplayground";
 
@@ -239,9 +240,33 @@ export async function markAsViewed(applicationId: number) {
 
 export async function deleteApplication(applicationId: number) {
     try {
+        // 1. Fetch application to get file paths
+        const application = await prisma.application.findUnique({
+            where: { id: applicationId }
+        });
+
+        if (application) {
+            // 2. Delete known files
+            if (application.resume) await deleteFile(application.resume);
+            if (application.photo) await deleteFile(application.photo);
+
+            // 3. Delete files from dynamic data if any
+            if (application.dynamicData) {
+                const dynamicData = application.dynamicData as Record<string, any>;
+                for (const key in dynamicData) {
+                     const value = dynamicData[key];
+                     if (typeof value === 'string' && value.startsWith('/uploads/')) {
+                         await deleteFile(value);
+                     }
+                }
+            }
+        }
+
+        // 4. Delete DB Record
         await prisma.application.delete({
             where: { id: applicationId }
         });
+        
         revalidatePath('/admin/dashboard/job-recruitment/applications');
         revalidatePath('/admin/dashboard/job-recruitment/overview');
         return { success: true };

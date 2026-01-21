@@ -203,8 +203,17 @@ export default async function JobDetailsPage({ params }: { params: Promise<{ slu
               )}
 
               <div className="text-center text-xs text-muted-foreground mt-4">
-                Having trouble applying? <a href="mailto:support@mediasoft.com.bd" className="text-primary hover:text-blue-700 transition-colors">Contact Support</a>
-              </div>
+  Having trouble applying?{" "}
+  <a
+    href="https://mediasoftbd.com/contact-us-mediasoft-data-systems-for-best-point-of-sale-software/"
+    target="_blank"
+    rel="noopener noreferrer"
+    className="text-primary hover:text-blue-700 transition-colors"
+  >
+    Contact Support
+  </a>
+</div>
+
             </div>
           </div>
 
