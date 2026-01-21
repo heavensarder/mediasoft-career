@@ -22,6 +22,25 @@ import { JobList } from "@/components/JobList";
 import { StatsSection } from "@/components/StatsSection";
 import { BenefitsSection } from "@/components/BenefitsSection";
 
+import { Metadata } from 'next';
+import { getPageSeo } from '@/lib/seo-actions';
+
+export async function generateMetadata(): Promise<Metadata> {
+  const [seo, branding] = await Promise.all([
+    getPageSeo('home'),
+    getBrandingSettings()
+  ]);
+
+  return {
+    title: seo?.title || "Home - MediaSoft Career",
+    description: seo?.description || "Find your dream job at MediaSoft.",
+    keywords: seo?.keywords?.split(',').map((k: string) => k.trim()) || [],
+    openGraph: {
+       images: seo?.ogImage ? [{ url: seo.ogImage }] : (branding.logoPath ? [{ url: branding.logoPath }] : []),
+    }
+  };
+}
+
 export default async function Home() {
   const jobs = await getActiveJobs();
   const settings = await getBrandingSettings();

@@ -28,6 +28,7 @@ import MarkAsViewed from '@/components/admin/MarkAsViewed';
 import PrintButton from '@/components/admin/PrintButton';
 import ApplicantEmailModal from '@/components/admin/ApplicantEmailModal';
 import { prisma } from '@/lib/prisma';
+import { getBrandingSettings } from '@/lib/settings-actions';
 
 async function getApplication(id: number) {
     return await prisma.application.findUnique({
@@ -49,6 +50,10 @@ export default async function ApplicationDetailsPage({ params }: { params: { id:
         where: { isActive: true, isSystem: false },
         orderBy: { order: 'asc' }
     });
+
+    // Fetch branding settings
+    const branding = await getBrandingSettings();
+    const logoUrl = branding?.logoPath || '/placeholder-logo.png'; // Fallback if no logo
 
     return (
         <div className="space-y-8 max-w-7xl mx-auto pb-20">
@@ -334,132 +339,126 @@ export default async function ApplicationDetailsPage({ params }: { params: { id:
                 </div>
             </div>
 
-            {/* Print View - Official Document Structure (Kept mostly similar but cleaned up) */}
-            <div className="hidden print:block space-y-8 p-8 max-w-[210mm] mx-auto bg-white text-slate-900">
-                <div className="flex items-center justify-between border-b-2 border-slate-900 pb-6">
-                    <div>
-                        <div className="flex items-center gap-3 mb-2">
-                            <div className="h-10 w-10 bg-slate-900 rounded-lg flex items-center justify-center text-white font-bold text-xl">
-                                M
+            {/* Print View - Official Document Structure */}
+            <div className="hidden print:block space-y-6 pt-0 p-8 max-w-[210mm] mx-auto bg-white text-slate-900 font-sans" style={{ fontFamily: 'Inter, sans-serif' }}>
+                <div className="flex items-center justify-between border-b-2 border-slate-900 pb-4 mb-8">
+                   <div className="max-h-[60px] max-w-[250px] overflow-hidden flex items-center">
+                        {logoUrl ? (
+                             <img src={logoUrl} alt="Company Logo" className="h-full w-auto object-contain max-h-[60px]" />
+                        ) : (
+                            <div className="flex items-center gap-3">
+                                <div className="h-10 w-10 bg-slate-900 rounded-lg flex items-center justify-center text-white font-bold text-xl">
+                                    M
+                                </div>
+                                <h1 className="text-3xl font-black tracking-tight text-slate-900">MediaSoft</h1>
                             </div>
-                            <h1 className="text-3xl font-black tracking-tight text-slate-900">MediaSoft</h1>
-                        </div>
-                        <p className="text-sm text-slate-500 uppercase tracking-widest font-bold">Job Application Record</p>
-                    </div>
+                        )}
+                   </div>
                     <div className="text-right">
-                        <p className="text-xs text-slate-500 uppercase font-semibold">Applied On</p>
-                        <p className="font-bold text-slate-900 text-lg">{new Date(application.createdAt).toLocaleDateString()}</p>
+                         <h2 className="text-xl font-black text-slate-900 tracking-tight uppercase">Job Application</h2>
+                         <p className="text-xs text-slate-500 font-semibold mt-1">Ref: #{application.id.toString().padStart(6, '0')}</p>
                     </div>
                 </div>
 
                 {/* Candidate Header */}
-                <div className="grid grid-cols-[200px_1fr] gap-8 items-start">
+                <div className="grid grid-cols-[180px_1fr] gap-8 items-start mb-8">
                     {application.photo ? (
-                        <img src={application.photo} alt="Applicant" className="w-[200px] h-[200px] rounded-lg object-cover border-2 border-slate-200 shadow-sm" />
+                        <img src={application.photo} alt="Applicant" className="w-[180px] h-[180px] rounded-lg object-cover border border-slate-200 shadow-sm" />
                     ) : (
-                        <div className="w-[200px] h-[200px] rounded-lg bg-slate-100 flex items-center justify-center text-slate-400 font-medium text-sm border-2 border-slate-200">No Photo</div>
+                        <div className="w-[180px] h-[180px] rounded-lg bg-slate-100 flex items-center justify-center text-slate-400 font-medium text-sm border border-slate-200">No Photo</div>
                     )}
 
-                    <div className="space-y-6">
+                    <div className="space-y-4">
                         <div>
-                            <h2 className="text-4xl font-black text-slate-900 leading-tight mb-2">{application.fullName}</h2>
-                            <div className="inline-block bg-slate-100 px-3 py-1 rounded text-slate-700 font-medium text-sm">
-                                Applied for <span className="text-blue-700 font-bold">{application.job.title}</span>
+                            <h2 className="text-3xl font-bold text-slate-900 leading-tight">{application.fullName}</h2>
+                             <div className="mt-2 flex items-center gap-2 text-sm text-slate-600">
+                                <span className="font-semibold">Applied Position:</span>
+                                <span className="bg-slate-100 px-2 py-0.5 rounded text-slate-900 font-bold">{application.job.title}</span>
                             </div>
                         </div>
 
-                        <div className="grid grid-cols-1 gap-y-2 text-sm max-w-lg">
-                            <div className="grid grid-cols-[140px_1fr] gap-4 py-1 border-b border-slate-100">
-                                <span className="text-slate-500 font-medium">Email</span>
-                                <span className="font-bold text-slate-900 break-words">{application.email}</span>
+                        <div className="grid grid-cols-2 gap-x-8 gap-y-2 text-sm">
+                            <div className="border-b border-slate-100 pb-1">
+                                <span className="block text-[10px] text-slate-500 uppercase tracking-wider font-bold">Email</span>
+                                <span className="text-slate-900 font-medium">{application.email}</span>
                             </div>
-                            <div className="grid grid-cols-[140px_1fr] gap-4 py-1 border-b border-slate-100">
-                                <span className="text-slate-500 font-medium">Mobile</span>
-                                <span className="font-bold text-slate-900">{application.mobile}</span>
+                            <div className="border-b border-slate-100 pb-1">
+                                <span className="block text-[10px] text-slate-500 uppercase tracking-wider font-bold">Mobile</span>
+                                <span className="text-slate-900 font-medium">{application.mobile}</span>
                             </div>
-                            <div className="grid grid-cols-[140px_1fr] gap-4 py-1 border-b border-slate-100">
-                                <span className="text-slate-500 font-medium">Experience</span>
-                                <span className="font-bold text-slate-900">{application.experience}</span>
+                            <div className="border-b border-slate-100 pb-1 pt-2">
+                                <span className="block text-[10px] text-slate-500 uppercase tracking-wider font-bold">Expected Salary</span>
+                                <span className="text-slate-900 font-medium">{application.expectedSalary}</span>
                             </div>
-                            <div className="grid grid-cols-[140px_1fr] gap-4 py-1 border-b border-slate-100">
-                                <span className="text-slate-500 font-medium">Expected Salary</span>
-                                <span className="font-bold text-slate-900">{application.expectedSalary}</span>
+                            <div className="border-b border-slate-100 pb-1 pt-2">
+                                <span className="block text-[10px] text-slate-500 uppercase tracking-wider font-bold">Experience</span>
+                                <span className="text-slate-900 font-medium">{application.experience}</span>
                             </div>
-                            <div className="grid grid-cols-[140px_1fr] gap-4 py-1 border-b border-slate-100">
-                                <span className="text-slate-500 font-medium">Education</span>
-                                <span className="font-bold text-slate-900 leading-tight">{application.education}</span>
-                            </div>
-                            <div className="grid grid-cols-[140px_1fr] gap-4 py-1 pt-2">
-                                <span className="text-slate-500 font-medium">Status</span>
-                                <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold bg-slate-100 text-slate-800 uppercase tracking-wide">
-                                    {application.status}
-                                </span>
+                             <div className="border-b border-slate-100 pb-1 pt-2 col-span-2">
+                                <span className="block text-[10px] text-slate-500 uppercase tracking-wider font-bold">Education</span>
+                                <span className="text-slate-900 font-medium">{application.education}</span>
                             </div>
                         </div>
                     </div>
                 </div>
 
                 {/* Sections */}
-                <div className="space-y-10">
+                <div className="space-y-8">
                     {/* Objectives */}
-                    <div className="space-y-3">
-                        <h3 className="text-lg font-bold text-slate-900 uppercase tracking-wide border-b-2 border-slate-200 pb-2">Career Objective</h3>
-                        <div className="text-sm leading-relaxed text-slate-800 whitespace-pre-wrap text-justify">
+                    <div className="space-y-2">
+                        <h3 className="text-sm font-bold text-slate-900 uppercase tracking-wider border-b border-slate-300 pb-1">Career Objective</h3>
+                        <div className="text-xs leading-relaxed text-slate-800 whitespace-pre-wrap text-justify bg-slate-50 p-3 rounded">
                             {application.objective || <span className="text-slate-400 italic">No objective provided.</span>}
                         </div>
                     </div>
 
                     {/* Achievements */}
                     {application.achievements && (
-                        <div className="space-y-3">
-                            <h3 className="text-lg font-bold text-slate-900 uppercase tracking-wide border-b-2 border-slate-200 pb-2">Key Achievements</h3>
-                            <div className="bg-slate-50 p-5 rounded-lg border border-slate-100">
-                                <div className="text-sm leading-relaxed text-slate-800 whitespace-pre-wrap text-justify">
-                                    {application.achievements}
-                                </div>
+                        <div className="space-y-2">
+                            <h3 className="text-sm font-bold text-slate-900 uppercase tracking-wider border-b border-slate-300 pb-1">Key Achievements</h3>
+                           <div className="text-xs leading-relaxed text-slate-800 whitespace-pre-wrap text-justify bg-slate-50 p-3 rounded">
+                                {application.achievements}
                             </div>
                         </div>
                     )}
 
                     {/* Additional Data Grid */}
-                    <div className="grid grid-cols-2 gap-12">
-                        <div className="space-y-4">
-                            <h3 className="text-lg font-bold text-slate-900 uppercase tracking-wide border-b-2 border-slate-200 pb-2">Personal Details</h3>
-                            <div className="space-y-2 text-sm">
-                                <div className="grid grid-cols-[140px_1fr] gap-4 py-1 border-b border-slate-100">
-                                    <span className="text-slate-500 font-medium">Date of Birth</span>
-                                    <span className="font-bold text-slate-900">{new Date(application.dob).toLocaleDateString()}</span>
+                    <div className="grid grid-cols-2 gap-10">
+                        <div className="space-y-3">
+                            <h3 className="text-sm font-bold text-slate-900 uppercase tracking-wider border-b border-slate-300 pb-1">Personal Details</h3>
+                            <div className="grid grid-cols-1 gap-2 text-xs">
+                                <div className="flex justify-between border-b border-slate-100 pb-1">
+                                    <span className="text-slate-500 font-bold">Date of Birth</span>
+                                    <span className="font-semibold text-slate-900">{new Date(application.dob).toLocaleDateString()}</span>
                                 </div>
-                                <div className="grid grid-cols-[140px_1fr] gap-4 py-1 border-b border-slate-100">
-                                    <span className="text-slate-500 font-medium">Gender</span>
-                                    <span className="font-bold text-slate-900">{application.gender}</span>
+                                <div className="flex justify-between border-b border-slate-100 pb-1">
+                                    <span className="text-slate-500 font-bold">Gender</span>
+                                    <span className="font-semibold text-slate-900">{application.gender}</span>
                                 </div>
-                                <div className="grid grid-cols-[140px_1fr] gap-4 py-1 border-b border-slate-100">
-                                    <span className="text-slate-500 font-medium">NID / Passport</span>
-                                    <span className="font-bold text-slate-900">{application.nid}</span>
+                                <div className="flex justify-between border-b border-slate-100 pb-1">
+                                    <span className="text-slate-500 font-bold">NID / Passport</span>
+                                    <span className="font-semibold text-slate-900">{application.nid}</span>
                                 </div>
-                                <div className="grid grid-cols-[140px_1fr] gap-4 py-1 border-b border-slate-100">
-                                    <span className="text-slate-500 font-medium">Current Salary</span>
-                                    <span className="font-bold text-slate-900">{application.currentSalary || "N/A"}</span>
+                                <div className="flex justify-between border-b border-slate-100 pb-1">
+                                    <span className="text-slate-500 font-bold">Current Salary</span>
+                                    <span className="font-semibold text-slate-900">{application.currentSalary || "N/A"}</span>
                                 </div>
                             </div>
                         </div>
 
                         {formFields.length > 0 && (
-                            <div className="space-y-4">
-                                <h3 className="text-lg font-bold text-slate-900 uppercase tracking-wide border-b-2 border-slate-200 pb-2">Additional Info</h3>
-                                <div className="space-y-2 text-sm">
+                            <div className="space-y-3">
+                                <h3 className="text-sm font-bold text-slate-900 uppercase tracking-wider border-b border-slate-300 pb-1">Additional Info</h3>
+                                <div className="grid grid-cols-1 gap-2 text-xs">
                                     {formFields.map((field) => {
                                         const value = (application.dynamicData as any)?.[field.name];
                                         if (!value) return null;
                                         return (
-                                            <div key={field.id} className="grid grid-cols-[140px_1fr] gap-4 py-1 border-b border-slate-100">
-                                                <span className="text-slate-500 font-medium">{field.label}</span>
-                                                <span className="font-bold text-slate-900 break-words">
+                                            <div key={field.id} className="flex justify-between border-b border-slate-100 pb-1 gap-4">
+                                                <span className="text-slate-500 font-bold whitespace-nowrap">{field.label}</span>
+                                                <span className="font-semibold text-slate-900 text-right truncate max-w-[150px]">
                                                     {field.type === 'file' ? (
-                                                        <span className="text-blue-600 italic flex items-center gap-1">
-                                                            <Download className="h-3 w-3" /> File Attachment
-                                                        </span>
+                                                        <span className="text-blue-600 italic">File (Online)</span>
                                                     ) : value}
                                                 </span>
                                             </div>
@@ -471,9 +470,9 @@ export default async function ApplicationDetailsPage({ params }: { params: { id:
                     </div>
                 </div>
 
-                <div className="mt-12 pt-8 border-t-2 border-slate-100 flex justify-between items-center text-[10px] text-slate-400 uppercase tracking-wider font-semibold">
-                    <p>Generated by MediaSoft Recruitment System</p>
-                    <p>{new Date().toLocaleDateString()} &bull; {new Date().toLocaleTimeString()}</p>
+                <div className="mt-8 pt-4 border-t border-slate-200 flex justify-between items-center text-[9px] text-slate-400 font-medium">
+                     <p>Generated on {new Date().toLocaleDateString()} at {new Date().toLocaleTimeString()}</p>
+                     <p>Applicant ID: {application.id}</p>
                 </div>
             </div>
         </div>

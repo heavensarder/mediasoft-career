@@ -11,7 +11,8 @@ import {
   Settings,
   Download,
   LogOut,
-  ChevronDown
+  ChevronDown,
+  Globe
 } from 'lucide-react';
 import { handleSignOut } from '@/lib/auth-actions';
 import { getNewApplicationCount } from '@/lib/application-actions';
@@ -36,6 +37,7 @@ const menuItems = [
     icon: Settings,
     submenu: [
       { name: 'Branding', href: '/admin/dashboard/white-label', icon: Settings },
+      { name: 'SEO Manager', href: '/admin/dashboard/seo-manager', icon: Globe },
       { name: 'Mail Configuration', href: '/admin/dashboard/mail-configuration', icon: Users }, // Using Users icon temporarily, can switch to Mail if imported
     ]
   }

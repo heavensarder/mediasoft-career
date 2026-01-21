@@ -35,13 +35,17 @@ async function saveFile(file: File, folder: string): Promise<string> {
 export async function updateBrandingSettings(prevState: any, formData: FormData) {
   try {
     const file = formData.get('logo') as File;
+    const faviconFile = formData.get('favicon') as File;
     const redirectUrl = formData.get('logo_redirect_url') as string;
+    const siteBaseUrl = formData.get('site_base_url') as string;
+    
     let logoPath = null;
+    let faviconPath = null;
 
     // Handle Logo Upload
     if (file && file.size > 0) {
       if (!file.type.startsWith('image/')) {
-        return { error: "File must be an image." };
+        return { error: "Logo must be an image." };
       }
       logoPath = await saveFile(file, 'branding');
       
@@ -52,8 +56,19 @@ export async function updateBrandingSettings(prevState: any, formData: FormData)
       });
     }
 
+    // Handle Favicon Upload
+    if (faviconFile && faviconFile.size > 0) {
+       // Favicon can be .ico, .png, .svg etc.
+       faviconPath = await saveFile(faviconFile, 'branding');
+       await prisma.systemSettings.upsert({
+         where: { key: 'site_favicon' },
+         update: { value: faviconPath },
+         create: { key: 'site_favicon', value: faviconPath }
+       });
+    }
+
     // Handle Redirect URL
-    if (redirectUrl !== null) { // Allow empty string to clear it
+    if (redirectUrl !== null) { 
       await prisma.systemSettings.upsert({
         where: { key: 'logo_redirect_url' },
         update: { value: redirectUrl },
@@ -61,10 +76,20 @@ export async function updateBrandingSettings(prevState: any, formData: FormData)
       });
     }
 
+    // Handle Site Base URL
+    if (siteBaseUrl !== null) {
+      await prisma.systemSettings.upsert({
+        where: { key: 'site_base_url' },
+        update: { value: siteBaseUrl },
+        create: { key: 'site_base_url', value: siteBaseUrl }
+      });
+    }
+
     revalidatePath('/admin');
     revalidatePath('/auth/login');
+    revalidatePath('/'); // Refresh home for favicon/SEO
 
-    return { success: true, logoPath, redirectUrl };
+    return { success: true, logoPath, faviconPath, redirectUrl, siteBaseUrl };
 
   } catch (error) {
     console.error("Update Branding Error:", error);
@@ -76,14 +101,18 @@ export async function getBrandingSettings() {
   try {
     const logoSrc = await prisma.systemSettings.findUnique({ where: { key: 'company_logo' } });
     const redirectUrl = await prisma.systemSettings.findUnique({ where: { key: 'logo_redirect_url' } });
+    const faviconSrc = await prisma.systemSettings.findUnique({ where: { key: 'site_favicon' } });
+    const baseSiteUrl = await prisma.systemSettings.findUnique({ where: { key: 'site_base_url' } });
     
     return {
       logoPath: logoSrc?.value || null,
-      logoRedirectUrl: redirectUrl?.value || ''
+      logoRedirectUrl: redirectUrl?.value || '',
+      faviconPath: faviconSrc?.value || null,
+      siteBaseUrl: baseSiteUrl?.value || 'https://career.mediasoftbd.com'
     };
   } catch (error) {
     console.error("Error fetching branding settings:", error);
-    return { logoPath: null, logoRedirectUrl: '' };
+    return { logoPath: null, logoRedirectUrl: '', faviconPath: null, siteBaseUrl: '' };
   }
 }
 

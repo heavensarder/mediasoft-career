@@ -230,17 +230,7 @@ export default async function OverviewPage() {
             <h3 className="text-xl font-bold text-slate-800 w-full text-left mb-2">Job Distribution</h3>
             <DepartmentDistributionChart data={chartData} />
 
-            <div className="w-full space-y-3 mt-4">
-              {chartData.slice(0, 4).map((item, idx) => (
-                <div key={idx} className="flex justify-between items-center text-sm p-2 rounded hover:bg-slate-20 transition-colors">
-                  <div className="flex items-center gap-2">
-                    <div className="h-3 w-3 rounded-md shadow-sm" style={{ backgroundColor: ['#0ea5e9', '#8b5cf6', '#10b981', '#f43f5e', '#f59e0b'][idx] }}></div>
-                    <span className="text-slate-600 font-medium truncate max-w-[140px]">{item.name}</span>
-                  </div>
-                  <span className="font-bold text-slate-800 bg-slate-100 px-2 py-0.5 rounded">{item.value}</span>
-                </div>
-              ))}
-            </div>
+
           </div>
 
         </div>

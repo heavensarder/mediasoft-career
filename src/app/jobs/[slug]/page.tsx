@@ -34,6 +34,42 @@ async function getJob(slug: string) {
   return job;
 }
 
+import { Metadata } from 'next';
+import { getPageSeo } from '@/lib/seo-actions';
+import { getBrandingSettings } from '@/lib/settings-actions';
+
+// ... existing code ...
+
+export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
+  const { slug } = await params;
+  const decodedSlug = decodeURIComponent(slug);
+  const job = await getJob(decodedSlug);
+  
+  if (!job) return {};
+
+  const [seo, branding] = await Promise.all([
+    getPageSeo('job_details'),
+    getBrandingSettings()
+  ]);
+
+  const titleTemplate = seo?.title || "{{job_title}} at MediaSoft";
+  const title = titleTemplate.replace('{{job_title}}', job.title);
+  
+  const descriptionTemplate = seo?.description || `Apply for the ${job.title} position at MediaSoft.`;
+  const description = descriptionTemplate.replace('{{job_title}}', job.title);
+
+  return {
+    title: title,
+    description: description,
+    keywords: seo?.keywords?.replace('{{job_title}}', job.title).split(',').map((k: string) => k.trim()) || [],
+    openGraph: {
+       title: title,
+       description: description,
+       images: seo?.ogImage ? [{ url: seo.ogImage }] : (branding.logoPath ? [{ url: branding.logoPath }] : []),
+    }
+  };
+}
+
 async function getFormFields() {
   return await prisma.formField.findMany({
     where: { isActive: true },

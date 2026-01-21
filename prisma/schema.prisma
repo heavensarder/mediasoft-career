@@ -143,3 +143,15 @@ model MailTemplate {
   // Relations
   mailConfigs MailConfig[] @relation("AutoReplyTemplate")
 }
+
+model PageSeo {
+  id          Int      @id @default(autoincrement())
+  page        String   @unique // e.g., "home", "job_details", "global"
+  title       String?  // Title template
+  description String?  @db.Text
+  keywords    String?  @db.Text
+  ogImage     String?
+  jsonLd      String?  @db.Text // Custom Structured Data
+  updatedAt   DateTime @updatedAt
+}
+
