@@ -22,35 +22,59 @@ interface FormField {
     isSystem: boolean;
 }
 
+const MAX_FILE_SIZE_MB = 5; // 5MB for documents
+const MAX_PHOTO_SIZE_MB = 2; // 2MB for photos
+
 const FileUploadInput = ({ field, commonProps }: { field: FormField, commonProps: any }) => {
     const [fileName, setFileName] = useState<string | null>(null);
+    const [error, setError] = useState<string | null>(null);
 
     const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
-        if (file) setFileName(file.name);
-        else setFileName(null);
+        setError(null);
+
+        if (file) {
+            const maxSize = MAX_FILE_SIZE_MB * 1024 * 1024; // 5MB in bytes
+            if (file.size > maxSize) {
+                setError(`File size must be less than ${MAX_FILE_SIZE_MB}MB`);
+                e.target.value = ''; // Clear the input
+                setFileName(null);
+                return;
+            }
+            setFileName(file.name);
+        } else {
+            setFileName(null);
+        }
     };
 
     return (
         <div className="relative group">
             <div className={cn(
                 "flex items-center justify-between p-4 border-2 border-dashed rounded-xl transition-all cursor-pointer",
-                fileName
-                    ? "border-[#00ADE7] bg-[#00ADE7]/5"
-                    : "border-slate-200 bg-slate-50/50 hover:bg-white hover:border-[#00ADE7]/50 hover:shadow-sm"
+                error
+                    ? "border-red-400 bg-red-50"
+                    : fileName
+                        ? "border-[#00ADE7] bg-[#00ADE7]/5"
+                        : "border-slate-200 bg-slate-50/50 hover:bg-white hover:border-[#00ADE7]/50 hover:shadow-sm"
             )}>
                 <div className="flex items-center gap-4">
                     <div className={cn(
                         "p-3 rounded-full transition-colors",
-                        fileName ? "bg-[#00ADE7] text-white" : "bg-slate-100 text-slate-500 group-hover:bg-[#00ADE7]/10 group-hover:text-[#00ADE7]"
+                        error
+                            ? "bg-red-100 text-red-500"
+                            : fileName
+                                ? "bg-[#00ADE7] text-white"
+                                : "bg-slate-100 text-slate-500 group-hover:bg-[#00ADE7]/10 group-hover:text-[#00ADE7]"
                     )}>
                         <UploadCloud className="w-6 h-6" />
                     </div>
                     <div className="flex flex-col">
-                        <span className={cn("text-sm font-semibold", fileName ? "text-[#00ADE7]" : "text-slate-700")}>
-                            {fileName || `Click to upload ${field.label}`}
+                        <span className={cn("text-sm font-semibold",
+                            error ? "text-red-600" : fileName ? "text-[#00ADE7]" : "text-slate-700"
+                        )}>
+                            {error || fileName || `Click to upload ${field.label}`}
                         </span>
-                        {!fileName && <span className="text-xs text-slate-500 mt-0.5">PDF, DOC, DOCX up to 10MB</span>}
+                        {!fileName && !error && <span className="text-xs text-slate-500 mt-0.5">PDF, DOC, DOCX (Max {MAX_FILE_SIZE_MB}MB)</span>}
                     </div>
                 </div>
                 {fileName && (
@@ -70,15 +94,27 @@ const FileUploadInput = ({ field, commonProps }: { field: FormField, commonProps
     );
 };
 
+
 export default function ApplicationForm({ jobId, jobTitle, fields }: { jobId: number, jobTitle: string, fields: FormField[] }) {
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [success, setSuccess] = useState(false);
     const [errorMsg, setErrorMsg] = useState('');
     const [photoPreview, setPhotoPreview] = useState<string | null>(null);
+    const [photoError, setPhotoError] = useState<string | null>(null);
 
     const handlePhotoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
+        setPhotoError(null);
+
         if (file) {
+            const maxSize = MAX_PHOTO_SIZE_MB * 1024 * 1024; // 2MB in bytes
+            if (file.size > maxSize) {
+                setPhotoError(`Photo must be less than ${MAX_PHOTO_SIZE_MB}MB`);
+                e.target.value = ''; // Clear the input
+                setPhotoPreview(null);
+                return;
+            }
+
             const reader = new FileReader();
             reader.onloadend = () => {
                 setPhotoPreview(reader.result as string);
@@ -87,12 +123,19 @@ export default function ApplicationForm({ jobId, jobTitle, fields }: { jobId: nu
         }
     };
 
+
     async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
         event.preventDefault();
+
+        // Prevent double submission
+        if (isSubmitting) return;
+
         setIsSubmitting(true);
         setErrorMsg('');
 
-        const formData = new FormData(event.currentTarget);
+        // Create a new FormData from the form
+        const form = event.currentTarget;
+        const formData = new FormData(form);
         formData.append('jobId', jobId.toString());
 
         try {
@@ -100,7 +143,7 @@ export default function ApplicationForm({ jobId, jobTitle, fields }: { jobId: nu
             const dynamicData: Record<string, string> = {};
             fields.filter(f => !f.isSystem).forEach(f => {
                 const value = formData.get(f.name);
-                if (value) dynamicData[f.name] = value.toString();
+                if (value && typeof value === 'string') dynamicData[f.name] = value;
             });
             formData.append('dynamicData', JSON.stringify(dynamicData));
 
@@ -109,13 +152,21 @@ export default function ApplicationForm({ jobId, jobTitle, fields }: { jobId: nu
                 setErrorMsg(result.error);
             } else if (result?.success) {
                 setSuccess(true);
+                form.reset(); // Reset form on success
             }
-        } catch (e) {
-            setErrorMsg("An unexpected error occurred. Please try again.");
+        } catch (e: any) {
+            console.error('Form submission error:', e);
+            // Handle the "Unexpected end of form" error specifically
+            if (e?.message?.includes('Unexpected end of form')) {
+                setErrorMsg("There was an issue uploading your files. Please refresh the page and try again.");
+            } else {
+                setErrorMsg("An unexpected error occurred. Please try again.");
+            }
         } finally {
             setIsSubmitting(false);
         }
     }
+
 
     if (success) {
         return (
@@ -167,7 +218,12 @@ export default function ApplicationForm({ jobId, jobTitle, fields }: { jobId: nu
             case 'file':
                 if (field.name === 'photo') {
                     return (
-                        <div className="border-2 border-dashed border-primary/20 bg-primary/5 rounded-xl p-6 text-center hover:bg-primary/10 transition-colors relative group">
+                        <div className={cn(
+                            "border-2 border-dashed rounded-xl p-6 text-center transition-colors relative group",
+                            photoError
+                                ? "border-red-400 bg-red-50"
+                                : "border-primary/20 bg-primary/5 hover:bg-primary/10"
+                        )}>
                             <input
                                 {...commonProps}
                                 type="file"
@@ -175,7 +231,15 @@ export default function ApplicationForm({ jobId, jobTitle, fields }: { jobId: nu
                                 className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
                                 onChange={handlePhotoChange}
                             />
-                            {photoPreview ? (
+                            {photoError ? (
+                                <div className="flex flex-col items-center justify-center text-red-600">
+                                    <div className="bg-red-100 p-3 rounded-full shadow-sm mb-3">
+                                        <UploadCloud className="h-6 w-6 text-red-500" />
+                                    </div>
+                                    <span className="text-sm font-medium">{photoError}</span>
+                                    <span className="text-xs mt-1 opacity-70">Click to try again</span>
+                                </div>
+                            ) : photoPreview ? (
                                 <div className="relative inline-block">
                                     <img src={photoPreview} alt="Preview" className="mx-auto h-32 w-32 object-cover rounded-full border-4 border-white shadow-md relative z-0" />
                                     <div className="absolute inset-0 bg-black/40 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
@@ -188,11 +252,12 @@ export default function ApplicationForm({ jobId, jobTitle, fields }: { jobId: nu
                                         <UploadCloud className="h-6 w-6 text-primary" />
                                     </div>
                                     <span className="text-sm font-medium text-primary">Upload Photo</span>
-                                    <span className="text-xs mt-1 opacity-70">Click or drag image</span>
+                                    <span className="text-xs mt-1 opacity-70">JPG, PNG (Max {MAX_PHOTO_SIZE_MB}MB)</span>
                                 </div>
                             )}
                         </div>
                     );
+
                 } else {
                     return <FileUploadInput field={field} commonProps={commonProps} />;
                 }
@@ -205,6 +270,18 @@ export default function ApplicationForm({ jobId, jobTitle, fields }: { jobId: nu
                     inputType = 'url';
                 } else if (field.type === 'phone') {
                     inputType = 'tel';
+                }
+
+                // Date field validation
+                if (field.type === 'date') {
+                    const today = new Date().toISOString().split('T')[0];
+                    // DOB/Birthday fields should not allow future dates
+                    const dobFieldNames = ['dob', 'dateofbirth', 'date_of_birth', 'birthday', 'birthdate'];
+                    if (dobFieldNames.includes(field.name.toLowerCase())) {
+                        return <Input {...commonProps} type="date" max={today} />;
+                    }
+                    // Other date fields default to today onwards (future dates)
+                    return <Input {...commonProps} type="date" min={today} />;
                 }
 
                 return <Input {...commonProps} type={inputType} />;

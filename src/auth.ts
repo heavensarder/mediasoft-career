@@ -5,12 +5,35 @@ import { z } from 'zod';
 import { prisma } from '@/lib/prisma';
 import bcrypt from 'bcryptjs';
 
-async function getUser(email: string) {
+type UserWithRole = {
+  id: number;
+  name: string;
+  email: string;
+  password: string;
+  role: 'admin' | 'interview_admin';
+};
+
+async function getUser(email: string): Promise<UserWithRole | null> {
   try {
-    const user = await prisma.admin.findUnique({
+    // Check main Admin first
+    const admin = await prisma.admin.findUnique({
       where: { email },
     });
-    return user;
+
+    if (admin) {
+      return { ...admin, role: 'admin' };
+    }
+
+    // Check Interview Admin
+    const interviewAdmin = await prisma.interviewAdmin.findUnique({
+      where: { email },
+    });
+
+    if (interviewAdmin) {
+      return { ...interviewAdmin, role: 'interview_admin' };
+    }
+
+    return null;
   } catch (error) {
     console.error('Failed to fetch user:', error);
     throw new Error('Failed to fetch user.');
@@ -38,6 +61,7 @@ export const { auth, signIn, signOut } = NextAuth({
               id: user.id.toString(),
               name: user.name,
               email: user.email,
+              role: user.role,
             };
           }
         }
@@ -48,3 +72,4 @@ export const { auth, signIn, signOut } = NextAuth({
     }),
   ],
 });
+

@@ -65,7 +65,7 @@ export default async function OverviewPage() {
 
   return (
     <div className="premium-bg min-h-screen text-slate-800 p-4 sm:p-8 -m-4 sm:-m-6 md:-m-12">
-      <AutoRefresh interval={5000} /> 
+      <AutoRefresh interval={5000} />
       {/* Header */}
       <div className="flex items-center justify-between mb-10">
         <div>
@@ -172,11 +172,10 @@ export default async function OverviewPage() {
 
             <div className="space-y-3">
               {recentApps.map((app) => (
-                <div key={app.id} className={`group flex flex-col sm:flex-row sm:items-center justify-between p-4 rounded-xl  hover:shadow-xl hover:-translate-y-1 transition-all duration-300 border gap-4 ${
-                  app.status === 'New' 
-                    ? 'bg-sky-50 border-sky-200 hover:border-sky-300' 
+                <div key={app.id} className={`group flex flex-col sm:flex-row sm:items-center justify-between p-4 rounded-xl  hover:shadow-xl hover:-translate-y-1 transition-all duration-300 border gap-4 ${app.status === 'New'
+                    ? 'bg-sky-50 border-sky-200 hover:border-sky-300'
                     : 'bg-white border-slate-200 hover:border-blue-400'
-                }`}>
+                  }`}>
                   <div className="flex items-center gap-4 w-full sm:w-auto">
                     <Link href={`/admin/dashboard/job-recruitment/applications/${app.id}`} className="transition-transform hover:scale-105 shrink-0">
                       <Avatar className="h-10 w-10 border-2 border-white shadow-sm cursor-pointer">
@@ -209,14 +208,13 @@ export default async function OverviewPage() {
                         }
                       })()}
                     </span>
-                    <div className={`px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider shadow-sm border ${
-                      app.status === 'New' ? 'bg-blue-100 text-blue-700 border-blue-200' :
-                      app.status === 'Shortlisted' ? 'bg-green-100 text-green-700 border-green-200' :
-                      app.status === 'Rejected' ? 'bg-red-100 text-red-700 border-red-200' :
-                      app.status === 'Selected' ? 'bg-purple-100 text-purple-700 border-purple-200' :
-                      app.status === 'Interview' ? 'bg-orange-100 text-orange-700 border-orange-200' :
-                      'bg-slate-100 text-slate-700 border-slate-200'
-                    }`}>
+                    <div className={`px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider shadow-sm border ${app.status === 'New' ? 'bg-blue-100 text-blue-700 border-blue-200' :
+                        app.status === 'Shortlisted' ? 'bg-purple-100 text-purple-700 border-purple-200' :
+                          app.status === 'Rejected' ? 'bg-red-100 text-red-700 border-red-200' :
+                            app.status === 'Selected' ? 'bg-green-100 text-green-700 border-green-200' :
+                              app.status === 'Interview' ? 'bg-orange-100 text-orange-700 border-orange-200' :
+                                'bg-slate-100 text-slate-700 border-slate-200'
+                      }`}>
                       {app.status}
                     </div>
                   </div>

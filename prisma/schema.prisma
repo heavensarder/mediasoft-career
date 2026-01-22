@@ -82,11 +82,68 @@ model Application {
   linkedin       String?
   facebook       String?
   portfolio      String?
-  status         String   @default("New") // New, Viewed, Shortlisted, Rejected, Selected
+  status         String   @default("New") // New, Viewed, Shortlisted, Interview, Rejected, Selected
   notes          String?  @db.Text
   createdAt      DateTime @default(now())
   updatedAt      DateTime @updatedAt
   dynamicData    Json?    // Stores values for custom dynamic fields
+  interviewDate  DateTime? // Interview date and time
+  interviewEnded Boolean  @default(false) // When true, removes from Interview Panel but keeps status
+  interviewMarking InterviewMarking?
+  
+  // Assigned interviewers for this applicant (many-to-many)
+  assignedInterviewers ApplicationAssignment[]
+}
+
+// Join table for many-to-many relationship between Application and InterviewAdmin
+model ApplicationAssignment {
+  id              Int            @id @default(autoincrement())
+  applicationId   Int
+  application     Application    @relation(fields: [applicationId], references: [id], onDelete: Cascade)
+  interviewerId   Int
+  interviewer     InterviewAdmin @relation(fields: [interviewerId], references: [id], onDelete: Cascade)
+  assignedAt      DateTime       @default(now())
+  
+  @@unique([applicationId, interviewerId])
+}
+
+// Interview Admin users with restricted access
+model InterviewAdmin {
+  id                    Int                     @id @default(autoincrement())
+  name                  String
+  email                 String                  @unique
+  password              String
+  role                  String                  @default("interview_admin")
+  createdAt             DateTime                @default(now())
+  updatedAt             DateTime                @updatedAt
+  markingPermissions    MarkingPermission?
+  marks                 InterviewMarking[]
+  assignedApplications  ApplicationAssignment[]
+}
+
+
+// Interview marking scores per applicant
+model InterviewMarking {
+  id              Int              @id @default(autoincrement())
+  applicationId   Int              @unique
+  application     Application      @relation(fields: [applicationId], references: [id], onDelete: Cascade)
+  writtenExam     Int?             // 0-30
+  technicalViva   Int?             // 0-10
+  projectRating   Int?             // 1-5 stars
+  markedById      Int?
+  markedBy        InterviewAdmin?  @relation(fields: [markedById], references: [id], onDelete: SetNull)
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @updatedAt
+}
+
+// Granular permissions for marking sections
+model MarkingPermission {
+  id                Int             @id @default(autoincrement())
+  interviewAdminId  Int             @unique
+  interviewAdmin    InterviewAdmin  @relation(fields: [interviewAdminId], references: [id], onDelete: Cascade)
+  writtenExam       Boolean         @default(false)
+  technicalViva     Boolean         @default(false)
+  project           Boolean         @default(false)
 }
 
 model FormField {

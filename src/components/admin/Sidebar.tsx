@@ -13,7 +13,10 @@ import {
   LogOut,
   ChevronDown,
   Globe,
-  Terminal
+  Terminal,
+  ClipboardList,
+  UserCheck,
+  Mail
 } from 'lucide-react';
 import { handleSignOut } from '@/lib/auth-actions';
 import { getNewApplicationCount } from '@/lib/application-actions';
@@ -24,41 +27,77 @@ const menuItems = [
   {
     title: 'Job Recruitment',
     icon: Briefcase,
+    adminOnly: true,
     submenu: [
       { name: 'Overview', href: '/admin/dashboard/job-recruitment/overview', icon: LayoutDashboard },
       { name: 'Job List', href: '/admin/dashboard/job-recruitment/job-list', icon: Briefcase },
       { name: 'Add New Job', href: '/admin/dashboard/job-recruitment/add-new-job', icon: PlusCircle },
       { name: 'Applications', href: '/admin/dashboard/job-recruitment/applications', icon: Users, showCount: true },
-      { name: 'Settings', href: '/admin/dashboard/job-recruitment/settings', icon: Settings },
+      { name: 'Manage', href: '/admin/dashboard/job-recruitment/settings', icon: Settings },
       { name: 'Export', href: '/admin/dashboard/job-recruitment/export', icon: Download },
+    ],
+  },
+  {
+    title: 'Interview Panel',
+    icon: ClipboardList,
+    submenu: [
+      { name: 'Interview List', href: '/admin/dashboard/interview-panel', icon: ClipboardList, exact: true },
+      { name: 'Interviewer', href: '/admin/dashboard/interview-panel/interviewers', icon: UserCheck, adminOnly: true },
     ],
   },
   {
     title: 'White Label',
     icon: Settings,
+    adminOnly: true,
     submenu: [
       { name: 'Branding', href: '/admin/dashboard/white-label', icon: Settings, exact: true },
-      { name: 'Image Slider', href: '/admin/dashboard/white-label/image-slider', icon: LayoutDashboard }, // Using LayoutDashboard for visuals
+      { name: 'Image Slider', href: '/admin/dashboard/white-label/image-slider', icon: LayoutDashboard },
       { name: 'SEO Manager', href: '/admin/dashboard/seo-manager', icon: Globe },
     ]
   },
   {
-      title: 'Developer',
-      icon: Terminal,
-      submenu: [
-          { name: 'API Zone', href: '/admin/dashboard/developer-zone', icon: Terminal }
-      ]
+    title: 'Developer',
+    icon: Terminal,
+    adminOnly: true,
+    submenu: [
+      { name: 'API Zone', href: '/admin/dashboard/developer-zone', icon: Terminal }
+    ]
   }
 ];
 
 interface SidebarProps {
   newApplicationCount?: number;
   logoUrl?: string | null;
+  faviconUrl?: string | null;
+  userRole?: 'admin' | 'interview_admin';
+  userName?: string;
+  userEmail?: string;
 }
 
-export default function Sidebar({ newApplicationCount = 0, logoUrl }: SidebarProps) {
+export default function Sidebar({
+  newApplicationCount = 0,
+  logoUrl,
+  faviconUrl,
+  userRole = 'admin',
+  userName = 'Admin User',
+  userEmail = 'admin@mediasoft.com'
+}: SidebarProps) {
   const pathname = usePathname();
-  const [openMenus, setOpenMenus] = useState<string[]>(['Job Recruitment', 'White Label']);
+  const isMainAdmin = userRole === 'admin';
+
+  // Filter menu items based on role
+  const filteredMenuItems = menuItems
+    .filter(item => !item.adminOnly || isMainAdmin)
+    .map(item => ({
+      ...item,
+      submenu: item.submenu.filter(subItem => !(subItem as any).adminOnly || isMainAdmin)
+    }));
+
+  const [openMenus, setOpenMenus] = useState<string[]>(
+    isMainAdmin
+      ? ['Job Recruitment', 'Interview Panel', 'White Label']
+      : ['Interview Panel']
+  );
   const [appCount, setAppCount] = useState(newApplicationCount);
 
   useEffect(() => {
@@ -101,7 +140,7 @@ export default function Sidebar({ newApplicationCount = 0, logoUrl }: SidebarPro
       {/* Navigation */}
       <div className="flex-1 overflow-y-auto py-6 px-3">
         <nav className="space-y-1">
-          {menuItems.map((item) => (
+          {filteredMenuItems.map((item) => (
             <div key={item.title} className="mb-4">
               {/* Section Title as Button */}
               <button
@@ -123,8 +162,8 @@ export default function Sidebar({ newApplicationCount = 0, logoUrl }: SidebarPro
                 <div className="space-y-1">
                   {item.submenu.map((subItem) => {
                     const isActive = (subItem as any).exact
-                         ? pathname === subItem.href
-                         : pathname === subItem.href || pathname.startsWith(subItem.href + '/');
+                      ? pathname === subItem.href
+                      : pathname === subItem.href || pathname.startsWith(subItem.href + '/');
 
                     return (
                       <Link
@@ -161,22 +200,49 @@ export default function Sidebar({ newApplicationCount = 0, logoUrl }: SidebarPro
       </div>
 
       {/* Footer / User Profile */}
-      <div className="border-t border-border p-4">
-        <div className="flex items-center gap-3 mb-4 px-2">
-          <div className="h-9 w-9 rounded-full bg-muted flex items-center justify-center text-muted-foreground">
-            <Users className="h-5 w-5" />
+      <div className="border-t border-slate-200 p-4 bg-slate-50/50">
+        {/* User Info Card */}
+        <div className="flex items-center gap-3 p-3 rounded-lg bg-white border border-slate-200 mb-3">
+          <div className="h-10 w-10 rounded-full bg-primary flex items-center justify-center text-white font-bold text-sm overflow-hidden ring-2 ring-white shadow-sm">
+            {faviconUrl ? (
+              <img src={faviconUrl} alt="Logo" className="h-full w-full object-contain" />
+            ) : (
+              userName.charAt(0).toUpperCase()
+            )}
           </div>
-          <div className="flex flex-col">
-            <span className="text-sm font-medium text-foreground">Admin User</span>
-            <span className="text-xs text-muted-foreground">admin@mediasoft.com</span>
+          <div className="flex flex-col flex-1 min-w-0">
+            <span className="text-sm font-semibold text-slate-800 truncate">{userName}</span>
+            <span className="text-[11px] text-slate-500 truncate">{userEmail}</span>
           </div>
         </div>
-        <form action={handleSignOut}>
-          <button className="flex w-full items-center justify-center rounded-md px-3 py-2 text-sm font-medium text-destructive hover:bg-destructive/10 transition-colors border border-transparent hover:border-destructive/20">
-            <LogOut className="mr-2 h-4 w-4" />
-            Sign Out
-          </button>
-        </form>
+
+        {/* Action Buttons */}
+        <div className="space-y-1.5">
+          {isMainAdmin && (
+            <>
+              <Link
+                href="/admin/dashboard/mail-configuration"
+                className="flex w-full items-center rounded-lg px-3 py-2.5 text-sm font-medium text-slate-600 hover:text-slate-800 hover:bg-slate-100 transition-colors"
+              >
+                <Mail className="mr-2.5 h-4 w-4 text-slate-400" />
+                Mail Configuration
+              </Link>
+              <Link
+                href="/admin/dashboard/settings"
+                className="flex w-full items-center rounded-lg px-3 py-2.5 text-sm font-medium text-slate-600 hover:text-slate-800 hover:bg-slate-100 transition-colors"
+              >
+                <Settings className="mr-2.5 h-4 w-4 text-slate-400" />
+                Settings
+              </Link>
+            </>
+          )}
+          <form action={handleSignOut}>
+            <button className="flex w-full items-center rounded-lg px-3 py-2.5 text-sm font-medium text-red-500 hover:text-red-600 hover:bg-red-50 transition-colors">
+              <LogOut className="mr-2.5 h-4 w-4 text-red-400" />
+              Sign Out
+            </button>
+          </form>
+        </div>
       </div>
     </div>
   );

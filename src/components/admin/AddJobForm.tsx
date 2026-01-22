@@ -132,8 +132,8 @@ export default function AddJobForm({ departments, jobTypes, locations, initialDa
                             <span className={`text-sm font-medium ${status === 'Active' ? 'text-green-600' : 'text-slate-400'}`}>Active</span>
                         </div>
                     </div>
-                    
-                    <JobActivationModal 
+
+                    <JobActivationModal
                         isOpen={showActivationModal}
                         onClose={() => setShowActivationModal(false)}
                         onConfirm={handleActivationConfirm}
@@ -147,7 +147,7 @@ export default function AddJobForm({ departments, jobTypes, locations, initialDa
                         </div>
                         <div className="space-y-2">
                             <label className="text-sm font-medium">Expiry Date</label>
-                            <Input type="date" {...register('expiryDate')} />
+                            <Input type="date" {...register('expiryDate')} min={new Date().toISOString().split('T')[0]} />
                             {errors.expiryDate && <p className="text-red-500 text-sm">{errors.expiryDate.message}</p>}
                         </div>
                     </div>
