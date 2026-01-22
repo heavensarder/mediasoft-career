@@ -121,7 +121,7 @@ export function DepartmentDistributionChart({ data }: { data: ChartData[] }) {
                             }}
                             itemStyle={{ color: '#0f172a', fontWeight: 'bold', fontSize: '14px' }}
                             cursor={{ fill: 'transparent' }}
-                            formatter={(value: number) => [`${value} Jobs`, 'Vol']}
+                            formatter={(value: number | undefined) => [`${value || 0} Applications`, 'Volume']}
                         />
                     </PieChart>
                 </ResponsiveContainer>

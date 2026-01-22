@@ -22,7 +22,7 @@ import {
     User
 } from "lucide-react";
 import Link from 'next/link';
-import ResumeViewerWrapper from '@/components/admin/ResumeViewerWrapper';
+import ResumePreviewLauncher from '@/components/admin/ResumePreviewLauncher';
 import StatusSelector from '@/components/admin/StatusSelector';
 import MarkAsViewed from '@/components/admin/MarkAsViewed';
 import PrintButton from '@/components/admin/PrintButton';
@@ -184,11 +184,11 @@ export default async function ApplicationDetailsPage({ params }: { params: { id:
                                          <div className="grid grid-cols-2 gap-4">
                                             <div>
                                                 <p className="text-xs text-slate-500 font-medium">Current</p>
-                                                <p className="text-sm font-bold text-slate-800">{application.currentSalary || "N/A"}</p>
+                                                <p className="text-sm font-bold text-slate-800">{application.currentSalary ? `${application.currentSalary} BDT` : "N/A"}</p>
                                             </div>
                                             <div>
                                                 <p className="text-xs text-slate-500 font-medium">Expected</p>
-                                                <p className="text-sm font-bold text-[#00ADE7]">{application.expectedSalary || "N/A"}</p>
+                                                <p className="text-sm font-bold text-[#00ADE7]">{application.expectedSalary ? `${application.expectedSalary} BDT` : "N/A"}</p>
                                             </div>
                                          </div>
                                     </div>
@@ -293,17 +293,11 @@ export default async function ApplicationDetailsPage({ params }: { params: { id:
                                         </Button>
                                     </a>
                                 )}
-                             </div>
-                            <CardContent className="p-0 bg-slate-100 min-h-[500px]">
-                                {application.resume ? (
-                                    <ResumeViewerWrapper url={application.resume} />
-                                ) : (
-                                    <div className="flex flex-col items-center justify-center py-20 text-slate-400">
-                                        <Download className="h-16 w-16 mb-4 opacity-20" />
-                                        <p>No resume uploaded</p>
-                                    </div>
+                                {application.resume && (
+                                    <ResumePreviewLauncher url={application.resume} applicantName={application.fullName} />
                                 )}
-                            </CardContent>
+                             </div>
+                            {/* Removed placeholder content as requested */}
                         </Card>
 
                         {/* Dynamic Fields */}
@@ -388,7 +382,7 @@ export default async function ApplicationDetailsPage({ params }: { params: { id:
                             </div>
                             <div className="border-b border-slate-100 pb-1 pt-2">
                                 <span className="block text-[10px] text-slate-500 uppercase tracking-wider font-bold">Expected Salary</span>
-                                <span className="text-slate-900 font-medium">{application.expectedSalary}</span>
+                                <span className="text-slate-900 font-medium">{application.expectedSalary ? `${application.expectedSalary} BDT` : "N/A"}</span>
                             </div>
                             <div className="border-b border-slate-100 pb-1 pt-2">
                                 <span className="block text-[10px] text-slate-500 uppercase tracking-wider font-bold">Experience</span>
@@ -441,7 +435,7 @@ export default async function ApplicationDetailsPage({ params }: { params: { id:
                                 </div>
                                 <div className="flex justify-between border-b border-slate-100 pb-1">
                                     <span className="text-slate-500 font-bold">Current Salary</span>
-                                    <span className="font-semibold text-slate-900">{application.currentSalary || "N/A"}</span>
+                                    <span className="font-semibold text-slate-900">{application.currentSalary ? `${application.currentSalary} BDT` : "N/A"}</span>
                                 </div>
                             </div>
                         </div>

@@ -99,7 +99,7 @@ export default function ApplicantEmailModal({ applicantEmail, applicantName }: A
     return (
         <Dialog open={open} onOpenChange={setOpen}>
             <DialogTrigger asChild>
-                <Button variant="outline" className="gap-2">
+                <Button className="gap-2 bg-blue-600 hover:bg-blue-700 text-white shadow-md hover:shadow-lg transition-all hover:scale-105 active:scale-95 font-bold glass-button-filled border-0 h-10 px-6">
                     <Mail className="h-4 w-4" /> Send Email
                 </Button>
             </DialogTrigger>

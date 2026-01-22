@@ -221,7 +221,7 @@ export default async function OverviewPage() {
 
           {/* Distribution */}
           <div className="premium-glass-card p-6 flex flex-col items-center">
-            <h3 className="text-xl font-bold text-slate-800 w-full text-left mb-2">Job Distribution</h3>
+            <h3 className="text-xl font-bold text-slate-800 w-full text-left mb-2">Job Applications</h3>
             <DepartmentDistributionChart data={chartData} />
 
 
