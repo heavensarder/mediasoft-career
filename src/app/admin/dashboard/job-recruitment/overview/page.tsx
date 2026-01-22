@@ -63,7 +63,7 @@ export default async function OverviewPage() {
   } = await getOverviewData();
 
   return (
-    <div className="premium-bg min-h-screen text-slate-800 p-8 -m-6 md:-m-12">
+    <div className="premium-bg min-h-screen text-slate-800 p-4 sm:p-8 -m-4 sm:-m-6 md:-m-12">
       {/* Header */}
       <div className="flex items-center justify-between mb-10">
         <div>
@@ -167,23 +167,27 @@ export default async function OverviewPage() {
 
             <div className="space-y-3">
               {recentApps.map((app) => (
-                <div key={app.id} className="group flex items-center justify-between p-4 rounded-xl bg-white border border-slate-200 hover:shadow-xl hover:border-blue-400 hover:-translate-y-1 transition-all duration-300">
-                  <div className="flex items-center gap-4">
-                    <Link href={`/admin/dashboard/job-recruitment/applications/${app.id}`} className="transition-transform hover:scale-105">
+                <div key={app.id} className={`group flex flex-col sm:flex-row sm:items-center justify-between p-4 rounded-xl  hover:shadow-xl hover:-translate-y-1 transition-all duration-300 border gap-4 ${
+                  app.status === 'New' 
+                    ? 'bg-sky-50 border-sky-200 hover:border-sky-300' 
+                    : 'bg-white border-slate-200 hover:border-blue-400'
+                }`}>
+                  <div className="flex items-center gap-4 w-full sm:w-auto">
+                    <Link href={`/admin/dashboard/job-recruitment/applications/${app.id}`} className="transition-transform hover:scale-105 shrink-0">
                       <Avatar className="h-10 w-10 border-2 border-white shadow-sm cursor-pointer">
                         <AvatarImage src={app.photo || undefined} />
                         <AvatarFallback className="bg-slate-200 text-slate-600 font-bold">{app.fullName[0]}</AvatarFallback>
                       </Avatar>
                     </Link>
-                    <div>
-                      <Link href={`/admin/dashboard/job-recruitment/applications/${app.id}`} className="text-sm font-bold text-slate-800 group-hover:text-[#00ADE7] transition-colors">
+                    <div className="min-w-0">
+                      <Link href={`/admin/dashboard/job-recruitment/applications/${app.id}`} className="text-sm font-bold text-slate-800 group-hover:text-[#00ADE7] transition-colors truncate block">
                         {app.fullName}
                       </Link>
-                      <p className="text-xs text-slate-500 font-medium">Applied for <span className="text-[#00ADE7]">{app.job.title}</span></p>
+                      <p className="text-xs text-slate-500 font-medium truncate">Applied for <span className="text-[#00ADE7]">{app.job.title}</span></p>
                     </div>
                   </div>
-                  <div className="flex items-center gap-4">
-                    <span className="text-xs text-slate-400 hidden sm:flex items-center gap-1 font-semibold">
+                  <div className="flex items-center justify-between w-full sm:w-auto gap-4 mt-2 sm:mt-0 pl-14 sm:pl-0">
+                    <span className="text-xs text-slate-400 flex items-center gap-1 font-semibold">
                       <Calendar className="h-3 w-3" />
                       {(() => {
                         const date = new Date(app.createdAt);

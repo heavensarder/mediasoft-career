@@ -173,7 +173,7 @@ export default function AdminJobList({ jobs }: { jobs: Job[] }) {
                             className="group bg-white rounded-xl p-4 shadow-sm border border-slate-200/60 hover:shadow-md hover:border-[#00ADE7]/30 transition-all duration-200 flex flex-col sm:flex-row gap-4 items-center"
                         >
                             {/* Icon & ID */}
-                            <div className="flex items-center gap-4">
+                            <div className="flex items-center gap-4 w-full sm:w-auto">
                                 <div className="h-12 w-12 rounded-xl bg-slate-50 group-hover:bg-blue-50 flex items-center justify-center text-slate-400 group-hover:text-[#00ADE7] transition-colors shrink-0">
                                     <Briefcase className="h-6 w-6" />
                                 </div>
@@ -181,50 +181,54 @@ export default function AdminJobList({ jobs }: { jobs: Job[] }) {
                             </div>
 
                             {/* Title & Type */}
-                            <div className="flex-1 min-w-[250px]">
+                            <div className="flex-1 w-full sm:w-auto sm:min-w-[250px]">
                                 <div className="flex items-center gap-3 mb-1">
-                                    <h3 className="text-lg font-bold text-slate-800 group-hover:text-[#00ADE7] transition-colors line-clamp-1">
+                                    <h3 className="text-lg font-bold text-slate-900 group-hover:text-[#00ADE7] transition-colors line-clamp-1 break-all">
                                         {job.title}
                                     </h3>
                                     <div className="shrink-0">
                                         <JobStatusToggle jobId={job.id} initialStatus={job.status || 'Active'} />
                                     </div>
                                 </div>
-                                <div className="flex items-center gap-2 text-sm text-slate-500">
+                                <div className="flex items-center gap-2 text-sm text-slate-500 flex-wrap">
                                     <span className="flex items-center gap-1">
                                         <Briefcase className="w-3.5 h-3.5" />
                                         {job.jobType?.name}
                                     </span>
-                                    <span className="text-slate-300">•</span>
+                                    <span className="text-slate-300 hidden sm:inline">•</span>
                                     <span>{job.department?.name || "No Dept"}</span>
                                 </div>
                             </div>
 
                             {/* Stats */}
-                            <div className="flex items-center gap-6 px-4 border-l border-r border-slate-100 min-w-[200px] justify-center">
-                                <div className="text-center">
+                            <div className="flex items-center gap-6 px-0 sm:px-4 border-t sm:border-t-0 sm:border-l sm:border-r border-slate-100 w-full sm:w-auto sm:min-w-[200px] justify-between sm:justify-center py-3 sm:py-0">
+                                <div className="text-center flex flex-row sm:flex-col items-center gap-2 sm:gap-0">
                                     <div className="text-lg font-bold text-slate-800">{job._count.applications}</div>
-                                    <div className="text-[10px] uppercase tracking-wider text-slate-400 font-medium">Aplicants</div>
+                                    <div className="text-[10px] uppercase tracking-wider text-slate-400 font-medium">Applicants</div>
                                 </div>
-                                <div className="text-center">
+                                <div className="text-center flex flex-row sm:flex-col items-center gap-2 sm:gap-0">
                                     <div className="text-lg font-bold text-slate-800">{job.views}</div>
                                     <div className="text-[10px] uppercase tracking-wider text-slate-400 font-medium">Views</div>
                                 </div>
                             </div>
 
                             {/* Dates & Action */}
-                            <div className="flex items-center gap-6 min-w-[200px] justify-between sm:justify-end w-full sm:w-auto">
-                                <div className="text-right hidden xl:block">
-                                    <div className="text-xs text-slate-500 mb-1">
-                                        Posted: <span className="font-medium text-slate-700">{format(new Date(job.createdAt), 'dd/MM/yyyy')}</span>
+                            <div className="flex items-center gap-6 min-w-[200px] justify-between sm:justify-end w-full sm:w-auto pt-2 sm:pt-0 border-t sm:border-t-0 border-slate-100 sm:border-none">
+                                <div className="text-right block">
+                                    <div className="text-xs text-slate-500 mb-1 flex sm:block gap-2">
+                                        <span className="hidden sm:inline">Posted:</span>
+                                        <span className="sm:hidden font-medium text-slate-400">Posted:</span>
+                                        <span className="font-medium text-slate-700">{format(new Date(job.createdAt), 'dd/MM/yyyy')}</span>
                                     </div>
                                     {job.expiryDate && (
-                                        <div className={`text-xs ${new Date(job.expiryDate) < new Date() ? 'text-red-500 font-bold' : 'text-slate-500'}`}>
-                                            Exp: <span className="font-medium">{format(new Date(job.expiryDate), 'dd/MM/yyyy')}</span>
+                                        <div className={`text-xs ${new Date(job.expiryDate) < new Date() ? 'text-red-500 font-bold' : 'text-slate-500'} flex sm:block gap-2`}>
+                                            <span className="hidden sm:inline">Exp:</span>
+                                            <span className="sm:hidden font-medium text-slate-400">Expires:</span>
+                                            <span className="font-medium">{format(new Date(job.expiryDate), 'dd/MM/yyyy')}</span>
                                         </div>
                                     )}
                                 </div>
-                                <div className="opacity-80 group-hover:opacity-100 transition-opacity">
+                                <div className="opacity-100 sm:opacity-80 group-hover:opacity-100 transition-opacity">
                                     <JobActions jobId={job.id} jobSlug={job.slug as string} jobTitle={job.title} />
                                 </div>
                             </div>

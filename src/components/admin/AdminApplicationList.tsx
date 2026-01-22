@@ -14,6 +14,7 @@ import {
     DialogTitle,
 } from "@/components/ui/dialog";
 import DeleteApplicationButton from '@/components/admin/DeleteApplicationButton';
+import { format } from 'date-fns';
 
 interface Application {
     id: number;
@@ -28,6 +29,7 @@ interface Application {
 }
 
 export default function AdminApplicationList({ applications }: { applications: Application[] }) {
+
     const [viewMode, setViewMode] = useState<'grid' | 'list'>('list');
 
     if (applications.length === 0) {
@@ -169,7 +171,7 @@ export default function AdminApplicationList({ applications }: { applications: A
                                     <div className="flex flex-col pointer-events-none">
                                         <span className="text-[10px] text-slate-400 font-medium">Applied on</span>
                                         <span className="text-xs font-semibold text-slate-600 active:text-slate-800">
-                                            {new Date(app.createdAt).toLocaleDateString()}
+                                            {format(new Date(app.createdAt), 'dd/MM/yyyy')}
                                         </span>
                                     </div>
                                     <div className="transform scale-90 origin-bottom-right pointer-events-auto">
@@ -193,7 +195,7 @@ export default function AdminApplicationList({ applications }: { applications: A
                                 }`}
                         >
                             {/* Avatar & Info */}
-                            <div className="flex items-center gap-4 min-w-[250px]">
+                            <div className="flex items-center gap-4 w-full sm:w-auto sm:min-w-[250px]">
                                 <Dialog>
                                     <DialogTrigger asChild>
                                         <div className="h-12 w-12 rounded-xl overflow-hidden cursor-pointer shadow-sm border border-slate-100 group-hover:scale-105 transition-all shrink-0">
@@ -225,42 +227,43 @@ export default function AdminApplicationList({ applications }: { applications: A
                                     </DialogContent>
                                 </Dialog>
 
-                                <div>
+                                <div className="min-w-0 flex-1">
                                     <Link href={`/admin/dashboard/job-recruitment/applications/${app.id}`} className="block">
-                                        <h3 className="text-base font-bold text-slate-800 group-hover:text-[#00ADE7] transition-colors mb-0.5">
+                                        <h3 className="text-base font-bold text-slate-800 group-hover:text-[#00ADE7] transition-colors mb-0.5 truncate">
                                             {app.fullName}
                                         </h3>
                                     </Link>
                                     <div className="text-xs text-slate-500 flex items-center gap-1.5">
-                                        <Mail className="h-3 w-3" />
+                                        <Mail className="h-3 w-3 shrink-0" />
                                         <span className="truncate max-w-[150px]">{app.email}</span>
                                     </div>
                                 </div>
                             </div>
 
                             {/* Job Info */}
-                            <div className="flex-1 min-w-[200px]">
+                            <div className="flex-1 w-full sm:w-auto sm:min-w-[200px]">
                                 <Link href={`/admin/dashboard/job-recruitment/applications/${app.id}`} className="block">
                                     <div className="flex items-center gap-2 mb-1">
-                                        <Briefcase className="w-3.5 h-3.5 text-slate-400" />
-                                        <span className="text-sm font-medium text-slate-700 hover:text-[#00ADE7] transition-colors">
+                                        <Briefcase className="w-3.5 h-3.5 text-slate-400 shrink-0" />
+                                        <span className="text-sm font-medium text-slate-700 hover:text-[#00ADE7] transition-colors truncate">
                                             {app.job.title}
                                         </span>
                                     </div>
                                     <div className="flex items-center gap-1.5 text-xs text-slate-400">
-                                        <Calendar className="w-3 h-3" />
-                                        Applied: {new Date(app.createdAt).toLocaleDateString()}
+                                        <Calendar className="w-3 h-3 shrink-0" />
+                                        Applied: {format(new Date(app.createdAt), 'dd/MM/yyyy')}
                                     </div>
                                 </Link>
                             </div>
 
-                            {/* Status */}
-                            <div className="min-w-[140px] flex justify-center">
-                                <StatusSelector id={app.id} currentStatus={app.status} />
-                            </div>
+                            <div className="flex items-center justify-between w-full sm:w-auto gap-4">
+                                {/* Status */}
+                                <div className="min-w-[140px] flex justify-center">
+                                    <StatusSelector id={app.id} currentStatus={app.status} />
+                                </div>
 
-                            {/* Actions */}
-                            <div className="flex items-center gap-2 justify-end min-w-[100px]">
+                                {/* Actions */}
+                                <div className="flex items-center gap-2 justify-end min-w-[80px]">
                                 <Link href={`/admin/dashboard/job-recruitment/applications/${app.id}`}>
                                     <div className="h-9 w-9 rounded-full bg-slate-50 border border-slate-100 flex items-center justify-center text-slate-400 hover:bg-[#00ADE7] hover:border-[#00ADE7] hover:text-white transition-all shadow-sm">
                                         <Eye className="h-4 w-4" />
@@ -269,7 +272,8 @@ export default function AdminApplicationList({ applications }: { applications: A
                                 <DeleteApplicationButton id={app.id} />
                             </div>
                         </div>
-                    ))}
+                    </div>
+                ))}
                 </div>
             )}
         </div>
