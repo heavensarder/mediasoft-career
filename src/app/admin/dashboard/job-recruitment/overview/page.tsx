@@ -200,12 +200,14 @@ export default async function OverviewPage() {
                         }
                       })()}
                     </span>
-                    <div className={`px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider shadow-sm
-                                    ${app.status === 'New' ? 'bg-blue-100 text-blue-700' :
-                        app.status === 'Shortlisted' ? 'bg-emerald-100 text-emerald-700' :
-                          'bg-slate-200 text-slate-600'
-                      }
-                                `}>
+                    <div className={`px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider shadow-sm border ${
+                      app.status === 'New' ? 'bg-blue-100 text-blue-700 border-blue-200' :
+                      app.status === 'Shortlisted' ? 'bg-green-100 text-green-700 border-green-200' :
+                      app.status === 'Rejected' ? 'bg-red-100 text-red-700 border-red-200' :
+                      app.status === 'Selected' ? 'bg-purple-100 text-purple-700 border-purple-200' :
+                      app.status === 'Interview' ? 'bg-orange-100 text-orange-700 border-orange-200' :
+                      'bg-slate-100 text-slate-700 border-slate-200'
+                    }`}>
                       {app.status}
                     </div>
                   </div>
