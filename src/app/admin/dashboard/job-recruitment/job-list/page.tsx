@@ -18,7 +18,10 @@ async function getJobs() {
                 select: { applications: true }
             }
         },
-        orderBy: { createdAt: 'desc' }
+        orderBy: [
+            { status: 'asc' }, // 'Active' comes before 'Closed', 'Draft', 'Inactive'
+            { createdAt: 'desc' }
+        ]
     });
     return jobs;
 }

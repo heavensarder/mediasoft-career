@@ -12,7 +12,8 @@ import {
   Download,
   LogOut,
   ChevronDown,
-  Globe
+  Globe,
+  Terminal
 } from 'lucide-react';
 import { handleSignOut } from '@/lib/auth-actions';
 import { getNewApplicationCount } from '@/lib/application-actions';
@@ -40,6 +41,13 @@ const menuItems = [
       { name: 'Image Slider', href: '/admin/dashboard/white-label/image-slider', icon: LayoutDashboard }, // Using LayoutDashboard for visuals
       { name: 'SEO Manager', href: '/admin/dashboard/seo-manager', icon: Globe },
     ]
+  },
+  {
+      title: 'Developer',
+      icon: Terminal,
+      submenu: [
+          { name: 'API Zone', href: '/admin/dashboard/developer-zone', icon: Terminal }
+      ]
   }
 ];
 
@@ -134,7 +142,7 @@ export default function Sidebar({ newApplicationCount = 0, logoUrl }: SidebarPro
                           <subItem.icon className={clsx("h-4 w-4", isActive ? "text-primary" : "text-muted-foreground group-hover:text-foreground")} />
                           <span>{subItem.name}</span>
                         </div>
-                        {subItem.showCount && appCount > 0 && (
+                        {(subItem as any).showCount && appCount > 0 && (
                           <span className={clsx(
                             "flex h-5 min-w-[1.25rem] items-center justify-center rounded-full text-[10px] font-bold px-1",
                             isActive ? "bg-primary text-primary-foreground" : "bg-primary/10 text-primary"
