@@ -91,33 +91,33 @@ export default function DeveloperZonePage() {
                     </CardDescription>
                 </CardHeader>
                 <CardContent className="bg-indigo-50/30 pt-6">
-                    <div className="flex flex-col sm:flex-row items-end gap-4">
-                         <div className="grid w-full gap-2">
-                            <Label htmlFor="apiKey" className="font-semibold text-slate-700">API Secret Key</Label>
-                            <div className="relative">
+                    <div className="flex flex-col gap-2">
+                        <Label htmlFor="apiKey" className="font-semibold text-slate-700">API Secret Key</Label>
+                        <div className="flex items-center gap-3">
+                            <div className="relative flex-1">
                                 <Input 
                                     id="apiKey" 
                                     value={apiKey} 
                                     onChange={(e) => setApiKey(e.target.value)}
                                     placeholder="Enter your secret key..."
-                                    className="font-mono bg-white border-slate-300 pr-10"
+                                    className="font-mono bg-white border-slate-300 pr-10 h-11"
                                     type="text"
                                 />
-                                <div className="absolute right-3 top-2.5 text-slate-400">
-                                    <Shield className="h-4 w-4" />
+                                <div className="absolute right-3 top-3 text-slate-400">
+                                    <Shield className="h-5 w-5" />
                                 </div>
                             </div>
-                            <p className="text-xs text-slate-500">
-                                Warning: Changing this key will invalidate all existing integrations.
-                            </p>
+                            <Button 
+                                onClick={handleUpdateKey} 
+                                disabled={isSaving || isLoading}
+                                className="bg-indigo-600 hover:bg-indigo-700 text-white min-w-[120px] h-11"
+                            >
+                                {isSaving ? <RefreshCw className="h-4 w-4 animate-spin" /> : "Save Key"}
+                            </Button>
                         </div>
-                        <Button 
-                            onClick={handleUpdateKey} 
-                            disabled={isSaving || isLoading}
-                            className="bg-indigo-600 hover:bg-indigo-700 text-white min-w-[100px]"
-                        >
-                            {isSaving ? <RefreshCw className="h-4 w-4 animate-spin" /> : "Save Key"}
-                        </Button>
+                        <p className="text-xs text-slate-500">
+                            Warning: Changing this key will invalidate all existing integrations.
+                        </p>
                     </div>
                 </CardContent>
             </Card>
