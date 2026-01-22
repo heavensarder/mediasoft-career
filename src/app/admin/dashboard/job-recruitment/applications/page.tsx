@@ -7,6 +7,7 @@ import { getApplications } from '@/lib/application-actions';
 import PaginationControls from '@/components/ui/pagination-controls';
 import DownloadDataButton from '@/components/admin/DownloadDataButton';
 import AdminApplicationList from '@/components/admin/AdminApplicationList';
+import AutoRefresh from '@/components/admin/AutoRefresh';
 
 async function getJobs() {
     return await prisma.job.findMany({
@@ -42,6 +43,7 @@ export default async function ApplicationsPage({
 
     return (
         <div className="space-y-8 pb-10">
+            <AutoRefresh interval={5000} />
             <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8">
                 <div>
                     <h1 className="text-3xl font-bold tracking-tight text-foreground flex items-center gap-3">

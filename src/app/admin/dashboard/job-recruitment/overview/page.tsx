@@ -3,6 +3,7 @@ import { prisma } from '@/lib/prisma';
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import Link from "next/link";
 import { ApplicationTrendChart, DepartmentDistributionChart, MetricSparkline } from '@/components/admin/DashboardCharts';
+import AutoRefresh from '@/components/admin/AutoRefresh';
 
 async function getOverviewData() {
   const [
@@ -64,6 +65,7 @@ export default async function OverviewPage() {
 
   return (
     <div className="premium-bg min-h-screen text-slate-800 p-4 sm:p-8 -m-4 sm:-m-6 md:-m-12">
+      <AutoRefresh interval={5000} /> 
       {/* Header */}
       <div className="flex items-center justify-between mb-10">
         <div>

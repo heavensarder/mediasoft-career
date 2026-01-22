@@ -145,10 +145,12 @@ export default async function JobDetailsPage({ params }: { params: Promise<{ slu
                   <Briefcase className="w-4 h-4 text-slate-400" />
                   {job.jobType?.name}
                 </span>
-                <span className="flex items-center gap-2">
-                  <Clock className="w-4 h-4 text-slate-400" />
-                  {isExpired ? 'Expired' : `${daysLeft} days left to apply`}
-                </span>
+                {job.expiryDate && (
+                  <span className="flex items-center gap-2">
+                    <Clock className="w-4 h-4 text-slate-400" />
+                    {isExpired ? 'Expired' : `${daysLeft} days left to apply`}
+                  </span>
+                )}
               </div>
             </div>
 
