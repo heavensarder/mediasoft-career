@@ -84,15 +84,15 @@ export default async function OverviewPage() {
 
       {/* metric Cards Row */}
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4 mb-8">
-        
+
         {/* Total Apps */}
         <div className="relative overflow-hidden rounded-2xl p-6 bg-gradient-to-br from-blue-600 to-blue-500 shadow-xl shadow-blue-200 transition-transform hover:-translate-y-1">
           <div className="relative z-10 text-white">
             <div className="flex items-center justify-between mb-4">
-               <div className="p-3 bg-white/10 rounded-xl backdrop-blur-sm shadow-inner">
-                  <Users className="h-6 w-6 text-white" />
-               </div>
-               <span className="text-xs font-bold uppercase tracking-wider bg-white/20 px-3 py-1 rounded-full text-white shadow-sm border border-white/10">Total</span>
+              <div className="p-3 bg-white/10 rounded-xl backdrop-blur-sm shadow-inner">
+                <Users className="h-6 w-6 text-white" />
+              </div>
+              <span className="text-xs font-bold uppercase tracking-wider bg-white/20 px-3 py-1 rounded-full text-white shadow-sm border border-white/10">Total</span>
             </div>
             <h3 className="text-5xl font-black tracking-tight mb-1 drop-shadow-sm">{totalApps}</h3>
             <p className="text-blue-50 font-bold text-lg tracking-wide opacity-90">Applications</p>
@@ -105,10 +105,10 @@ export default async function OverviewPage() {
         <div className="relative overflow-hidden rounded-2xl p-6 bg-gradient-to-br from-emerald-600 to-emerald-500 shadow-xl shadow-emerald-200 transition-transform hover:-translate-y-1">
           <div className="relative z-10 text-white">
             <div className="flex items-center justify-between mb-4">
-               <div className="p-3 bg-white/10 rounded-xl backdrop-blur-sm shadow-inner">
-                  <Briefcase className="h-6 w-6 text-white" />
-               </div>
-               <span className="text-xs font-bold uppercase tracking-wider bg-white/20 px-3 py-1 rounded-full text-white shadow-sm border border-white/10">Active</span>
+              <div className="p-3 bg-white/10 rounded-xl backdrop-blur-sm shadow-inner">
+                <Briefcase className="h-6 w-6 text-white" />
+              </div>
+              <span className="text-xs font-bold uppercase tracking-wider bg-white/20 px-3 py-1 rounded-full text-white shadow-sm border border-white/10">Active</span>
             </div>
             <h3 className="text-5xl font-black tracking-tight mb-1 drop-shadow-sm">{activeJobs}</h3>
             <p className="text-emerald-50 font-bold text-lg tracking-wide opacity-90">Positions Open</p>
@@ -121,10 +121,10 @@ export default async function OverviewPage() {
         <div className="relative overflow-hidden rounded-2xl p-6 bg-gradient-to-br from-violet-600 to-violet-500 shadow-xl shadow-violet-200 transition-transform hover:-translate-y-1">
           <div className="relative z-10 text-white">
             <div className="flex items-center justify-between mb-4">
-               <div className="p-3 bg-white/10 rounded-xl backdrop-blur-sm shadow-inner">
-                  <UserCheck className="h-6 w-6 text-white" />
-               </div>
-               <span className="text-xs font-bold uppercase tracking-wider bg-white/20 px-3 py-1 rounded-full text-white shadow-sm border border-white/10">Qualified</span>
+              <div className="p-3 bg-white/10 rounded-xl backdrop-blur-sm shadow-inner">
+                <UserCheck className="h-6 w-6 text-white" />
+              </div>
+              <span className="text-xs font-bold uppercase tracking-wider bg-white/20 px-3 py-1 rounded-full text-white shadow-sm border border-white/10">Qualified</span>
             </div>
             <h3 className="text-5xl font-black tracking-tight mb-1 drop-shadow-sm">{shortlistedApps}</h3>
             <p className="text-violet-50 font-bold text-lg tracking-wide opacity-90">Candidates</p>
@@ -137,10 +137,10 @@ export default async function OverviewPage() {
         <div className="relative overflow-hidden rounded-2xl p-6 bg-gradient-to-br from-rose-600 to-rose-500 shadow-xl shadow-rose-200 transition-transform hover:-translate-y-1">
           <div className="relative z-10 text-white">
             <div className="flex items-center justify-between mb-4">
-               <div className="p-3 bg-white/10 rounded-xl backdrop-blur-sm shadow-inner">
-                  <UserX className="h-6 w-6 text-white" />
-               </div>
-               <span className="text-xs font-bold uppercase tracking-wider bg-white/20 px-3 py-1 rounded-full text-white shadow-sm border border-white/10">Archived</span>
+              <div className="p-3 bg-white/10 rounded-xl backdrop-blur-sm shadow-inner">
+                <UserX className="h-6 w-6 text-white" />
+              </div>
+              <span className="text-xs font-bold uppercase tracking-wider bg-white/20 px-3 py-1 rounded-full text-white shadow-sm border border-white/10">Archived</span>
             </div>
             <h3 className="text-5xl font-black tracking-tight mb-1 drop-shadow-sm">{rejectedApps}</h3>
             <p className="text-rose-50 font-bold text-lg tracking-wide opacity-90">Rejected</p>
@@ -185,7 +185,20 @@ export default async function OverviewPage() {
                   <div className="flex items-center gap-4">
                     <span className="text-xs text-slate-400 hidden sm:flex items-center gap-1 font-semibold">
                       <Calendar className="h-3 w-3" />
-                      {new Date(app.createdAt).toLocaleDateString()}
+                      {(() => {
+                        const date = new Date(app.createdAt);
+                        const today = new Date();
+                        const yesterday = new Date(today);
+                        yesterday.setDate(yesterday.getDate() - 1);
+
+                        if (date.toDateString() === today.toDateString()) {
+                          return "Today";
+                        } else if (date.toDateString() === yesterday.toDateString()) {
+                          return "Yesterday";
+                        } else {
+                          return date.toLocaleDateString();
+                        }
+                      })()}
                     </span>
                     <div className={`px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider shadow-sm
                                     ${app.status === 'New' ? 'bg-blue-100 text-blue-700' :

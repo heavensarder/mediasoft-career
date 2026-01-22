@@ -35,8 +35,8 @@ const FileUploadInput = ({ field, commonProps }: { field: FormField, commonProps
         <div className="relative group">
             <div className={cn(
                 "flex items-center justify-between p-4 border-2 border-dashed rounded-xl transition-all cursor-pointer",
-                fileName 
-                    ? "border-[#00ADE7] bg-[#00ADE7]/5" 
+                fileName
+                    ? "border-[#00ADE7] bg-[#00ADE7]/5"
                     : "border-slate-200 bg-slate-50/50 hover:bg-white hover:border-[#00ADE7]/50 hover:shadow-sm"
             )}>
                 <div className="flex items-center gap-4">
@@ -47,10 +47,10 @@ const FileUploadInput = ({ field, commonProps }: { field: FormField, commonProps
                         <UploadCloud className="w-6 h-6" />
                     </div>
                     <div className="flex flex-col">
-                         <span className={cn("text-sm font-semibold", fileName ? "text-[#00ADE7]" : "text-slate-700")}>
+                        <span className={cn("text-sm font-semibold", fileName ? "text-[#00ADE7]" : "text-slate-700")}>
                             {fileName || `Click to upload ${field.label}`}
-                         </span>
-                         {!fileName && <span className="text-xs text-slate-500 mt-0.5">PDF, DOC, DOCX up to 10MB</span>}
+                        </span>
+                        {!fileName && <span className="text-xs text-slate-500 mt-0.5">PDF, DOC, DOCX up to 10MB</span>}
                     </div>
                 </div>
                 {fileName && (
@@ -59,9 +59,9 @@ const FileUploadInput = ({ field, commonProps }: { field: FormField, commonProps
                     </span>
                 )}
             </div>
-            <Input 
+            <Input
                 {...commonProps}
-                type="file" 
+                type="file"
                 className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
                 onChange={handleFileChange}
                 accept=".pdf,.doc,.docx,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document"
@@ -197,7 +197,17 @@ export default function ApplicationForm({ jobId, jobTitle, fields }: { jobId: nu
                     return <FileUploadInput field={field} commonProps={commonProps} />;
                 }
             default: // text, email, number, date
-                return <Input {...commonProps} type={field.type === 'phone' ? 'tel' : field.type} />;
+                let inputType = field.type;
+
+                // System Override for Social Links to enforce URL validation
+                const urlFields = ['facebook', 'portfolio', 'github', 'linkedin', 'website', 'twitter'];
+                if (urlFields.includes(field.name.toLowerCase())) {
+                    inputType = 'url';
+                } else if (field.type === 'phone') {
+                    inputType = 'tel';
+                }
+
+                return <Input {...commonProps} type={inputType} />;
         }
     };
 
