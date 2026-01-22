@@ -21,6 +21,7 @@ import {
     Eye,
     Users
 } from 'lucide-react';
+import { format } from 'date-fns';
 import JobActions from '@/components/admin/JobActions';
 import JobStatusToggle from '@/components/admin/JobStatusToggle';
 
@@ -150,12 +151,12 @@ export default function AdminJobList({ jobs }: { jobs: Job[] }) {
                                 <div className="pt-4 border-t border-slate-100 flex items-center justify-between text-xs text-slate-500 font-medium">
                                     <span className="flex items-center gap-1.5">
                                         <Clock className="h-3.5 w-3.5" />
-                                        {new Date(job.createdAt).toLocaleDateString()}
+                                        {format(new Date(job.createdAt), 'dd/MM/yyyy')}
                                     </span>
                                     {job.expiryDate && (
                                         <span className={`flex items-center gap-1.5 ${new Date(job.expiryDate) < new Date() ? 'text-red-500' : ''}`}>
                                             <Calendar className="h-3.5 w-3.5" />
-                                            {new Date(job.expiryDate).toLocaleDateString()}
+                                            {format(new Date(job.expiryDate), 'dd/MM/yyyy')}
                                         </span>
                                     )}
                                 </div>
@@ -215,11 +216,11 @@ export default function AdminJobList({ jobs }: { jobs: Job[] }) {
                             <div className="flex items-center gap-6 min-w-[200px] justify-between sm:justify-end w-full sm:w-auto">
                                 <div className="text-right hidden xl:block">
                                     <div className="text-xs text-slate-500 mb-1">
-                                        Posted: <span className="font-medium text-slate-700">{new Date(job.createdAt).toLocaleDateString()}</span>
+                                        Posted: <span className="font-medium text-slate-700">{format(new Date(job.createdAt), 'dd/MM/yyyy')}</span>
                                     </div>
                                     {job.expiryDate && (
                                         <div className={`text-xs ${new Date(job.expiryDate) < new Date() ? 'text-red-500 font-bold' : 'text-slate-500'}`}>
-                                            Exp: <span className="font-medium">{new Date(job.expiryDate).toLocaleDateString()}</span>
+                                            Exp: <span className="font-medium">{format(new Date(job.expiryDate), 'dd/MM/yyyy')}</span>
                                         </div>
                                     )}
                                 </div>
