@@ -198,10 +198,10 @@ export default function AdminApplicationList({ applications }: { applications: A
                             <div className="flex items-center gap-4 w-full sm:w-auto sm:min-w-[250px]">
                                 <Dialog>
                                     <DialogTrigger asChild>
-                                        <div className="h-12 w-12 rounded-xl overflow-hidden cursor-pointer shadow-sm border border-slate-100 group-hover:scale-105 transition-all shrink-0">
-                                            <Avatar className="w-full h-full">
-                                                <AvatarImage src={app.photo || undefined} alt={app.fullName} className="object-cover" />
-                                                <AvatarFallback className="bg-gradient-to-br from-blue-50 to-indigo-50 text-slate-400 font-bold">
+                                        <div className="h-12 w-12 rounded-lg overflow-hidden cursor-pointer shadow-sm border border-slate-100 group-hover:scale-105 transition-all shrink-0">
+                                            <Avatar className="w-full h-full rounded-none">
+                                                <AvatarImage src={app.photo || undefined} alt={app.fullName} className="object-cover object-top w-full h-full" />
+                                                <AvatarFallback className="bg-gradient-to-br from-blue-50 to-indigo-50 text-slate-400 font-bold rounded-none w-full h-full">
                                                     {app.fullName.substring(0, 2).toUpperCase()}
                                                 </AvatarFallback>
                                             </Avatar>
@@ -264,16 +264,16 @@ export default function AdminApplicationList({ applications }: { applications: A
 
                                 {/* Actions */}
                                 <div className="flex items-center gap-2 justify-end min-w-[80px]">
-                                <Link href={`/admin/dashboard/job-recruitment/applications/${app.id}`}>
-                                    <div className="h-9 w-9 rounded-full bg-slate-50 border border-slate-100 flex items-center justify-center text-slate-400 hover:bg-[#00ADE7] hover:border-[#00ADE7] hover:text-white transition-all shadow-sm">
-                                        <Eye className="h-4 w-4" />
-                                    </div>
-                                </Link>
-                                <DeleteApplicationButton id={app.id} />
+                                    <Link href={`/admin/dashboard/job-recruitment/applications/${app.id}`}>
+                                        <div className="h-9 w-9 rounded-full bg-slate-50 border border-slate-100 flex items-center justify-center text-slate-400 hover:bg-[#00ADE7] hover:border-[#00ADE7] hover:text-white transition-all shadow-sm">
+                                            <Eye className="h-4 w-4" />
+                                        </div>
+                                    </Link>
+                                    <DeleteApplicationButton id={app.id} />
+                                </div>
                             </div>
                         </div>
-                    </div>
-                ))}
+                    ))}
                 </div>
             )}
         </div>

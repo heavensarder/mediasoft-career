@@ -114,6 +114,8 @@ export async function seedSystemFields() {
         { label: "Achievements", name: "achievements", type: "textarea", required: false, isSystem: true, order: 15 },
         { label: "Your Message", name: "message", type: "textarea", required: false, isSystem: true, order: 16 },
         { label: "Linkedin Profile", name: "linkedin", type: "url", required: false, isSystem: true, order: 17 },
+        { label: "Facebook Profile", name: "facebook", type: "url", required: false, isSystem: true, order: 18 },
+        { label: "Website/GitHub", name: "portfolio", type: "url", required: false, isSystem: true, order: 19 },
     ];
 
     for (const field of systemFields) {
