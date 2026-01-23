@@ -4,6 +4,7 @@ import { prisma } from '@/lib/prisma';
 import { revalidatePath } from 'next/cache';
 import { writeFile, mkdir } from 'fs/promises';
 import { join } from 'path';
+import { logActivity } from './activity-log-actions';
 
 // --- System Settings (White Label) ---
 
@@ -38,7 +39,7 @@ export async function updateBrandingSettings(prevState: any, formData: FormData)
     const faviconFile = formData.get('favicon') as File;
     const redirectUrl = formData.get('logo_redirect_url') as string;
     const siteBaseUrl = formData.get('site_base_url') as string;
-    
+
     let logoPath = null;
     let faviconPath = null;
 
@@ -48,7 +49,7 @@ export async function updateBrandingSettings(prevState: any, formData: FormData)
         return { error: "Logo must be an image." };
       }
       logoPath = await saveFile(file, 'branding');
-      
+
       await prisma.systemSettings.upsert({
         where: { key: 'company_logo' },
         update: { value: logoPath },
@@ -58,17 +59,17 @@ export async function updateBrandingSettings(prevState: any, formData: FormData)
 
     // Handle Favicon Upload
     if (faviconFile && faviconFile.size > 0) {
-       // Favicon can be .ico, .png, .svg etc.
-       faviconPath = await saveFile(faviconFile, 'branding');
-       await prisma.systemSettings.upsert({
-         where: { key: 'site_favicon' },
-         update: { value: faviconPath },
-         create: { key: 'site_favicon', value: faviconPath }
-       });
+      // Favicon can be .ico, .png, .svg etc.
+      faviconPath = await saveFile(faviconFile, 'branding');
+      await prisma.systemSettings.upsert({
+        where: { key: 'site_favicon' },
+        update: { value: faviconPath },
+        create: { key: 'site_favicon', value: faviconPath }
+      });
     }
 
     // Handle Redirect URL
-    if (redirectUrl !== null) { 
+    if (redirectUrl !== null) {
       await prisma.systemSettings.upsert({
         where: { key: 'logo_redirect_url' },
         update: { value: redirectUrl },
@@ -89,6 +90,14 @@ export async function updateBrandingSettings(prevState: any, formData: FormData)
     revalidatePath('/auth/login');
     revalidatePath('/'); // Refresh home for favicon/SEO
 
+    // Log activity
+    await logActivity({
+      action: 'UPDATE_BRANDING',
+      entityType: 'Settings',
+      entityName: 'Branding Settings',
+      details: JSON.stringify({ logoUpdated: !!logoPath, faviconUpdated: !!faviconPath }),
+    });
+
     return { success: true, logoPath, faviconPath, redirectUrl, siteBaseUrl };
 
   } catch (error) {
@@ -103,9 +112,9 @@ export async function getBrandingSettings() {
     const redirectUrl = await prisma.systemSettings.findUnique({ where: { key: 'logo_redirect_url' } });
     const faviconSrc = await prisma.systemSettings.findUnique({ where: { key: 'site_favicon' } });
     const baseSiteUrl = await prisma.systemSettings.findUnique({ where: { key: 'site_base_url' } });
-    
+
     const defaultBaseUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
-    
+
     return {
       logoPath: logoSrc?.value || null,
       logoRedirectUrl: redirectUrl?.value || '',

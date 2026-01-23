@@ -40,6 +40,26 @@ async function getUser(email: string): Promise<UserWithRole | null> {
   }
 }
 
+// Log login activity (called after successful login)
+async function logLoginActivity(user: UserWithRole) {
+  try {
+    await prisma.activityLog.create({
+      data: {
+        userId: user.id,
+        userType: user.role,
+        userName: user.name,
+        userEmail: user.email,
+        action: 'LOGIN',
+        entityType: 'Auth',
+        entityName: 'User Login',
+      },
+    });
+  } catch (error) {
+    console.error('Failed to log login activity:', error);
+    // Don't throw - login should still succeed even if logging fails
+  }
+}
+
 export const { auth, signIn, signOut } = NextAuth({
   ...authConfig,
   providers: [
@@ -57,6 +77,9 @@ export const { auth, signIn, signOut } = NextAuth({
 
           const passwordsMatch = await bcrypt.compare(password, user.password);
           if (passwordsMatch) {
+            // Log login activity
+            await logLoginActivity(user);
+
             return {
               id: user.id.toString(),
               name: user.name,

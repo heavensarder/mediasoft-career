@@ -11,7 +11,11 @@ export interface PageSeoData {
   description?: string;
   keywords?: string;
   ogImage?: string;
+  ogTitle?: string;
+  ogDescription?: string;
   jsonLd?: string;
+  canonicalUrl?: string;
+  robots?: string;
 }
 
 export async function getPageSeo(page: string) {
@@ -50,10 +54,10 @@ export async function initDefaultSeo() {
   ];
 
   for (const def of defaults) {
-      await prisma.pageSeo.upsert({
-          where: { page: def.page },
-          update: {},
-          create: def
-      });
+    await prisma.pageSeo.upsert({
+      where: { page: def.page },
+      update: {},
+      create: def
+    });
   }
 }

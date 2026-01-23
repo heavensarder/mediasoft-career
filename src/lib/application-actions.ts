@@ -9,6 +9,7 @@ import { join } from 'path';
 import nodemailer from "nodemailer";
 import { google } from "googleapis";
 import { deleteFile } from './file-actions';
+import { logActivity } from './activity-log-actions';
 
 const REDIRECT_URI = "https://developers.google.com/oauthplayground";
 
@@ -147,31 +148,31 @@ export async function submitApplication(prevState: any, formData: FormData) {
             });
 
             if (mailConfig && mailConfig.isAutoReplyEnabled && mailConfig.autoReplyTemplate && dbData.email && mailConfig.senderEmail && mailConfig.clientId) {
-                 const { senderEmail, clientId, clientSecret, refreshToken } = mailConfig;
-                 
-                 // Dynamic Replacement
-                 let body = mailConfig.autoReplyTemplate.body || "";
-                 body = body.replace(/{{fullName}}/g, dbData.fullName || "Applicant")
-                            .replace(/{{email}}/g, dbData.email)
-                            .replace(/{{date}}/g, new Date().toLocaleDateString());
-                            
-                 // Ideally fetch job title
-                 const jobTitle = "this position"; // Placeholder or fetch job
-                 body = body.replace(/{{jobTitle}}/g, jobTitle);
+                const { senderEmail, clientId, clientSecret, refreshToken } = mailConfig;
+
+                // Dynamic Replacement
+                let body = mailConfig.autoReplyTemplate.body || "";
+                body = body.replace(/{{fullName}}/g, dbData.fullName || "Applicant")
+                    .replace(/{{email}}/g, dbData.email)
+                    .replace(/{{date}}/g, new Date().toLocaleDateString());
+
+                // Ideally fetch job title
+                const jobTitle = "this position"; // Placeholder or fetch job
+                body = body.replace(/{{jobTitle}}/g, jobTitle);
 
 
-                 const oAuth2Client = new google.auth.OAuth2(
+                const oAuth2Client = new google.auth.OAuth2(
                     clientId,
                     clientSecret,
                     REDIRECT_URI
-                 );
-        
-                 oAuth2Client.setCredentials({ refresh_token: refreshToken });
-                 
-                 // Refresh token logic handled by googleapis getAccessToken
-                 const accessToken = await oAuth2Client.getAccessToken();
-        
-                 const transport = nodemailer.createTransport({
+                );
+
+                oAuth2Client.setCredentials({ refresh_token: refreshToken });
+
+                // Refresh token logic handled by googleapis getAccessToken
+                const accessToken = await oAuth2Client.getAccessToken();
+
+                const transport = nodemailer.createTransport({
                     service: 'gmail',
                     auth: {
                         type: 'OAuth2',
@@ -181,18 +182,18 @@ export async function submitApplication(prevState: any, formData: FormData) {
                         refreshToken: refreshToken,
                         accessToken: accessToken.token || '',
                     },
-                 });
-        
-                 await transport.sendMail({
+                });
+
+                await transport.sendMail({
                     from: `MediaSoft <${senderEmail}>`,
                     to: dbData.email,
                     subject: mailConfig.autoReplyTemplate.subject || "Application Received",
                     html: body,
-                 });
+                });
             }
         } catch (mailError) {
-             console.error("Auto-reply failed:", mailError);
-             // We don't block the submission success for email failure
+            console.error("Auto-reply failed:", mailError);
+            // We don't block the submission success for email failure
         }
 
         revalidatePath('/admin/dashboard/job-recruitment/applications');
@@ -206,9 +207,19 @@ export async function submitApplication(prevState: any, formData: FormData) {
 
 export async function updateApplicationStatus(applicationId: number, status: string) {
     try {
-        await prisma.application.update({
+        const application = await prisma.application.update({
             where: { id: applicationId },
             data: { status },
+            include: { job: { select: { title: true } } }
+        });
+
+        // Log activity
+        await logActivity({
+            action: 'UPDATE_APPLICATION_STATUS',
+            entityType: 'Application',
+            entityId: applicationId,
+            entityName: `${application.fullName} - ${application.job?.title || 'Unknown Job'}`,
+            details: JSON.stringify({ newStatus: status }),
         });
 
         revalidatePath('/admin/dashboard/job-recruitment/applications');
@@ -254,10 +265,10 @@ export async function deleteApplication(applicationId: number) {
             if (application.dynamicData) {
                 const dynamicData = application.dynamicData as Record<string, any>;
                 for (const key in dynamicData) {
-                     const value = dynamicData[key];
-                     if (typeof value === 'string' && value.startsWith('/uploads/')) {
-                         await deleteFile(value);
-                     }
+                    const value = dynamicData[key];
+                    if (typeof value === 'string' && value.startsWith('/uploads/')) {
+                        await deleteFile(value);
+                    }
                 }
             }
         }
@@ -266,7 +277,7 @@ export async function deleteApplication(applicationId: number) {
         await prisma.application.delete({
             where: { id: applicationId }
         });
-        
+
         revalidatePath('/admin/dashboard/job-recruitment/applications');
         revalidatePath('/admin/dashboard/job-recruitment/overview');
         return { success: true };

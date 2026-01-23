@@ -16,7 +16,8 @@ import {
   Terminal,
   ClipboardList,
   UserCheck,
-  Mail
+  Mail,
+  History
 } from 'lucide-react';
 import { handleSignOut } from '@/lib/auth-actions';
 import { getNewApplicationCount } from '@/lib/application-actions';
@@ -60,7 +61,8 @@ const menuItems = [
     icon: Terminal,
     adminOnly: true,
     submenu: [
-      { name: 'API Zone', href: '/admin/dashboard/developer-zone', icon: Terminal }
+      { name: 'API Zone', href: '/admin/dashboard/developer-zone', icon: Terminal, exact: true },
+      { name: 'History', href: '/admin/dashboard/developer-zone/history', icon: History }
     ]
   }
 ];

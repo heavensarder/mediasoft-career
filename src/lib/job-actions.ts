@@ -4,6 +4,7 @@ import { z } from 'zod';
 import { PrismaClient } from '@prisma/client';
 import { revalidatePath } from 'next/cache';
 import slugify from 'slugify';
+import { logActivity } from './activity-log-actions';
 
 const prisma = new PrismaClient();
 
@@ -69,6 +70,13 @@ export async function createJobAction(data: any) {
                 slug,
             } as any,
         });
+
+        // Log activity
+        await logActivity({
+            action: 'CREATE_JOB',
+            entityType: 'Job',
+            entityName: title,
+        });
     } catch (error) {
         console.error("Database Error:", error);
         return { error: "Database Error: Failed to create job." };
@@ -81,9 +89,20 @@ export async function createJobAction(data: any) {
 
 export async function deleteJobAction(id: number) {
     try {
+        const job = await prisma.job.findUnique({ where: { id }, select: { title: true } });
+
         await prisma.job.delete({
             where: { id },
         });
+
+        // Log activity
+        await logActivity({
+            action: 'DELETE_JOB',
+            entityType: 'Job',
+            entityId: id,
+            entityName: job?.title || `Job #${id}`,
+        });
+
         revalidatePath('/admin/dashboard/job-recruitment/job-list');
         return { success: true };
     } catch (error) {
@@ -124,6 +143,14 @@ export async function updateJobAction(id: number, data: any) {
                 slug,
             } as any,
         });
+
+        // Log activity
+        await logActivity({
+            action: 'UPDATE_JOB',
+            entityType: 'Job',
+            entityId: id,
+            entityName: title,
+        });
     } catch (error) {
         console.error("Database Error:", error);
         return { error: "Database Error: Failed to update job." };
@@ -163,9 +190,18 @@ export async function toggleJobStatusAction(id: number, status: 'Active' | 'Inac
             data.expiryDate = expiryDate ? new Date(expiryDate) : null;
         }
 
-        await prisma.job.update({
+        const job = await prisma.job.update({
             where: { id },
             data
+        });
+
+        // Log activity
+        await logActivity({
+            action: 'TOGGLE_JOB_STATUS',
+            entityType: 'Job',
+            entityId: id,
+            entityName: job.title,
+            details: JSON.stringify({ newStatus: status }),
         });
 
         revalidatePath('/admin/dashboard/job-recruitment/job-list');

@@ -3,6 +3,7 @@
 import { prisma } from '@/lib/prisma';
 import { revalidatePath } from 'next/cache';
 import { getSessionUser, canMarkSection } from './interview-auth';
+import { logActivity } from './activity-log-actions';
 
 /**
  * Get all applicants who have gone through interview process
@@ -83,9 +84,19 @@ export async function getInterviewApplicant(applicationId: number) {
  */
 export async function setInterviewDate(applicationId: number, date: Date | null) {
     try {
-        await prisma.application.update({
+        const application = await prisma.application.update({
             where: { id: applicationId },
             data: { interviewDate: date },
+            include: { job: { select: { title: true } } }
+        });
+
+        // Log activity
+        await logActivity({
+            action: 'SCHEDULE_INTERVIEW',
+            entityType: 'Application',
+            entityId: applicationId,
+            entityName: `${application.fullName} - ${application.job?.title || 'Unknown Job'}`,
+            details: date ? `Scheduled for ${date.toISOString()}` : 'Date cleared',
         });
 
         revalidatePath('/admin/dashboard/interview-panel');
@@ -169,6 +180,21 @@ export async function saveMarking(
                 ...allowedScores,
                 markedById: user.role === 'interview_admin' ? parseInt(user.id) : null,
             },
+        });
+
+        // Get application info for logging
+        const application = await prisma.application.findUnique({
+            where: { id: applicationId },
+            include: { job: { select: { title: true } } }
+        });
+
+        // Log activity
+        await logActivity({
+            action: 'MARK_INTERVIEW',
+            entityType: 'Application',
+            entityId: applicationId,
+            entityName: `${application?.fullName || 'Unknown'} - ${application?.job?.title || 'Unknown Job'}`,
+            details: JSON.stringify(allowedScores),
         });
 
         revalidatePath('/admin/dashboard/interview-panel');

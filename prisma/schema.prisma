@@ -202,19 +202,42 @@ model MailTemplate {
 }
 
 model PageSeo {
-  id          Int      @id @default(autoincrement())
-  page        String   @unique // e.g., "home", "job_details", "global"
-  title       String?  // Title template
-  description String?  @db.Text
-  keywords    String?  @db.Text
-  ogImage     String?
-  jsonLd      String?  @db.Text // Custom Structured Data
-  updatedAt   DateTime @updatedAt
+  id           Int      @id @default(autoincrement())
+  page         String   @unique // e.g., "home", "job_details", "global"
+  title        String?  // Title template
+  description  String?  @db.Text
+  keywords     String?  @db.Text
+  ogImage      String?
+  ogTitle      String?  // Social media title override
+  ogDescription String? @db.Text // Social media description override
+  jsonLd       String?  @db.Text // Custom Structured Data (JSON-LD)
+  canonicalUrl String?  // Canonical URL for duplicate content
+  robots       String?  // e.g., "index,follow", "noindex,nofollow"
+  updatedAt    DateTime @updatedAt
 }
 
 model SliderImage {
   id        Int      @id @default(autoincrement())
   url       String
   createdAt DateTime @default(now())
+}
+
+model ActivityLog {
+  id          Int      @id @default(autoincrement())
+  userId      Int?
+  userType    String   // 'admin' | 'interview_admin'
+  userName    String
+  userEmail   String
+  action      String   // e.g., 'CREATE_JOB', 'UPDATE_APPLICATION', 'CHANGE_SETTINGS'
+  entityType  String?  // e.g., 'Job', 'Application', 'Settings'
+  entityId    Int?     // ID of the affected entity
+  entityName  String?  // Human-readable name (e.g., job title)
+  details     String?  @db.Text  // JSON or additional details
+  ipAddress   String?
+  createdAt   DateTime @default(now())
+
+  @@index([createdAt])
+  @@index([action])
+  @@index([userEmail])
 }
 

@@ -4,6 +4,7 @@ import { prisma } from '@/lib/prisma';
 import { revalidatePath } from 'next/cache';
 import bcrypt from 'bcryptjs';
 import { isMainAdmin } from './interview-auth';
+import { logActivity } from './activity-log-actions';
 
 /**
  * Get all interview admins
@@ -73,6 +74,14 @@ export async function createInterviewer(data: {
             },
         });
 
+        // Log activity
+        await logActivity({
+            action: 'CREATE_INTERVIEWER',
+            entityType: 'Interviewer',
+            entityId: interviewer.id,
+            entityName: data.name,
+        });
+
         revalidatePath('/admin/dashboard/interview-panel/interviewers');
         return { success: true, id: interviewer.id };
     } catch (error) {
@@ -126,7 +135,7 @@ export async function updateInterviewer(
         }
 
         // Update interviewer
-        await prisma.interviewAdmin.update({
+        const interviewer = await prisma.interviewAdmin.update({
             where: { id },
             data: updateData,
         });
@@ -142,6 +151,14 @@ export async function updateInterviewer(
                 },
             });
         }
+
+        // Log activity
+        await logActivity({
+            action: 'UPDATE_INTERVIEWER',
+            entityType: 'Interviewer',
+            entityId: id,
+            entityName: interviewer.name,
+        });
 
         revalidatePath('/admin/dashboard/interview-panel/interviewers');
         return { success: true };
@@ -161,8 +178,22 @@ export async function deleteInterviewer(id: number) {
     }
 
     try {
+        // Get interviewer info before deleting
+        const interviewer = await prisma.interviewAdmin.findUnique({
+            where: { id },
+            select: { name: true, email: true }
+        });
+
         await prisma.interviewAdmin.delete({
             where: { id },
+        });
+
+        // Log activity
+        await logActivity({
+            action: 'DELETE_INTERVIEWER',
+            entityType: 'Interviewer',
+            entityId: id,
+            entityName: interviewer?.name || `Interviewer #${id}`,
         });
 
         revalidatePath('/admin/dashboard/interview-panel/interviewers');
