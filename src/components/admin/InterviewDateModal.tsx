@@ -143,8 +143,8 @@ export default function InterviewDateModal({
                         />
                     </div>
 
-                    {/* Assign Interviewer (Super Admin only) */}
-                    {isAdmin && interviewers.length > 0 && (
+                    {/* Assign Interviewer (Super Admin only, only when changing status to Interview) */}
+                    {isAdmin && interviewers.length > 0 && mode === 'status_change' && (
                         <div className="space-y-2">
                             <Label htmlFor="interviewer" className="flex items-center gap-2">
                                 <UserPlus className="h-4 w-4" />

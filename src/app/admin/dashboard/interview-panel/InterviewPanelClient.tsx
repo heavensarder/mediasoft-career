@@ -64,6 +64,7 @@ interface Application {
     interviewDate: Date | null;
     status: string;
     totalScore: number;
+    maxPossibleScore?: number;
     assignedInterviewerIds: number[];
     assignedInterviewers?: Array<{ interviewer: { id: number; name: string } }>;
     job: {
@@ -74,6 +75,9 @@ interface Application {
         writtenExam: number | null;
         technicalViva: number | null;
         projectRating: number | null;
+        excludeWritten?: boolean;
+        excludeTechnical?: boolean;
+        excludeProject?: boolean;
     } | null;
 }
 
@@ -322,18 +326,30 @@ export default function InterviewPanelClient({
                     </span>
                 )}
             </TableCell>
-            <TableCell className={`text-center ${getWrittenExamColor(app.interviewMarking?.writtenExam ?? null)}`}>
-                {app.interviewMarking?.writtenExam ?? <span className="text-muted-foreground">—</span>}
+            <TableCell className={`text-center ${app.interviewMarking?.excludeWritten ? 'opacity-50' : getWrittenExamColor(app.interviewMarking?.writtenExam ?? null)}`}>
+                {app.interviewMarking?.excludeWritten ? (
+                    <span className="line-through text-slate-400" title="Excluded from total">N/A</span>
+                ) : (
+                    app.interviewMarking?.writtenExam ?? <span className="text-muted-foreground">—</span>
+                )}
             </TableCell>
-            <TableCell className={`text-center ${getTechnicalVivaColor(app.interviewMarking?.technicalViva ?? null)}`}>
-                {app.interviewMarking?.technicalViva ?? <span className="text-muted-foreground">—</span>}
+            <TableCell className={`text-center ${app.interviewMarking?.excludeTechnical ? 'opacity-50' : getTechnicalVivaColor(app.interviewMarking?.technicalViva ?? null)}`}>
+                {app.interviewMarking?.excludeTechnical ? (
+                    <span className="line-through text-slate-400" title="Excluded from total">N/A</span>
+                ) : (
+                    app.interviewMarking?.technicalViva ?? <span className="text-muted-foreground">—</span>
+                )}
             </TableCell>
             <TableCell className="text-center">
-                {renderStars(app.interviewMarking?.projectRating ?? null)}
+                {app.interviewMarking?.excludeProject ? (
+                    <span className="line-through text-slate-400" title="Excluded from total">N/A</span>
+                ) : (
+                    renderStars(app.interviewMarking?.projectRating ?? null)
+                )}
             </TableCell>
             <TableCell className="text-center">
                 <Badge variant="secondary" className="font-bold">
-                    {app.totalScore}<span className="text-muted-foreground font-normal">/50</span>
+                    {app.totalScore}<span className="text-muted-foreground font-normal">/{app.maxPossibleScore || 50}</span>
                 </Badge>
             </TableCell>
             <TableCell>
@@ -430,25 +446,37 @@ export default function InterviewPanelClient({
                     </Badge>
                 </div>
                 <Badge variant="secondary" className="font-bold text-lg px-3 py-1">
-                    {app.totalScore}<span className="text-muted-foreground font-normal text-sm">/50</span>
+                    {app.totalScore}<span className="text-muted-foreground font-normal text-sm">/{app.maxPossibleScore || 50}</span>
                 </Badge>
             </div>
 
             <div className="grid grid-cols-3 gap-2 text-center mb-4 p-3 bg-white/50 rounded-lg">
-                <div>
+                <div className={app.interviewMarking?.excludeWritten ? 'opacity-50' : ''}>
                     <p className="text-xs text-slate-500">Written</p>
-                    <p className={`font-bold ${getWrittenExamColor(app.interviewMarking?.writtenExam ?? null)}`}>
-                        {app.interviewMarking?.writtenExam ?? '—'}
-                    </p>
+                    {app.interviewMarking?.excludeWritten ? (
+                        <p className="font-bold line-through text-slate-400" title="Excluded">N/A</p>
+                    ) : (
+                        <p className={`font-bold ${getWrittenExamColor(app.interviewMarking?.writtenExam ?? null)}`}>
+                            {app.interviewMarking?.writtenExam ?? '—'}
+                        </p>
+                    )}
                 </div>
-                <div>
+                <div className={app.interviewMarking?.excludeTechnical ? 'opacity-50' : ''}>
                     <p className="text-xs text-slate-500">Technical</p>
-                    <p className={`font-bold ${getTechnicalVivaColor(app.interviewMarking?.technicalViva ?? null)}`}>{app.interviewMarking?.technicalViva ?? '—'}</p>
+                    {app.interviewMarking?.excludeTechnical ? (
+                        <p className="font-bold line-through text-slate-400" title="Excluded">N/A</p>
+                    ) : (
+                        <p className={`font-bold ${getTechnicalVivaColor(app.interviewMarking?.technicalViva ?? null)}`}>{app.interviewMarking?.technicalViva ?? '—'}</p>
+                    )}
                 </div>
-                <div>
+                <div className={app.interviewMarking?.excludeProject ? 'opacity-50' : ''}>
                     <p className="text-xs text-slate-500">Project</p>
                     <div className="flex justify-center">
-                        {renderStars(app.interviewMarking?.projectRating ?? null)}
+                        {app.interviewMarking?.excludeProject ? (
+                            <span className="font-bold line-through text-slate-400" title="Excluded">N/A</span>
+                        ) : (
+                            renderStars(app.interviewMarking?.projectRating ?? null)
+                        )}
                     </div>
                 </div>
             </div>

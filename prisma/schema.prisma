@@ -130,6 +130,10 @@ model InterviewMarking {
   writtenExam     Int?             // 0-30
   technicalViva   Int?             // 0-10
   projectRating   Int?             // 1-5 stars
+  // Exclusion flags - if true, section is excluded from total score
+  excludeWritten  Boolean          @default(false)
+  excludeTechnical Boolean         @default(false)
+  excludeProject  Boolean          @default(false)
   markedById      Int?
   markedBy        InterviewAdmin?  @relation(fields: [markedById], references: [id], onDelete: SetNull)
   createdAt       DateTime         @default(now())

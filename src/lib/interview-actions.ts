@@ -33,15 +33,23 @@ export async function getInterviewApplicants() {
             ],
         });
 
-        // Calculate total scores and sort
+        // Calculate total scores and sort (respecting exclusion flags)
         const withScores = applications.map(app => {
             const marking = app.interviewMarking;
             const totalScore = marking
-                ? (marking.writtenExam || 0) + (marking.technicalViva || 0) + ((marking.projectRating || 0) * 2)
+                ? (!marking.excludeWritten ? (marking.writtenExam || 0) : 0) +
+                (!marking.excludeTechnical ? (marking.technicalViva || 0) : 0) +
+                (!marking.excludeProject ? ((marking.projectRating || 0) * 2) : 0)
                 : 0;
+            // Calculate max possible score based on exclusions
+            const maxPossibleScore = marking
+                ? (!marking.excludeWritten ? 30 : 0) +
+                (!marking.excludeTechnical ? 10 : 0) +
+                (!marking.excludeProject ? 10 : 0)
+                : 50;
             // Map assigned interviewers to simple array of IDs
             const assignedInterviewerIds = app.assignedInterviewers.map(a => a.interviewerId);
-            return { ...app, totalScore, assignedInterviewerIds };
+            return { ...app, totalScore, maxPossibleScore, assignedInterviewerIds };
         });
 
         // Sort by total score descending
@@ -138,7 +146,10 @@ export async function saveMarking(
     scores: {
         writtenExam?: number;
         technicalViva?: number;
-        projectRating?: number
+        projectRating?: number;
+        excludeWritten?: boolean;
+        excludeTechnical?: boolean;
+        excludeProject?: boolean;
     }
 ) {
     try {
@@ -162,6 +173,19 @@ export async function saveMarking(
         }
         if (scores.projectRating !== undefined && canMarkProject) {
             allowedScores.projectRating = scores.projectRating;
+        }
+
+        // Only super admin can set exclusion flags
+        if (user.role === 'admin') {
+            if (scores.excludeWritten !== undefined) {
+                allowedScores.excludeWritten = scores.excludeWritten;
+            }
+            if (scores.excludeTechnical !== undefined) {
+                allowedScores.excludeTechnical = scores.excludeTechnical;
+            }
+            if (scores.excludeProject !== undefined) {
+                allowedScores.excludeProject = scores.excludeProject;
+            }
         }
 
         if (Object.keys(allowedScores).length === 0) {
