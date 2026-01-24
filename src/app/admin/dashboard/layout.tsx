@@ -33,8 +33,23 @@ export default async function Layout({ children }: { children: React.ReactNode }
           userEmail={userEmail}
         />
       </div>
-      <div className="flex-grow p-6 md:overflow-y-auto md:p-12 print:p-0 print:overflow-visible">
-        {children}
+      <div className="flex-grow flex flex-col md:overflow-y-auto print:overflow-visible">
+        <div className="flex-grow p-6 md:p-12 print:p-0">
+          {children}
+        </div>
+        {/* Copyright Footer */}
+        <footer className="p-4 text-center text-xs text-muted-foreground border-t border-slate-100 bg-white/50 print:hidden">
+          © {new Date().getFullYear()}{' '}
+          <a
+            href="https://www.mediasoftbd.com"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-primary hover:underline font-medium"
+          >
+            Mediasoft Data Systems Limited
+          </a>
+          . All rights reserved.
+        </footer>
       </div>
     </div>
   );
