@@ -43,7 +43,8 @@ import {
     LayoutList,
     ChevronDown,
     StopCircle,
-    UserPlus
+    UserPlus,
+    User
 } from 'lucide-react';
 import { updateInterviewStatus, setInterviewDate, endInterviews, assignInterviewers } from '@/lib/interview-actions';
 import { toast } from 'sonner';
@@ -742,45 +743,109 @@ export default function InterviewPanelClient({
 
             {/* Assign Interviewers Dialog */}
             <AlertDialog open={assignModalOpen} onOpenChange={setAssignModalOpen}>
-                <AlertDialogContent>
-                    <AlertDialogHeader>
-                        <AlertDialogTitle className="flex items-center gap-2">
-                            <UserPlus className="h-5 w-5 text-violet-500" />
+                <AlertDialogContent className="max-w-md p-0 overflow-hidden border-0 shadow-2xl">
+                    {/* Header with gradient */}
+                    <div className="bg-gradient-to-r from-violet-500 to-purple-600 px-6 py-5 text-white">
+                        <AlertDialogTitle className="flex items-center gap-3 text-lg font-bold text-white">
+                            <div className="p-2 bg-white/20 rounded-xl backdrop-blur-sm">
+                                <UserPlus className="h-5 w-5" />
+                            </div>
                             Assign to Interviewers
                         </AlertDialogTitle>
-                        <AlertDialogDescription>
-                            Assign <strong>{assigningApp?.fullName}</strong> to one or more interviewers.
+                        <AlertDialogDescription className="text-violet-100 mt-2 text-sm">
+                            Assign <span className="font-semibold text-white">{assigningApp?.fullName}</span> to one or more interviewers.
                             Selected interviewers will be able to see and mark this applicant.
                         </AlertDialogDescription>
-                    </AlertDialogHeader>
-                    <div className="py-4 space-y-2 max-h-60 overflow-y-auto">
-                        {interviewers.map(i => (
-                            <label key={i.id} className="flex items-center gap-3 p-2 rounded-lg hover:bg-violet-50 cursor-pointer">
-                                <input
-                                    type="checkbox"
-                                    checked={selectedInterviewers.includes(i.id.toString())}
-                                    onChange={(e) => {
-                                        if (e.target.checked) {
-                                            setSelectedInterviewers([...selectedInterviewers, i.id.toString()]);
-                                        } else {
-                                            setSelectedInterviewers(selectedInterviewers.filter(id => id !== i.id.toString()));
-                                        }
-                                    }}
-                                    className="h-4 w-4 rounded border-gray-300 text-violet-600 focus:ring-violet-500"
-                                />
-                                <span className="text-sm font-medium">{i.name}</span>
-                            </label>
-                        ))}
                     </div>
-                    <AlertDialogFooter>
-                        <AlertDialogCancel onClick={() => {
-                            setAssigningApp(null);
-                            setSelectedInterviewers([]);
-                        }}>Cancel</AlertDialogCancel>
+
+                    {/* Interviewer List */}
+                    <div className="p-4">
+                        <div className="space-y-2 max-h-64 overflow-y-auto pr-1">
+                            {interviewers.map((i, index) => {
+                                const isSelected = selectedInterviewers.includes(i.id.toString());
+                                return (
+                                    <label
+                                        key={i.id}
+                                        className={`flex items-center gap-4 p-3 rounded-xl cursor-pointer transition-all duration-200 border-2 ${isSelected
+                                            ? 'bg-violet-50 border-violet-300 shadow-sm'
+                                            : 'bg-slate-50/50 border-transparent hover:bg-violet-50/50 hover:border-violet-200'
+                                            }`}
+                                        style={{ animationDelay: `${index * 50}ms` }}
+                                    >
+                                        {/* Custom Checkbox */}
+                                        <div className={`relative flex-shrink-0 w-6 h-6 rounded-lg border-2 transition-all duration-200 flex items-center justify-center ${isSelected
+                                            ? 'bg-gradient-to-br from-violet-500 to-purple-600 border-transparent'
+                                            : 'border-slate-300 bg-white'
+                                            }`}>
+                                            {isSelected && (
+                                                <svg className="w-4 h-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
+                                                    <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                                                </svg>
+                                            )}
+                                            <input
+                                                type="checkbox"
+                                                checked={isSelected}
+                                                onChange={(e) => {
+                                                    if (e.target.checked) {
+                                                        setSelectedInterviewers([...selectedInterviewers, i.id.toString()]);
+                                                    } else {
+                                                        setSelectedInterviewers(selectedInterviewers.filter(id => id !== i.id.toString()));
+                                                    }
+                                                }}
+                                                className="absolute inset-0 opacity-0 cursor-pointer"
+                                            />
+                                        </div>
+
+                                        {/* Avatar Icon */}
+                                        <div className={`w-10 h-10 rounded-full flex items-center justify-center text-white transition-all ${isSelected
+                                            ? 'bg-gradient-to-br from-violet-500 to-purple-600 shadow-md'
+                                            : 'bg-gradient-to-br from-slate-400 to-slate-500'
+                                            }`}>
+                                            <User className="w-5 h-5" />
+                                        </div>
+
+                                        {/* Name */}
+                                        <span className={`font-medium transition-colors ${isSelected ? 'text-violet-900' : 'text-slate-700'
+                                            }`}>
+                                            {i.name}
+                                        </span>
+
+                                        {/* Selected indicator */}
+                                        {isSelected && (
+                                            <span className="ml-auto text-xs font-semibold text-violet-600 bg-violet-100 px-2 py-1 rounded-full">
+                                                Selected
+                                            </span>
+                                        )}
+                                    </label>
+                                );
+                            })}
+
+                            {interviewers.length === 0 && (
+                                <div className="text-center py-8 text-slate-500">
+                                    <UserPlus className="h-10 w-10 mx-auto mb-2 text-slate-300" />
+                                    <p className="text-sm">No interviewers available</p>
+                                </div>
+                            )}
+                        </div>
+                    </div>
+
+                    {/* Footer */}
+                    <AlertDialogFooter className="px-6 py-4 bg-slate-50 border-t border-slate-100">
+                        <AlertDialogCancel
+                            onClick={() => {
+                                setAssigningApp(null);
+                                setSelectedInterviewers([]);
+                            }}
+                            className="border-slate-200 hover:bg-slate-100"
+                        >
+                            Cancel
+                        </AlertDialogCancel>
                         <AlertDialogAction
                             onClick={handleAssignInterviewers}
-                            className="bg-violet-600 text-white hover:bg-violet-700"
+                            disabled={selectedInterviewers.length === 0}
+                            className="bg-gradient-to-r from-violet-500 to-purple-600 text-white hover:from-violet-600 hover:to-purple-700 shadow-md hover:shadow-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed"
                         >
+                            <UserPlus className="h-4 w-4 mr-2" />
                             Assign ({selectedInterviewers.length})
                         </AlertDialogAction>
                     </AlertDialogFooter>
