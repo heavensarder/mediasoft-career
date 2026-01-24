@@ -2,11 +2,11 @@ import { notFound } from 'next/navigation';
 import { prisma } from "@/lib/prisma";
 import { Badge } from '@/components/ui/badge';
 import { MapPin, Briefcase, Building2, Calendar, Clock, ChevronLeft } from 'lucide-react';
-import ApplicationForm from "@/components/ApplicationForm";
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import ShareButton from '@/components/ShareButton';
 import ViewTracker from '@/components/ViewTracker';
+import JobApplyWizard from '@/components/JobApplyWizard';
 
 async function getJob(slug: string) {
   // Try to find by slug first
@@ -44,7 +44,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   const { slug } = await params;
   const decodedSlug = decodeURIComponent(slug);
   const job = await getJob(decodedSlug);
-  
+
   if (!job) return {};
 
   const [seo, branding] = await Promise.all([
@@ -54,7 +54,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
 
   const titleTemplate = seo?.title || "{{job_title}} at MediaSoft";
   const title = titleTemplate.replace('{{job_title}}', job.title);
-  
+
   const descriptionTemplate = seo?.description || `Apply for the ${job.title} position at MediaSoft.`;
   const description = descriptionTemplate.replace('{{job_title}}', job.title);
 
@@ -63,9 +63,9 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
     description: description,
     keywords: seo?.keywords?.replace('{{job_title}}', job.title).split(',').map((k: string) => k.trim()) || [],
     openGraph: {
-       title: title,
-       description: description,
-       images: seo?.ogImage ? [{ url: seo.ogImage }] : (branding.logoPath ? [{ url: branding.logoPath }] : []),
+      title: title,
+      description: description,
+      images: seo?.ogImage ? [{ url: seo.ogImage }] : (branding.logoPath ? [{ url: branding.logoPath }] : []),
     }
   };
 }
@@ -93,6 +93,17 @@ export default async function JobDetailsPage({ params }: { params: Promise<{ slu
   const isExpired = daysLeft < 0;
   const isInactive = job.status !== 'Active';
   const showApplication = !isExpired && !isInactive;
+
+  // Prepare job data for client component
+  const jobData = {
+    id: job.id,
+    title: job.title,
+    description: job.description,
+    department: job.department,
+    jobType: job.jobType,
+    location: job.location,
+    expiryDate: job.expiryDate,
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50/30 font-sans selection:bg-primary/20">
@@ -159,71 +170,49 @@ export default async function JobDetailsPage({ params }: { params: Promise<{ slu
         </div>
       </div>
 
+      {/* Multi-Step Wizard */}
       <div className="container mx-auto px-3 md:px-4 py-8">
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
-
-          {/* Left Column: Job Description */}
-          <div className="lg:col-span-7 space-y-8 min-w-0">
-            <div className="premium-glass-card border-none p-4 md:p-10">
-              <h2 className="text-2xl font-bold mb-6 text-slate-900 border-b border-slate-100 pb-4 flex items-center gap-2">
-                Job Description
-              </h2>
-              <div
-                className="prose prose-slate max-w-full
-                        prose-headings:text-slate-900 prose-headings:font-bold 
-                        prose-a:text-primary prose-a:no-underline hover:prose-a:underline
-                        prose-strong:text-slate-800
-                        prose-li:marker:text-primary
-                        prose-p:leading-loose
-                        break-words hyphens-none"
-                dangerouslySetInnerHTML={{ __html: job.description }}
-              />
+        {!showApplication ? (
+          <div className="max-w-2xl mx-auto">
+            <div className="bg-slate-100 rounded-3xl p-8 text-center border border-slate-200">
+              <h3 className="text-xl font-bold text-slate-700 mb-2">
+                {isInactive ? 'Applications Expired' : 'Applications Expired'}
+              </h3>
+              <p className="text-slate-500">
+                {isInactive
+                  ? 'This position is currently not accepting new applications.'
+                  : 'The deadline for this position has passed. Please check our other openings.'}
+              </p>
+              <Button asChild className="mt-4 premium-btn">
+                <Link href="/">Browse Other Jobs</Link>
+              </Button>
             </div>
           </div>
+        ) : (
+          <JobApplyWizard
+            job={jobData}
+            fields={fields}
+            daysLeft={daysLeft}
+            isExpired={isExpired}
+          />
+        )}
 
-          {/* Right Column: Application Form */}
-          <div className="lg:col-span-5 relative">
-            <div className="sticky top-8 space-y-6">
-              {!showApplication ? (
-                <div className="bg-slate-100 rounded-3xl p-8 text-center border border-slate-200">
-                  <h3 className="text-xl font-bold text-slate-700 mb-2">
-                    {isInactive ? 'Applications Expired' : 'Applications Expired'}
-                  </h3>
-                  <p className="text-slate-500">
-                    {isInactive
-                      ? 'This position is currently not accepting new applications.'
-                      : 'The deadline for this position has passed. Please check our other openings.'}
-                  </p>
-                  <Button asChild className="mt-4 premium-btn">
-                    <Link href="/">Browse Other Jobs</Link>
-                  </Button>
-                </div>
-              ) : (
-                <div className="animate-in fade-in slide-in-from-bottom-6 duration-700">
-                  <ApplicationForm jobId={job.id} jobTitle={job.title} fields={fields} />
-                </div>
-              )}
-
-              <div className="text-center text-xs text-muted-foreground mt-4">
-  Having trouble applying?{" "}
-  <a
-    href="https://mediasoftbd.com/contact-us-mediasoft-data-systems-for-best-point-of-sale-software/"
-    target="_blank"
-    rel="noopener noreferrer"
-    className="text-primary hover:text-blue-700 transition-colors"
-  >
-    Contact Support
-  </a>
-</div>
-
-            </div>
-          </div>
-
+        <div className="text-center text-xs text-muted-foreground mt-8">
+          Having trouble applying?{" "}
+          <a
+            href="https://mediasoftbd.com/contact-us-mediasoft-data-systems-for-best-point-of-sale-software/"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-primary hover:text-blue-700 transition-colors"
+          >
+            Contact Support
+          </a>
         </div>
       </div>
 
-      
+
       <ViewTracker jobId={job.id} />
     </div>
   );
 }
+
