@@ -1,7 +1,8 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { submitApplication } from '@/lib/application-actions';
+import { getSystemSetting } from '@/lib/settings-actions';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
@@ -101,6 +102,15 @@ export default function ApplicationForm({ jobId, jobTitle, fields }: { jobId: nu
     const [errorMsg, setErrorMsg] = useState('');
     const [photoPreview, setPhotoPreview] = useState<string | null>(null);
     const [photoError, setPhotoError] = useState<string | null>(null);
+    const [logoUrl, setLogoUrl] = useState<string | null>(null);
+
+    useEffect(() => {
+        const fetchLogo = async () => {
+            const logo = await getSystemSetting('company_logo');
+            setLogoUrl(logo);
+        }
+        fetchLogo();
+    }, []);
 
     const handlePhotoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
@@ -172,6 +182,11 @@ export default function ApplicationForm({ jobId, jobTitle, fields }: { jobId: nu
         return (
             <Card className="bg-green-50 border-green-200">
                 <CardContent className="pt-6 text-center">
+                    {logoUrl && (
+                        <div className="flex justify-center mb-6">
+                            <img src={logoUrl} alt="Company Logo" className="h-16 w-auto object-contain" />
+                        </div>
+                    )}
                     <h3 className="text-2xl font-bold text-green-700 mb-2">Application Submitted!</h3>
                     <p className="text-green-600">
                         Thank you for applying to <strong>{jobTitle}</strong>.
