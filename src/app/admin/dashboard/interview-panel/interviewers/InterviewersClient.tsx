@@ -169,7 +169,7 @@ export default function InterviewersClient({ interviewers }: InterviewersClientP
             <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6 mb-8">
                 <div>
                     <h1 className="text-4xl font-extrabold tracking-tight gradient-text drop-shadow-sm flex items-center gap-3">
-                        Interviewer Management
+                        Interviewer Board
                         <Badge variant="secondary" className="text-lg px-3 py-0.5 rounded-full bg-white/50 text-slate-600">
                             {interviewers.length}
                         </Badge>
