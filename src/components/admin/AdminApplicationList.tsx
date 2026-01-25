@@ -26,6 +26,32 @@ interface Application {
     job: {
         title: string;
     };
+    interviewMarking?: {
+        writtenExam: number | null;
+        technicalViva: number | null;
+        projectRating: number | null;
+        excludeWritten: boolean;
+        excludeTechnical: boolean;
+        excludeProject: boolean;
+    } | null;
+}
+
+function calculateTotalScore(marking: NonNullable<Application['interviewMarking']>) {
+    let total = 0;
+    if (!marking.excludeWritten && marking.writtenExam) total += marking.writtenExam;
+    if (!marking.excludeTechnical && marking.technicalViva) total += marking.technicalViva;
+    if (!marking.excludeProject && marking.projectRating) total += marking.projectRating;
+    return total;
+}
+
+function calculateMaxScore(marking: NonNullable<Application['interviewMarking']>) {
+    let max = 0;
+    // Assuming standard max scores: Written=30, Technical=10, Project=5 (star rating)
+    // Adjust these constants if they differ in your system configuration
+    if (!marking.excludeWritten) max += 30;
+    if (!marking.excludeTechnical) max += 10;
+    if (!marking.excludeProject) max += 5;
+    return max;
 }
 
 export default function AdminApplicationList({ applications }: { applications: Application[] }) {
@@ -165,6 +191,19 @@ export default function AdminApplicationList({ applications }: { applications: A
                                         </div>
                                         <span className="truncate">{app.email}</span>
                                     </div>
+                                    
+                                    {/* Interview Status & Score */}
+                                    {app.interviewMarking && (
+                                        <div className="mt-2 flex items-center gap-2 pointer-events-auto">
+                                            <span className="inline-flex items-center rounded-md bg-violet-50 px-2 py-1 text-xs font-medium text-violet-700 ring-1 ring-inset ring-violet-700/10">
+                                                Interviewed
+                                            </span>
+                                            <span className="text-xs font-bold text-slate-700">
+                                                Score: <span className="text-violet-600 font-extrabold text-sm">{calculateTotalScore(app.interviewMarking)}</span>
+                                                <span className="text-slate-400 font-normal"> / {calculateMaxScore(app.interviewMarking)}</span>
+                                            </span>
+                                        </div>
+                                    )}
                                 </div>
 
                                 <div className="flex items-end justify-between mt-2 pt-2 border-t border-slate-50 relative z-20">
@@ -253,6 +292,17 @@ export default function AdminApplicationList({ applications }: { applications: A
                                         <Calendar className="w-3 h-3 shrink-0" />
                                         Applied: {format(new Date(app.createdAt), 'dd/MM/yyyy')}
                                     </div>
+                                    {app.interviewMarking && (
+                                        <div className="flex items-center gap-2 mt-1.5">
+                                            <span className="inline-flex items-center rounded-md bg-violet-50 px-2 py-1 text-[10px] font-medium text-violet-700 ring-1 ring-inset ring-violet-700/10">
+                                                Interviewed
+                                            </span>
+                                            <span className="text-xs font-bold text-slate-700">
+                                                Score: <span className="text-violet-600 font-extrabold text-sm">{calculateTotalScore(app.interviewMarking)}</span>
+                                                <span className="text-slate-400 font-normal"> / {calculateMaxScore(app.interviewMarking)}</span>
+                                            </span>
+                                        </div>
+                                    )}
                                 </Link>
                             </div>
 

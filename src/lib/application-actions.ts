@@ -325,6 +325,7 @@ export async function getApplications(
             where,
             include: {
                 job: true,
+                interviewMarking: true,
             },
             orderBy: { createdAt: 'desc' },
             skip,
